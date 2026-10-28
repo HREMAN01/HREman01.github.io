@@ -7,26 +7,26 @@
 <style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>حاسبة المستحقات — EMAN HR</title>
 <style>
-/* Layout: brand header, tab strip of calculators, each calculator = input sheet (yellow cells) beside a live result statement */
+/* Layout: brand header, tab strip of calculators, each calculator = input sheet (input cells) beside a live result statement */
 :root{
-  --bg:#F5F1E8;--surface:#FFFDF8;--sunk:#EEE7D8;--line:#DCD2BE;--fg:#13262B;--muted:#5A6668;
-  --navy:#0F4C5C;--navy-fg:#FFFFFF;--accent:#0F4C5C;--gold:#A87A1E;
-  --good:#0F4C5C;--good-bg:#DCEBEC;--warn:#7A5512;--warn-bg:#F3E6C8;
-  --input:#FFF6DA;--input-line:#D9B65A;--danger:#A33A2A;
+  --bg:#F3F4F8;--surface:#FFFFFF;--sunk:#E9ECF3;--line:#D5DAE6;--fg:#111C33;--muted:#596379;
+  --navy:#14254A;--navy-fg:#FFFFFF;--accent:#14254A;--gold:#A87A1E;
+  --good:#14254A;--good-bg:#E0E6F3;--warn:#7A5512;--warn-bg:#F3E6C8;
+  --input:#EAF0FB;--input-line:#9DB0D6;--danger:#A33A2A;
   --display:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0D1719;--surface:#132226;--sunk:#0F1C1F;--line:#24383C;--fg:#ECEFEC;--muted:#A3B0AF;
-  --navy:#16596A;--navy-fg:#FFFFFF;--accent:#7FC4CF;--gold:#E2B75C;
-  --good:#CDE9EC;--good-bg:#16424B;--warn:#F6E5BF;--warn-bg:#5A4316;
-  --input:#2A2512;--input-line:#8C7330;--danger:#F0A090;color-scheme:dark}}
+  --bg:#0A1226;--surface:#111C36;--sunk:#0D172E;--line:#24314F;--fg:#ECEFF6;--muted:#A6B0C6;
+  --navy:#1F3A75;--navy-fg:#FFFFFF;--accent:#9FB6E8;--gold:#E2B75C;
+  --good:#D5DEF2;--good-bg:#1D2F5A;--warn:#F6E5BF;--warn-bg:#5A4316;
+  --input:#18284E;--input-line:#3F5791;--danger:#F0A090;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0D1719;--surface:#132226;--sunk:#0F1C1F;--line:#24383C;--fg:#ECEFEC;--muted:#A3B0AF;
-  --navy:#16596A;--navy-fg:#FFFFFF;--accent:#7FC4CF;--gold:#E2B75C;
-  --good:#CDE9EC;--good-bg:#16424B;--warn:#F6E5BF;--warn-bg:#5A4316;
-  --input:#2A2512;--input-line:#8C7330;--danger:#F0A090;color-scheme:dark}
+  --bg:#0A1226;--surface:#111C36;--sunk:#0D172E;--line:#24314F;--fg:#ECEFF6;--muted:#A6B0C6;
+  --navy:#1F3A75;--navy-fg:#FFFFFF;--accent:#9FB6E8;--gold:#E2B75C;
+  --good:#D5DEF2;--good-bg:#1D2F5A;--warn:#F6E5BF;--warn-bg:#5A4316;
+  --input:#18284E;--input-line:#3F5791;--danger:#F0A090;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;direction:rtl}
 .wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px;display:flex;flex-direction:column;gap:20px}
@@ -94,45 +94,43 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
   <button role="tab" data-tab="eos">نهاية الخدمة</button>
   <button role="tab" data-tab="overtime">الإضافي والغياب</button>
 </nav>
-<div class="hint"><span><span class="swatch"></span>عبّي الخانات الصفراء فقط · Fill in the yellow cells only</span><span>الأرقام المعبأة مثال، غيّريها بأرقامك</span></div>
+<div class="hint"><span><span class="swatch"></span>عبّي الخانات الملونة فقط · Fill in the shaded cells only</span><span>النتيجة تتحدث تلقائيًا مع كل رقم تدخله</span></div>
 
 <!-- SETTLEMENT -->
 <section class="calc" data-panel="settlement">
   <form class="sheet" id="f-set">
     <fieldset><legend>الراتب <small>Salary</small></legend>
-      <label>الراتب الأساسي <em>Basic</em><input id="s-basic" type="number" min="0" value="3600"></label>
-      <label>بدل السكن <em>Housing</em><input id="s-house" type="number" min="0" value="1500"></label>
-      <label>بدل المواصلات <em>Transportation</em><input id="s-trans" type="number" min="0" value="900"></label>
-      <label>بدل الطعام <em>Food</em><input id="s-food" type="number" min="0" value="0"></label>
-      <label>بدلات أخرى <em>Other</em><input id="s-other" type="number" min="0" value="0"></label>
+      <label>الراتب الأساسي <em>Basic</em><input id="s-basic" type="number" min="0" placeholder="0"></label>
+      <label>بدل السكن <em>Housing</em><input id="s-house" type="number" min="0" placeholder="0"></label>
+      <label>بدل المواصلات <em>Transportation</em><input id="s-trans" type="number" min="0" placeholder="0"></label>
+      <label>بدل الطعام <em>Food</em><input id="s-food" type="number" min="0" placeholder="0"></label>
+      <label>بدلات أخرى <em>Other</em><input id="s-other" type="number" min="0" placeholder="0"></label>
     </fieldset>
     <fieldset><legend>الخدمة <small>Service</small></legend>
-      <label>تاريخ المباشرة <em>Hiring date</em><input id="s-start" type="date" value="2022-01-02"></label>
-      <label>آخر يوم عمل <em>Last working day</em><input id="s-end" type="date" value="2026-10-30"></label>
+      <label>تاريخ المباشرة <em>Hiring date</em><input id="s-start" type="date"></label>
+      <label>آخر يوم عمل <em>Last working day</em><input id="s-end" type="date"></label>
       <label>نوع العقد <em>Contract type</em>
         <select id="s-ctype"><option value="open">غير محدد المدة</option><option value="fixed">محدد المدة</option></select></label>
       <label>سبب انتهاء العلاقة <em>Reason</em>
         <select id="s-type"></select></label>
       <label>أساس حساب السنة <em>Year basis</em>
         <select id="s-basis"><option value="360">٣٦٠ يوم</option><option value="365">٣٦٥ يوم</option></select></label>
-      <label id="s-notice-wrap" hidden>أيام مهلة الإشعار غير المنفذة <em>Unserved notice days</em><input id="s-notice" type="number" min="0" value="0"></label>
-      <label id="s-rem-wrap" hidden>الأشهر المتبقية من العقد <em>Remaining months</em><input id="s-rem" type="number" min="0" step="0.5" value="0"></label>
+      <label id="s-notice-wrap" hidden>أيام مهلة الإشعار غير المنفذة <em>Unserved notice days</em><input id="s-notice" type="number" min="0" placeholder="0"></label>
+      <label id="s-rem-wrap" hidden>الأشهر المتبقية من العقد <em>Remaining months</em><input id="s-rem" type="number" min="0" step="0.5" placeholder="0"></label>
     </fieldset>
     <fieldset><legend>آخر شهر <small>Final month</small></legend>
-      <label>أيام الحضور غير المصروفة <em>Unpaid days</em><input id="s-days" type="number" min="0" value="30"></label>
+      <label>أيام الحضور غير المصروفة <em>Unpaid days</em><input id="s-days" type="number" min="0" placeholder="0"></label>
       <label>أيام الشهر للقسمة <em>Month days</em><input id="s-mdays" type="number" min="28" max="31" value="30"></label>
-      <label>رصيد الإجازات (يوم) <em>Leave balance</em><input id="s-leave" type="number" min="0" step="0.5" value="10"></label>
-      <label>ساعات إضافية <em>Overtime hours</em><input id="s-ot" type="number" min="0" value="0"></label>
-      <label>أيام الغياب <em>Absence days</em><input id="s-abs" type="number" min="0" value="0"></label>
+      <label>رصيد الإجازات (يوم) <em>Leave balance</em><input id="s-leave" type="number" min="0" step="0.5" placeholder="0"></label>
+      <label>ساعات إضافية <em>Overtime hours</em><input id="s-ot" type="number" min="0" placeholder="0"></label>
+      <label>أيام الغياب <em>Absence days</em><input id="s-abs" type="number" min="0" placeholder="0"></label>
       <label>خصم الغياب على <em>Absence base</em>
         <select id="s-absbase"><option value="basic">الراتب الأساسي</option><option value="total">الأجر الفعلي (الإجمالي)</option></select></label>
     </fieldset>
     <fieldset><legend>خصومات <small>Deductions</small></legend>
-      <label>سلف وقروض <em>Loans</em><input id="s-loan" type="number" min="0" value="500"></label>
-      <label>الجنسية <em>Nationality</em><select id="s-nat"><option value="sa">سعودي</option><option value="non">غير سعودي</option></select></label>
-      <label>تاريخ التسجيل في التأمينات <em>GOSI registration</em><input id="s-reg" type="date" value="2022-01-02"></label>
-      <label>نسبة استقطاع الموظف ٪ <em>Employee GOSI %</em><input id="s-gosi" type="number" min="0" step="0.25" value="9.75"></label>
-      <label>خصومات أخرى <em>Other</em><input id="s-oded" type="number" min="0" value="0"></label>
+      <label>سلف وقروض <em>Loans</em><input id="s-loan" type="number" min="0" placeholder="0"></label>
+      <label>نسبة استقطاع التأمينات <em>GOSI deduction</em><select id="s-cat"><option value="old">٩.٧٥٪ — سعودي مسجل قبل ٤ يوليو ٢٠٢٤</option><option value="new">١٠.٧٥٪ — سعودي مشترك جديد من ٤ يوليو ٢٠٢٤</option><option value="non">٠٪ — غير سعودي</option></select></label>
+      <label>خصومات أخرى <em>Other</em><input id="s-oded" type="number" min="0" placeholder="0"></label>
     </fieldset>
   </form>
   <div class="result" aria-live="polite">
@@ -148,14 +146,11 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
 <section class="calc" data-panel="salary" hidden>
   <form class="sheet" id="f-sal">
     <fieldset><legend>المدخلات <small>Inputs</small></legend>
-      <label>الراتب الإجمالي المطلوب <em>Gross salary</em><input id="p-gross" type="number" min="0" value="6000"></label>
-      <label>الجنسية <em>Nationality</em><select id="p-nat"><option value="sa">سعودي</option><option value="non">غير سعودي</option></select></label>
-      <label>تاريخ التسجيل في التأمينات <em>GOSI registration</em><input id="p-reg" type="date" value="2022-01-02"></label>
+      <label>الراتب الإجمالي المطلوب <em>Gross salary</em><input id="p-gross" type="number" min="0" placeholder="0"></label>
+      <label>نسبة استقطاع التأمينات <em>GOSI category</em><select id="p-cat"><option value="old">٩.٧٥٪ — سعودي مسجل قبل ٤ يوليو ٢٠٢٤</option><option value="new">١٠.٧٥٪ — سعودي مشترك جديد من ٤ يوليو ٢٠٢٤</option><option value="non">٠٪ — غير سعودي</option></select></label>
       <label>بدل السكن ٪ من الأساسي <em>Housing %</em><input id="p-hp" type="number" min="0" step="0.5" value="25"></label>
       <label>بدل المواصلات ٪ من الأساسي <em>Transport %</em><input id="p-tp" type="number" min="0" step="0.5" value="10"></label>
-      <label>بدلات ثابتة أخرى <em>Other fixed</em><input id="p-other" type="number" min="0" value="0"></label>
-      <label>تأمينات الموظف ٪ <em>Employee GOSI %</em><input id="p-ee" type="number" min="0" step="0.25" value="9.75"></label>
-      <label>تأمينات صاحب العمل ٪ <em>Employer GOSI %</em><input id="p-er" type="number" min="0" step="0.25" value="11.75"></label>
+      <label>بدلات ثابتة أخرى <em>Other fixed</em><input id="p-other" type="number" min="0" placeholder="0"></label>
     </fieldset>
     <p class="note">نسب الاستقطاع على الأساسي + السكن بحد أعلى ٤٥,٠٠٠:<br>
     سعودي مسجل قبل ٤ يوليو ٢٠٢٤: الموظف ٩.٧٥٪ (معاشات ٩٪ + ساند ٠.٧٥٪)، صاحب العمل ١١.٧٥٪ (معاشات ٩٪ + ساند ٠.٧٥٪ + أخطار مهنية ٢٪).<br>
@@ -175,14 +170,14 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
 <section class="calc" data-panel="leave" hidden>
   <form class="sheet" id="f-lv">
     <fieldset><legend>المدخلات <small>Inputs</small></legend>
-      <label>الأجر الشهري المعتمد للإجازة <em>Monthly wage</em><input id="l-wage" type="number" min="0" value="6000"></label>
+      <label>الأجر الشهري المعتمد للإجازة <em>Monthly wage</em><input id="l-wage" type="number" min="0" placeholder="0"></label>
       <label>الاستحقاق السنوي (يوم) <em>Days per year</em><select id="l-ent"><option value="21">٢١ يوم (أقل من ٥ سنوات)</option><option value="30">٣٠ يوم (٥ سنوات فأكثر)</option></select></label>
       <label>طريقة الحساب <em>Method</em><select id="l-mode"><option value="current">عندي رصيد لين اليوم</option><option value="period">من تاريخ بداية الاحتساب</option></select></label>
-      <label data-mode="current">الرصيد الحالي (يوم) <em>Balance as of today</em><input id="l-cur" type="number" min="0" step="0.5" value="12"></label>
+      <label data-mode="current">الرصيد الحالي (يوم) <em>Balance as of today</em><input id="l-cur" type="number" min="0" step="0.5" placeholder="0"></label>
       <label data-mode="current">تاريخ الرصيد <em>Balance date</em><input id="l-asof" type="date" value="2026-10-28"></label>
-      <label data-mode="period" hidden>بداية الاحتساب <em>From</em><input id="l-start" type="date" value="2026-01-01"></label>
-      <label>آخر يوم عمل <em>Last working day</em><input id="l-end" type="date" value="2026-12-31"></label>
-      <label data-mode="period" hidden>الأيام المستخدمة <em>Days taken</em><input id="l-used" type="number" min="0" step="0.5" value="5"></label>
+      <label data-mode="period" hidden>بداية الاحتساب <em>From</em><input id="l-start" type="date"></label>
+      <label>آخر يوم عمل <em>Last working day</em><input id="l-end" type="date"></label>
+      <label data-mode="period" hidden>الأيام المستخدمة <em>Days taken</em><input id="l-used" type="number" min="0" step="0.5" placeholder="0"></label>
       <label>أساس حساب السنة <em>Year basis</em><select id="l-basis"><option value="360">٣٦٠ يوم</option><option value="365">٣٦٥ يوم</option></select></label>
     </fieldset>
   </form>
@@ -197,11 +192,11 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
 <section class="calc" data-panel="eos" hidden>
   <form class="sheet" id="f-eos">
     <fieldset><legend>المدخلات <small>Inputs</small></legend>
-      <label>آخر أجر شامل البدلات <em>Last wage</em><input id="e-wage" type="number" min="0" value="6000"></label>
+      <label>آخر أجر شامل البدلات <em>Last wage</em><input id="e-wage" type="number" min="0" placeholder="0"></label>
       <label>نوع العقد <em>Contract type</em><select id="e-ctype"><option value="open">غير محدد المدة</option><option value="fixed">محدد المدة</option></select></label>
       <label>سبب انتهاء العلاقة <em>Reason</em><select id="e-type"></select></label>
-      <label>تاريخ المباشرة <em>Hiring date</em><input id="e-start" type="date" value="2022-01-02"></label>
-      <label>آخر يوم عمل <em>Last working day</em><input id="e-end" type="date" value="2026-10-30"></label>
+      <label>تاريخ المباشرة <em>Hiring date</em><input id="e-start" type="date"></label>
+      <label>آخر يوم عمل <em>Last working day</em><input id="e-end" type="date"></label>
       <label>أساس حساب السنة <em>Year basis</em><select id="e-basis"><option value="360">٣٦٠ يوم</option><option value="365">٣٦٥ يوم</option></select></label>
     </fieldset>
   </form>
@@ -218,11 +213,11 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
 <section class="calc" data-panel="overtime" hidden>
   <form class="sheet" id="f-ot">
     <fieldset><legend>المدخلات <small>Inputs</small></legend>
-      <label>الراتب الأساسي <em>Basic</em><input id="o-basic" type="number" min="0" value="3600"></label>
-      <label>الأجر الفعلي (الإجمالي) <em>Total wage</em><input id="o-total" type="number" min="0" value="6000"></label>
-      <label>عدد الساعات الإضافية <em>Overtime hours</em><input id="o-hours" type="number" min="0" step="0.5" value="10"></label>
+      <label>الراتب الأساسي <em>Basic</em><input id="o-basic" type="number" min="0" placeholder="0"></label>
+      <label>الأجر الفعلي (الإجمالي) <em>Total wage</em><input id="o-total" type="number" min="0" placeholder="0"></label>
+      <label>عدد الساعات الإضافية <em>Overtime hours</em><input id="o-hours" type="number" min="0" step="0.5" placeholder="0"></label>
       <label>ساعات العمل في الشهر <em>Monthly hours</em><input id="o-mh" type="number" min="1" value="240"></label>
-      <label>أيام الغياب <em>Absence days</em><input id="o-abs" type="number" min="0" value="2"></label>
+      <label>أيام الغياب <em>Absence days</em><input id="o-abs" type="number" min="0" placeholder="0"></label>
       <label>أيام الشهر للقسمة <em>Month days</em><input id="o-md" type="number" min="28" max="31" value="30"></label>
       <label>خصم الغياب على <em>Absence base</em><select id="o-base"><option value="basic">الراتب الأساسي</option><option value="total">الأجر الفعلي (الإجمالي)</option></select></label>
     </fieldset>
@@ -344,10 +339,11 @@ function calcSettlement(){
   const abs=absBase/md*n('s-abs');
   const acc=unpaid+leave+ot+eos+c77emp+noticeEmp;
   const insurable=Math.min(basic+house,45000);
-  const gosi=insurable*n('s-gosi')/100/md*Math.min(n('s-days'),md);
+  const sg=GOSI[$('s-cat').value];
+  const gosi=insurable*sg.ee/100/md*Math.min(n('s-days'),md);
   const ded=abs+n('s-loan')+gosi+n('s-oded')+c77wrk+noticeWrk;
   const Y=Math.floor(years),M=Math.floor((years-Y)*12);
-  $('set-chips').innerHTML='<span class="chip">الإجمالي '+num(total)+'</span><span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">المكافأة: '+eosLabel(sr,f)+'</span><span class="chip">'+catName[catOf('s-nat','s-reg')]+' · '+num(n('s-gosi'))+'٪</span>';
+  $('set-chips').innerHTML='<span class="chip">الإجمالي '+num(total)+'</span><span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">المكافأة: '+eosLabel(sr,f)+'</span><span class="chip">'+catName[$('s-cat').value]+' · '+num(sg.ee)+'٪</span>';
   const rows=[
     {sec:'المستحقات'},
     {k:'رواتب مستحقة',s:num(total)+' ÷ '+md+' × '+num(n('s-days'))+' يوم',v:unpaid},
@@ -361,7 +357,7 @@ function calcSettlement(){
   rows.push({sec:'الخصومات'},
     {k:'غياب',s:num(absBase)+' ÷ '+md+' × '+num(n('s-abs'))+' يوم',v:abs,minus:true},
     {k:'سلف وقروض',v:n('s-loan'),minus:true},
-    {k:'تأمينات (حصة الموظف)',s:'('+num(insurable)+' × '+num(n('s-gosi'))+'٪) ÷ '+md+' × '+num(Math.min(n('s-days'),md))+' يوم',v:gosi,minus:true},
+    {k:'تأمينات (حصة الموظف)',s:'('+num(insurable)+' × '+num(sg.ee)+'٪) ÷ '+md+' × '+num(Math.min(n('s-days'),md))+' يوم',v:gosi,minus:true},
     {k:'خصومات أخرى',v:n('s-oded'),minus:true});
   if(c77wrk)rows.push({k:'تعويض المادة ٧٧ لصاحب العمل',s:c77s,v:c77wrk,minus:true});
   if(noticeWrk)rows.push({k:'بدل مهلة الإشعار لصاحب العمل (م ٧٦)',s:num(total)+' ÷ 30 × '+num(nDays)+' يوم',v:noticeWrk,minus:true});
@@ -374,18 +370,17 @@ function calcSalary(){
   const basic=Math.max(gross-other,0)/(1+hp+tp);
   const house=basic*hp,trans=basic*tp;
   const insurable=Math.min(basic+house,45000);
-  const ee=insurable*n('p-ee')/100,er=insurable*n('p-er')/100;
-  const g=GOSI[catOf('p-nat','p-reg')];
-  const matches=Math.abs(g.ee-n('p-ee'))<0.001&&Math.abs(g.er-n('p-er'))<0.001;
+  const g=GOSI[$('p-cat').value];
+  const ee=insurable*g.ee/100,er=insurable*g.er/100;
   const rows=[
     {sec:'مكونات الراتب'},
     {k:'الراتب الأساسي',v:basic},{k:'بدل السكن',s:num(hp*100)+'٪ من الأساسي',v:house},
     {k:'بدل المواصلات',s:num(tp*100)+'٪ من الأساسي',v:trans},{k:'بدلات أخرى',v:other},
     {sec:'التأمينات الاجتماعية'},
-    {k:'فئة التأمينات',raw:catName[catOf('p-nat','p-reg')]},
+    {k:'فئة التأمينات',raw:catName[$('p-cat').value]},
     {k:'الأجر الخاضع',s:'الأساسي + السكن، بحد أعلى 45,000',v:insurable},
-    {k:'استقطاع الموظف',s:num(n('p-ee'))+'٪'+(matches&&g.parts.ee.length?' ('+g.parts.ee.map(p=>p[0]+' '+num(p[1])+'٪').join(' + ')+')':''),v:ee,minus:true},
-    {k:'حصة صاحب العمل',s:num(n('p-er'))+'٪'+(matches?' ('+g.parts.er.map(p=>p[0]+' '+num(p[1])+'٪').join(' + ')+')':''),v:er},
+    {k:'استقطاع الموظف',s:num(g.ee)+'٪'+(g.parts.ee.length?' ('+g.parts.ee.map(p=>p[0]+' '+num(p[1])+'٪').join(' + ')+')':''),v:ee,minus:true},
+    {k:'حصة صاحب العمل',s:num(g.er)+'٪'+(true?' ('+g.parts.er.map(p=>p[0]+' '+num(p[1])+'٪').join(' + ')+')':''),v:er},
     {k:'تكلفة الموظف على المنشأة',s:'الإجمالي + حصة صاحب العمل',v:gross+er}
   ];
   render('sal-table',rows,'sal-net',gross-ee,'salary','هيكل الراتب');
@@ -461,10 +456,6 @@ function calcOt(){
 
 const calcs={settlement:calcSettlement,salary:calcSalary,leave:calcLeave,eos:calcEos,overtime:calcOt};
 document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',e=>e.preventDefault());f.addEventListener('input',runAll);f.addEventListener('change',runAll)});
-function syncP(){const g=GOSI[catOf('p-nat','p-reg')];$('p-ee').value=g.ee;$('p-er').value=g.er;runAll()}
-function syncS(){$('s-gosi').value=GOSI[catOf('s-nat','s-reg')].ee;runAll()}
-['p-nat','p-reg'].forEach(id=>$(id).addEventListener('change',syncP));
-['s-nat','s-reg'].forEach(id=>$(id).addEventListener('change',syncS));
 try{const t=new Date();const iso=new Date(t.getTime()-t.getTimezoneOffset()*60000).toISOString().slice(0,10);$('l-asof').value=iso}catch(e){}
 fillReasons('s-ctype','s-type');fillReasons('e-ctype','e-type');
 $('s-ctype').addEventListener('change',()=>fillReasons('s-ctype','s-type'));
