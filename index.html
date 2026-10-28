@@ -3,38 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="حاسبات مخالصة وهيكل راتب وإجازات ونهاية خدمة وإضافي وغياب حسب نظام العمل السعودي — إيمان | EMAN">
+<meta name="description" content="حاسبة المستحقات حسب نظام العمل السعودي — EMAN HR">
 <style>html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>حاسبات EMAN للموارد البشرية</title>
+<title>حاسبة المستحقات — EMAN HR</title>
 <style>
 /* Layout: brand header, tab strip of calculators, each calculator = input sheet (yellow cells) beside a live result statement */
 :root{
-  --bg:#F6F4EF;--surface:#FFFFFF;--sunk:#EFECE4;--line:#DDD8CC;--fg:#18202C;--muted:#5D6573;
-  --navy:#1A2A4A;--navy-fg:#FFFFFF;--accent:#2B4C86;
-  --good:#1F6B55;--good-bg:#DDF0E8;--warn:#8A5A12;--warn-bg:#F8E9CF;
-  --input:#FFF7D6;--input-line:#E3C866;--danger:#A33A2A;
+  --bg:#F5F1E8;--surface:#FFFDF8;--sunk:#EEE7D8;--line:#DCD2BE;--fg:#13262B;--muted:#5A6668;
+  --navy:#0F4C5C;--navy-fg:#FFFFFF;--accent:#0F4C5C;--gold:#A87A1E;
+  --good:#0F4C5C;--good-bg:#DCEBEC;--warn:#7A5512;--warn-bg:#F3E6C8;
+  --input:#FFF6DA;--input-line:#D9B65A;--danger:#A33A2A;
   --display:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121212;--surface:#1B1B1B;--sunk:#151515;--line:#2C2C2C;--fg:#EDEDED;--muted:#A8A8A8;
-  --navy:#1A2A4A;--navy-fg:#FFFFFF;--accent:#9BB8E8;
-  --good:#BFE5D6;--good-bg:#1F4D40;--warn:#F7E9D2;--warn-bg:#5C3D12;
-  --input:#2B2614;--input-line:#7A6624;--danger:#F0A090;color-scheme:dark}}
+  --bg:#0D1719;--surface:#132226;--sunk:#0F1C1F;--line:#24383C;--fg:#ECEFEC;--muted:#A3B0AF;
+  --navy:#16596A;--navy-fg:#FFFFFF;--accent:#7FC4CF;--gold:#E2B75C;
+  --good:#CDE9EC;--good-bg:#16424B;--warn:#F6E5BF;--warn-bg:#5A4316;
+  --input:#2A2512;--input-line:#8C7330;--danger:#F0A090;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#121212;--surface:#1B1B1B;--sunk:#151515;--line:#2C2C2C;--fg:#EDEDED;--muted:#A8A8A8;
-  --navy:#1A2A4A;--navy-fg:#FFFFFF;--accent:#9BB8E8;
-  --good:#BFE5D6;--good-bg:#1F4D40;--warn:#F7E9D2;--warn-bg:#5C3D12;
-  --input:#2B2614;--input-line:#7A6624;--danger:#F0A090;color-scheme:dark}
+  --bg:#0D1719;--surface:#132226;--sunk:#0F1C1F;--line:#24383C;--fg:#ECEFEC;--muted:#A3B0AF;
+  --navy:#16596A;--navy-fg:#FFFFFF;--accent:#7FC4CF;--gold:#E2B75C;
+  --good:#CDE9EC;--good-bg:#16424B;--warn:#F6E5BF;--warn-bg:#5A4316;
+  --input:#2A2512;--input-line:#8C7330;--danger:#F0A090;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;direction:rtl}
 .wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px;display:flex;flex-direction:column;gap:20px}
 header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+h1 .brandtag{font-size:.45em;font-weight:700;color:var(--gold);letter-spacing:.5px;vertical-align:middle;margin-right:6px;white-space:nowrap}
 h1{font-family:var(--display);font-size:clamp(26px,5vw,38px);font-weight:700;margin:0;line-height:1.25;text-wrap:balance}
 .sub{color:var(--muted);margin:2px 0 0}
 .brand{display:flex;flex-direction:column;align-items:flex-start}
-.brand b{font-size:20px}.brand span{color:var(--muted);font-size:13px}
+.brand b{font-size:20px;color:var(--gold)}.brand span{color:var(--muted);font-size:13px}
 nav{display:flex;gap:8px;flex-wrap:wrap}
 nav button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 16px;cursor:pointer;min-height:44px}
 nav button[aria-selected="true"]{background:var(--navy);color:var(--navy-fg);border-color:var(--navy)}
@@ -80,7 +81,7 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
 <div class="wrap">
 <header>
   <div>
-    <h1>حاسبات الموارد البشرية</h1>
+    <h1>حاسبة المستحقات <span class="brandtag">EMAN HR</span></h1>
     <p class="sub">مخالصة، هيكل راتب، إجازات، نهاية خدمة، وإضافي وغياب، حسب نظام العمل السعودي</p>
   </div>
   <div class="brand"><b>إيمان | EMAN</b><span>مشرف عام الموارد البشرية</span></div>
@@ -108,13 +109,14 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
     <fieldset><legend>الخدمة <small>Service</small></legend>
       <label>تاريخ المباشرة <em>Hiring date</em><input id="s-start" type="date" value="2022-01-02"></label>
       <label>آخر يوم عمل <em>Last working day</em><input id="s-end" type="date" value="2026-10-30"></label>
+      <label>نوع العقد <em>Contract type</em>
+        <select id="s-ctype"><option value="open">غير محدد المدة</option><option value="fixed">محدد المدة</option></select></label>
       <label>سبب انتهاء العلاقة <em>Reason</em>
-        <select id="s-type"><option value="company">إنهاء من الشركة أو انتهاء العقد</option><option value="resign">استقالة</option></select></label>
+        <select id="s-type"></select></label>
       <label>أساس حساب السنة <em>Year basis</em>
         <select id="s-basis"><option value="360">٣٦٠ يوم</option><option value="365">٣٦٥ يوم</option></select></label>
-      <label>تعويض المادة ٧٧ <em>Art. 77</em>
-        <select id="s-77"><option value="none">لا يوجد</option><option value="open">إنهاء غير مشروع، عقد غير محدد</option><option value="fixed">إنهاء غير مشروع، عقد محدد</option></select></label>
-      <label>الأشهر المتبقية من العقد المحدد <em>Remaining months</em><input id="s-rem" type="number" min="0" step="0.5" value="0"></label>
+      <label id="s-notice-wrap" hidden>أيام مهلة الإشعار غير المنفذة <em>Unserved notice days</em><input id="s-notice" type="number" min="0" value="0"></label>
+      <label id="s-rem-wrap" hidden>الأشهر المتبقية من العقد <em>Remaining months</em><input id="s-rem" type="number" min="0" step="0.5" value="0"></label>
     </fieldset>
     <fieldset><legend>آخر شهر <small>Final month</small></legend>
       <label>أيام الحضور غير المصروفة <em>Unpaid days</em><input id="s-days" type="number" min="0" value="30"></label>
@@ -138,7 +140,7 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
     <div class="chips" id="set-chips"></div>
     <table id="set-table"></table>
     <div class="total"><b>الصافي</b><span id="set-net">0</span></div>
-    <p class="note">المكافأة على آخر أجر شامل البدلات. الإجازة ÷ ٣٠. الإضافي = أجر الساعة + ٥٠٪ من أجر الساعة الأساسي (الساعة = الأجر ÷ ٢٤٠).</p>
+    <p class="note">المكافأة على آخر أجر شامل البدلات (م ٨٤–٨٥). الإجازة ÷ ٣٠. الإضافي = أجر الساعة + ٥٠٪ من أجر الساعة الأساسي (م ١٠٧، الساعة = الأجر ÷ ٢٤٠). مهلة الإشعار في العقد غير المحدد: ٦٠ يومًا إذا أنهى صاحب العمل، و٣٠ يومًا إذا أنهى العامل (م ٧٥)، ومن لم يلتزم بها يدفع أجر المدة الناقصة (م ٧٦). تعويض المادة ٧٧ يُحسب ما لم يحدد العقد تعويضًا آخر.</p>
   </div>
 </section>
 
@@ -196,7 +198,8 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
   <form class="sheet" id="f-eos">
     <fieldset><legend>المدخلات <small>Inputs</small></legend>
       <label>آخر أجر شامل البدلات <em>Last wage</em><input id="e-wage" type="number" min="0" value="6000"></label>
-      <label>سبب انتهاء العلاقة <em>Reason</em><select id="e-type"><option value="company">إنهاء من الشركة أو انتهاء العقد</option><option value="resign">استقالة</option></select></label>
+      <label>نوع العقد <em>Contract type</em><select id="e-ctype"><option value="open">غير محدد المدة</option><option value="fixed">محدد المدة</option></select></label>
+      <label>سبب انتهاء العلاقة <em>Reason</em><select id="e-type"></select></label>
       <label>تاريخ المباشرة <em>Hiring date</em><input id="e-start" type="date" value="2022-01-02"></label>
       <label>آخر يوم عمل <em>Last working day</em><input id="e-end" type="date" value="2026-10-30"></label>
       <label>أساس حساب السنة <em>Year basis</em><select id="e-basis"><option value="360">٣٦٠ يوم</option><option value="365">٣٦٥ يوم</option></select></label>
@@ -207,7 +210,7 @@ footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padd
     <div class="chips" id="eos-chips"></div>
     <table id="eos-table"></table>
     <div class="total"><b>المكافأة المستحقة</b><span id="eos-net">0</span></div>
-    <p class="note">أول ٥ سنوات نصف أجر شهر لكل سنة، وبعدها أجر شهر كامل. في الاستقالة: أقل من سنتين لا شيء، ٢–٥ الثلث، ٥–١٠ الثلثان، ١٠ فأكثر كاملة.</p>
+    <p class="note">أول ٥ سنوات نصف أجر شهر لكل سنة، وبعدها أجر شهر كامل. في الاستقالة: أقل من سنتين لا شيء، ٢–٥ الثلث، ٥–١٠ الثلثان، ١٠ فأكثر كاملة. ترك العمل لسبب غير مشروع يُعامل كاستقالة. وفي الفصل وفق المادة ٨٠ أو خلال فترة التجربة لا يستحق مكافأة، وباقي الأسباب مكافأة كاملة.</p>
   </div>
 </section>
 
@@ -263,6 +266,45 @@ function catOf(natId,regId){
 const catName={old:'سعودي مسجل قبل ٤ يوليو ٢٠٢٤',new:'سعودي مشترك جديد',non:'غير سعودي'};
 function eosFull(years,wage){return years<=5?years*wage/2:2.5*wage+(years-5)*wage}
 function resignFactor(y){return y<2?0:y<5?1/3:y<10?2/3:1}
+const REASONS={
+  open:[
+    ['emp_lawful','إنهاء صاحب العمل لسبب مشروع (المادة ٧٥)','full',null],
+    ['emp_unlawful','إنهاء صاحب العمل لسبب غير مشروع (المادة ٧٧)','full','emp'],
+    ['mutual','اتفاق الطرفين','full',null],
+    ['resign','استقالة العامل (المادة ٨٥)','resign',null],
+    ['wrk_unlawful','ترك العامل العمل لسبب غير مشروع (المادة ٧٧)','resign','wrk'],
+    ['art81','ترك العمل لإخلال صاحب العمل (المادة ٨١)','full',null],
+    ['force','قوة قاهرة خارجة عن إرادة العامل (المادة ٨٧)','full',null],
+    ['marriage','إنهاء العاملة خلال ٦ أشهر من الزواج أو ٣ أشهر من الولادة (المادة ٨٧)','full',null],
+    ['retire','بلوغ سن التقاعد','full',null],
+    ['death','وفاة العامل أو عجزه الكلي عن العمل','full',null],
+    ['art80','فصل وفق المادة ٨٠','none',null],
+    ['probation','إنهاء خلال فترة التجربة (المادة ٥٤)','none',null]
+  ],
+  fixed:[
+    ['end','انتهاء مدة العقد أو عدم تجديده','full',null],
+    ['emp_lawful','إنهاء صاحب العمل قبل انتهاء المدة لسبب مشروع','full',null],
+    ['emp_unlawful','إنهاء صاحب العمل قبل انتهاء المدة لسبب غير مشروع (المادة ٧٧)','full','emp'],
+    ['mutual','اتفاق الطرفين','full',null],
+    ['resign','استقالة العامل بموافقة صاحب العمل (المادة ٨٥)','resign',null],
+    ['wrk_unlawful','ترك العامل العمل قبل انتهاء المدة لسبب غير مشروع (المادة ٧٧)','resign','wrk'],
+    ['art81','ترك العمل لإخلال صاحب العمل (المادة ٨١)','full',null],
+    ['force','قوة قاهرة خارجة عن إرادة العامل (المادة ٨٧)','full',null],
+    ['marriage','إنهاء العاملة خلال ٦ أشهر من الزواج أو ٣ أشهر من الولادة (المادة ٨٧)','full',null],
+    ['retire','بلوغ سن التقاعد','full',null],
+    ['death','وفاة العامل أو عجزه الكلي عن العمل','full',null],
+    ['art80','فصل وفق المادة ٨٠','none',null],
+    ['probation','إنهاء خلال فترة التجربة (المادة ٥٤)','none',null]
+  ]
+};
+function fillReasons(ctId,rId){
+  const ct=$(ctId).value,sel=$(rId),prev=sel.value;
+  sel.innerHTML=REASONS[ct].map(r=>'<option value="'+r[0]+'">'+r[1]+'</option>').join('');
+  if(REASONS[ct].some(r=>r[0]===prev))sel.value=prev;
+}
+function reasonOf(ctId,rId){const ct=$(ctId).value;return REASONS[ct].find(r=>r[0]===$(rId).value)||REASONS[ct][0]}
+function eosFactor(r,y){return r[2]==='none'?0:r[2]==='resign'?resignFactor(y):1}
+function eosLabel(r,f){return r[2]==='none'?'لا يستحق':r[2]==='resign'?'استقالة: '+factorLabel(f):'كاملة'}
 function factorLabel(f){return f===0?'لا شيء':f===1?'كاملة':f<0.5?'الثلث':'الثلثان'}
 
 function render(tableId,rows,netId,net,key,title){
@@ -287,34 +329,43 @@ function calcSettlement(){
   const hourTotal=total/240,hourBasic=basic/240;
   const ot=(hourTotal+0.5*hourBasic)*n('s-ot');
   const full=eosFull(years,total);
-  const resign=$('s-type').value==='resign';
-  const f=resign?resignFactor(years):1;
+  const sr=reasonOf('s-ctype','s-type'),fixedC=$('s-ctype').value==='fixed';
+  $('s-rem-wrap').hidden=!(fixedC&&sr[3]);
+  const nEmp=!fixedC&&(sr[0]==='emp_lawful'||sr[0]==='emp_unlawful'),nWrk=!fixedC&&(sr[0]==='resign'||sr[0]==='wrk_unlawful');
+  $('s-notice-wrap').hidden=!(nEmp||nWrk);
+  const nDays=(nEmp||nWrk)?n('s-notice'):0,notice=total/30*nDays;
+  const noticeEmp=nEmp?notice:0,noticeWrk=nWrk?notice:0;
+  const f=eosFactor(sr,years);
   const eos=full*f;
-  let c77=0;const t77=$('s-77').value;
-  if(t77==='open')c77=Math.max(total/2*years,total*2);
-  if(t77==='fixed')c77=Math.max(total*n('s-rem'),total*2);
+  let c77=0;
+  if(sr[3])c77=fixedC?Math.max(total*n('s-rem'),total*2):Math.max(total/2*years,total*2);
+  const c77emp=sr[3]==='emp'?c77:0,c77wrk=sr[3]==='wrk'?c77:0;
   const absBase=$('s-absbase').value==='total'?total:basic;
   const abs=absBase/md*n('s-abs');
-  const acc=unpaid+leave+ot+eos+c77;
+  const acc=unpaid+leave+ot+eos+c77emp+noticeEmp;
   const insurable=Math.min(basic+house,45000);
   const gosi=insurable*n('s-gosi')/100/md*Math.min(n('s-days'),md);
-  const ded=abs+n('s-loan')+gosi+n('s-oded');
+  const ded=abs+n('s-loan')+gosi+n('s-oded')+c77wrk+noticeWrk;
   const Y=Math.floor(years),M=Math.floor((years-Y)*12);
-  $('set-chips').innerHTML='<span class="chip">الإجمالي '+num(total)+'</span><span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">المكافأة: '+(resign?factorLabel(f):'كاملة')+'</span><span class="chip">'+catName[catOf('s-nat','s-reg')]+' · '+num(n('s-gosi'))+'٪</span>';
+  $('set-chips').innerHTML='<span class="chip">الإجمالي '+num(total)+'</span><span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">المكافأة: '+eosLabel(sr,f)+'</span><span class="chip">'+catName[catOf('s-nat','s-reg')]+' · '+num(n('s-gosi'))+'٪</span>';
   const rows=[
     {sec:'المستحقات'},
     {k:'رواتب مستحقة',s:num(total)+' ÷ '+md+' × '+num(n('s-days'))+' يوم',v:unpaid},
     {k:'رصيد الإجازات',s:num(total)+' ÷ 30 × '+num(n('s-leave'))+' يوم',v:leave},
     {k:'ساعات إضافية',s:'('+num(hourTotal)+' + '+num(0.5*hourBasic)+') × '+num(n('s-ot'))+' ساعة',v:ot},
-    {k:'مكافأة نهاية الخدمة',s:num(years.toFixed(3))+' سنة'+(resign?' × '+factorLabel(f):''),v:eos}
+    {k:'مكافأة نهاية الخدمة',s:num(years.toFixed(3))+' سنة · '+eosLabel(sr,f),v:eos}
   ];
-  if(t77!=='none')rows.push({k:'تعويض المادة ٧٧',s:t77==='open'?'أجر ١٥ يوم لكل سنة، بحد أدنى شهرين':'أجر المدة المتبقية، بحد أدنى شهرين',v:c77});
+  const c77s=fixedC?'أجر المدة المتبقية ('+num(n('s-rem'))+' شهر)، بحد أدنى شهرين':'أجر ١٥ يوم لكل سنة، بحد أدنى شهرين';
+  if(c77emp)rows.push({k:'تعويض المادة ٧٧ للعامل',s:c77s,v:c77emp});
+  if(noticeEmp)rows.push({k:'بدل مهلة الإشعار للعامل (م ٧٦)',s:num(total)+' ÷ 30 × '+num(nDays)+' يوم',v:noticeEmp});
   rows.push({sec:'الخصومات'},
     {k:'غياب',s:num(absBase)+' ÷ '+md+' × '+num(n('s-abs'))+' يوم',v:abs,minus:true},
     {k:'سلف وقروض',v:n('s-loan'),minus:true},
     {k:'تأمينات (حصة الموظف)',s:'('+num(insurable)+' × '+num(n('s-gosi'))+'٪) ÷ '+md+' × '+num(Math.min(n('s-days'),md))+' يوم',v:gosi,minus:true},
-    {k:'خصومات أخرى',v:n('s-oded'),minus:true},
-    {sec:'الملخص'},{k:'إجمالي المستحقات',v:acc},{k:'إجمالي الخصومات',v:ded,minus:true});
+    {k:'خصومات أخرى',v:n('s-oded'),minus:true});
+  if(c77wrk)rows.push({k:'تعويض المادة ٧٧ لصاحب العمل',s:c77s,v:c77wrk,minus:true});
+  if(noticeWrk)rows.push({k:'بدل مهلة الإشعار لصاحب العمل (م ٧٦)',s:num(total)+' ÷ 30 × '+num(nDays)+' يوم',v:noticeWrk,minus:true});
+  rows.push({sec:'الملخص'},{k:'إجمالي المستحقات',v:acc},{k:'إجمالي الخصومات',v:ded,minus:true});
   render('set-table',rows,'set-net',acc-ded,'settlement','بيان المخالصة');
 }
 
@@ -378,16 +429,16 @@ function calcEos(){
   const years=days/basis;
   const first=Math.min(years,5),rest=Math.max(years-5,0);
   const full=eosFull(years,wage);
-  const resign=$('e-type').value==='resign';
-  const f=resign?resignFactor(years):1;
+  const er=reasonOf('e-ctype','e-type');
+  const f=eosFactor(er,years);
   const Y=Math.floor(years),M=Math.floor((years-Y)*12);
-  $('eos-chips').innerHTML='<span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">'+(resign?'استقالة: '+factorLabel(f):'مكافأة كاملة')+'</span>';
+  $('eos-chips').innerHTML='<span class="chip">'+num(days)+' يوم · '+Y+' سنة و'+M+' شهر</span><span class="chip w">المكافأة: '+eosLabel(er,f)+'</span>';
   render('eos-table',[
     {k:'سنوات الخدمة',s:num(days)+' ÷ '+basis,raw:num(years.toFixed(3))+' سنة'},
     {k:'أول ٥ سنوات',s:num(first.toFixed(3))+' × نصف أجر',v:first*wage/2},
     {k:'ما بعد ٥ سنوات',s:num(rest.toFixed(3))+' × أجر كامل',v:rest*wage},
     {k:'المكافأة الكاملة',v:full},
-    {k:'نسبة الاستحقاق',raw:resign?factorLabel(f):'كاملة'}
+    {k:'نسبة الاستحقاق',raw:eosLabel(er,f)}
   ],'eos-net',full*f,'eos','مكافأة نهاية الخدمة');
 }
 
@@ -415,6 +466,9 @@ function syncS(){$('s-gosi').value=GOSI[catOf('s-nat','s-reg')].ee;runAll()}
 ['p-nat','p-reg'].forEach(id=>$(id).addEventListener('change',syncP));
 ['s-nat','s-reg'].forEach(id=>$(id).addEventListener('change',syncS));
 try{const t=new Date();const iso=new Date(t.getTime()-t.getTimezoneOffset()*60000).toISOString().slice(0,10);$('l-asof').value=iso}catch(e){}
+fillReasons('s-ctype','s-type');fillReasons('e-ctype','e-type');
+$('s-ctype').addEventListener('change',()=>fillReasons('s-ctype','s-type'));
+$('e-ctype').addEventListener('change',()=>fillReasons('e-ctype','e-type'));
 function runAll(){Object.values(calcs).forEach(c=>{try{c()}catch(e){}})}
 
 document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
