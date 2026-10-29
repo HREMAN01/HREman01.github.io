@@ -90,18 +90,18 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   <a href="#settle">المخالصة</a>
   <a href="#eos">مكافأة نهاية الخدمة</a>
 </nav>
-<div class="hint"><span class="sw"></span> الخانات الزرقاء الفاتحة للإدخال · الأرقام المكتوبة مثال، غيّرها بأرقامك</div>
+<div class="hint"><span class="sw"></span> اكتب أرقامك في الخانات الزرقاء الفاتحة، والنتيجة تطلع على طول</div>
 
 <!-- 1 leave -->
 <section id="v-leave" class="calc" hidden>
   <div class="card"><h2>رصيد الإجازات <small>Leave Balance</small></h2>
     <div class="grid">
-      <label>تاريخ البداية (المباشرة)<em>Start date</em><input id="l_start" type="date" value="2025-03-01"></label>
-      <label>تاريخ النهاية (الاحتساب)<em>End date</em><input id="l_end" type="date" value="2026-10-29"></label>
-      <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="l_ent"><option>21</option><option selected>30</option><option value="c">رقم آخر</option></select></label>
-      <label id="l_custw" hidden>اكتب الاستحقاق<em>Custom days</em><input id="l_cust" type="number" min="0" step="0.5" value="25"></label>
-      <label>أيام السنة<em>Days per year</em><select id="l_basis"><option selected>360</option><option>365</option></select></label>
-      <label>الأيام المستخدمة<em>Used days</em><input id="l_used" type="number" min="0" step="0.5" value="12"></label>
+      <label>تاريخ البداية (المباشرة)<em>Start date</em><input id="l_start" type="date"></label>
+      <label>تاريخ النهاية (الاحتساب)<em>End date</em><input id="l_end" type="date"></label>
+      <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="l_ent"><option value="" selected>اختر</option><option>21</option><option>30</option><option value="c">رقم آخر</option></select></label>
+      <label id="l_custw" hidden>اكتب الاستحقاق<em>Custom days</em><input id="l_cust" type="number" min="0" step="0.5"></label>
+      <label>أيام السنة<em>Days per year</em><select id="l_basis"><option value="" selected>اختر</option><option>360</option><option>365</option></select></label>
+      <label>الأيام المستخدمة<em>Used days</em><input id="l_used" type="number" min="0" step="0.5"></label>
     </div>
     <p class="note">نظام العمل: 21 يوم في السنة، و30 يوم بعد إكمال 5 سنوات. اختر اللي ينطبق عليك.</p>
   </div>
@@ -115,7 +115,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     </div>
     <div class="how" id="l_how"></div>
     <div class="status" id="l_st"></div>
-    <button class="copy" data-copy="leave">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="leave">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -123,12 +123,12 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 <section id="v-lastday" class="calc" hidden>
   <div class="card"><h2>الرصيد لآخر يوم عمل <small>Balance to Last Working Day</small></h2>
     <div class="grid">
-      <label>الرصيد الحالي (يوم)<em>Current balance</em><input id="d_cur" type="number" step="0.01" value="14.5"></label>
-      <label>الرصيد محسوب لين تاريخ<em>Balance as of</em><input id="d_asof" type="date" value="2026-09-30"></label>
-      <label>تاريخ آخر يوم عمل<em>Last working day</em><input id="d_last" type="date" value="2026-11-15"></label>
-      <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="d_ent"><option>21</option><option selected>30</option></select></label>
-      <label>أيام السنة<em>Days per year</em><select id="d_basis"><option>360</option><option selected>365</option></select></label>
-      <label>إجازات بعد تاريخ الرصيد<em>Leave taken after</em><input id="d_used" type="number" min="0" step="0.5" value="0"></label>
+      <label>الرصيد الحالي (يوم)<em>Current balance</em><input id="d_cur" type="number" step="0.01"></label>
+      <label>الرصيد محسوب لين تاريخ<em>Balance as of</em><input id="d_asof" type="date"></label>
+      <label>تاريخ آخر يوم عمل<em>Last working day</em><input id="d_last" type="date"></label>
+      <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="d_ent"><option value="" selected>اختر</option><option>21</option><option>30</option></select></label>
+      <label>أيام السنة<em>Days per year</em><select id="d_basis"><option value="" selected>اختر</option><option>360</option><option>365</option></select></label>
+      <label>إجازات بعد تاريخ الرصيد<em>Leave taken after</em><input id="d_used" type="number" min="0" step="0.5"></label>
     </div>
     <p class="note">إذا آخر يوم عمل قبل تاريخ الرصيد، تنخصم الأيام الزايدة من الرصيد.</p>
   </div>
@@ -141,7 +141,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     </div>
     <div class="how" id="d_how"></div>
     <div class="status" id="d_st"></div>
-    <button class="copy" data-copy="lastday">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="lastday">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -149,15 +149,15 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 <section id="v-eos" class="calc" hidden>
   <div class="card"><h2>مكافأة نهاية الخدمة <small>End of Service Benefit</small></h2>
     <div class="grid">
-      <label>الراتب الإجمالي<em>Total monthly wage</em><input id="e_wage" type="number" min="0" step="0.01" value="8000"></label>
+      <label>الراتب الإجمالي<em>Total monthly wage</em><input id="e_wage" type="number" min="0" step="0.01"></label>
       <label>سبب انتهاء العلاقة<em>Reason</em><select id="e_reason">
         <option value="full" selected>انتهاء العقد / اتفاق الطرفين / إنهاء من صاحب العمل</option>
         <option value="resign">استقالة الموظف (المادة 85)</option>
         <option value="none">فصل حسب المادة 80</option>
       </select></label>
-      <label>تاريخ بداية العمل<em>Start date</em><input id="e_start" type="date" value="2019-05-01"></label>
-      <label>تاريخ نهاية العمل<em>End date</em><input id="e_end" type="date" value="2026-10-31"></label>
-      <label>طريقة حساب المدة<em>Year basis</em><select id="e_basis"><option value="360" selected>360 (سنة + شهر ÷ 12 + يوم ÷ 360)</option><option value="365">365 (الأيام ÷ 365)</option></select></label>
+      <label>تاريخ بداية العمل<em>Start date</em><input id="e_start" type="date"></label>
+      <label>تاريخ نهاية العمل<em>End date</em><input id="e_end" type="date"></label>
+      <label>طريقة حساب المدة<em>Year basis</em><select id="e_basis"><option value="" selected>اختر</option><option value="360">360 (سنة + شهر ÷ 12 + يوم ÷ 360)</option><option value="365">365 (الأيام ÷ 365)</option></select></label>
     </div>
     <p class="note">المكافأة على الأجر الفعلي: الأساسي مع البدلات الثابتة.</p>
   </div>
@@ -172,7 +172,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     </div>
     <div class="how" id="e_how"></div>
     <div class="status" id="e_st"></div>
-    <button class="copy" data-copy="eos">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="eos">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -184,28 +184,28 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <option value="B">الطريقة الثانية: السكن والطعام لآخر يوم في العقد، والمكافأة بدون الطعام</option>
     </select></label>
     <div class="grid">
-      <label>الراتب الأساسي<em>Basic</em><input id="m_basic" type="number" min="0" step="0.01" value="4444"></label>
-      <label>بدل السكن<em>Housing</em><input id="m_house" type="number" min="0" step="0.01" value="1111"></label>
-      <label>بدل النقل<em>Transport</em><input id="m_trans" type="number" min="0" step="0.01" value="445"></label>
-      <label>بدل الطعام<em>Food</em><input id="m_food" type="number" min="0" step="0.01" value="0"></label>
-      <label>بدلات أخرى<em>Other allowances</em><input id="m_oth" type="number" min="0" step="0.01" value="0"></label>
+      <label>الراتب الأساسي<em>Basic</em><input id="m_basic" type="number" min="0" step="0.01"></label>
+      <label>بدل السكن<em>Housing</em><input id="m_house" type="number" min="0" step="0.01"></label>
+      <label>بدل النقل<em>Transport</em><input id="m_trans" type="number" min="0" step="0.01"></label>
+      <label>بدل الطعام<em>Food</em><input id="m_food" type="number" min="0" step="0.01"></label>
+      <label>بدلات أخرى<em>Other allowances</em><input id="m_oth" type="number" min="0" step="0.01"></label>
       <label>الجنسية<em>Nationality</em><select id="m_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
-      <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="m_rate"><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option selected>10.75</option><option>11.25</option><option>11.75</option></select></label>
+      <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="m_rate"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
       <label>سبب انتهاء العلاقة<em>Reason</em><select id="m_reason">
         <option value="full">انتهاء العقد / اتفاق الطرفين / إنهاء من صاحب العمل</option>
         <option value="resign">استقالة الموظف (المادة 85)</option>
         <option value="none" selected>خلال فترة التجربة (المادة 53)</option>
         <option value="none80">فصل حسب المادة 80</option>
       </select></label>
-      <label>تاريخ التعيين<em>Hiring date</em><input id="m_hire" type="date" value="2026-07-28"></label>
-      <label>تاريخ نهاية الخدمة<em>End of service</em><input id="m_end" type="date" value="2026-10-01"></label>
-      <label>أيام الشهر الأخير<em>Month days</em><select id="m_md"><option>28</option><option>29</option><option selected>30</option><option>31</option></select></label>
-      <label>أيام الدوام في الشهر الأخير<em>Days worked</em><input id="m_att" type="number" min="0" step="0.5" value="1"></label>
-      <label>أشهر كاملة غير مدفوعة<em>Unpaid full months</em><input id="m_months" type="number" min="0" step="1" value="1"></label>
-      <label>رصيد الإجازات (يوم)<em>Leave balance</em><input id="m_vac" type="number" min="0" step="0.001" value="3.42"></label>
-      <label>ساعات إضافية<em>Overtime hours</em><input id="m_ot" type="number" min="0" step="0.5" value="0"></label>
-      <label>أيام غياب<em>Absence days</em><input id="m_abs" type="number" min="0" step="0.5" value="0"></label>
-      <label>سلف وخصومات أخرى<em>Loans & other</em><input id="m_ded" type="number" min="0" step="0.01" value="0"></label>
+      <label>تاريخ التعيين<em>Hiring date</em><input id="m_hire" type="date"></label>
+      <label>تاريخ نهاية الخدمة<em>End of service</em><input id="m_end" type="date"></label>
+      <label>أيام الشهر الأخير<em>Month days</em><select id="m_md"><option value="" selected>اختر</option><option>28</option><option>29</option><option>30</option><option>31</option></select></label>
+      <label>أيام الدوام في الشهر الأخير<em>Days worked</em><input id="m_att" type="number" min="0" step="0.5"></label>
+      <label>أشهر كاملة غير مدفوعة<em>Unpaid full months</em><input id="m_months" type="number" min="0" step="1"></label>
+      <label>رصيد الإجازات (يوم)<em>Leave balance</em><input id="m_vac" type="number" min="0" step="0.001"></label>
+      <label>ساعات إضافية<em>Overtime hours</em><input id="m_ot" type="number" min="0" step="0.5"></label>
+      <label>أيام غياب<em>Absence days</em><input id="m_abs" type="number" min="0" step="0.5"></label>
+      <label>سلف وخصومات أخرى<em>Loans & other</em><input id="m_ded" type="number" min="0" step="0.01"></label>
       <label>طريقة مدة الخدمة<em>Year basis</em><select id="m_basis"><option value="auto" selected>حسب الطريقة (الأولى 360 · الثانية 365)</option><option value="360">360</option><option value="365">365</option></select></label>
     </div>
     <p class="note">الطريقة الأولى: الراتب الأخير على الإجمالي ÷ أيام الشهر × أيام الدوام، والمكافأة على الإجمالي. الطريقة الثانية: الأساسي والبدلات الأخرى على أيام الدوام، والسكن والطعام لين آخر يوم في العقد، والمكافأة على الإجمالي بدون الطعام. الإجازات والإضافي والغياب نفسها في الطريقتين.</p>
@@ -222,7 +222,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     </div>
     <div class="how" id="m_how"></div>
     <div class="status" id="m_st"></div>
-    <button class="copy" data-copy="settle">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="settle">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -232,11 +232,11 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     <div class="grid">
       <label>الجنسية<em>Nationality</em><select id="s_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
       <label>المبلغ المُدخل<em>Amount type</em><select id="s_type"><option value="gross">قبل خصم التأمينات (إجمالي)</option><option value="net" selected>بعد خصم التأمينات (صافي)</option></select></label>
-      <label>المبلغ<em>Amount</em><input id="s_amt" type="number" min="0" step="0.01" value="10000"></label>
-      <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="s_rate"><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option selected>10.75</option><option>11.25</option><option>11.75</option></select></label>
-      <label>بدل السكن من الأساسي %<em>Housing % of basic</em><input id="s_h" type="number" min="0" step="0.5" value="25"></label>
-      <label>بدل النقل من الأساسي %<em>Transport % of basic</em><input id="s_t" type="number" min="0" step="0.5" value="10"></label>
-      <label>الحد الأعلى لأجر الاشتراك<em>GOSI wage cap</em><input id="s_cap" type="number" min="0" step="1" value="45000"></label>
+      <label>المبلغ<em>Amount</em><input id="s_amt" type="number" min="0" step="0.01"></label>
+      <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="s_rate"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
+      <label>بدل السكن من الأساسي %<em>Housing % of basic</em><input id="s_h" type="number" min="0" step="0.5"></label>
+      <label>بدل النقل من الأساسي %<em>Transport % of basic</em><input id="s_t" type="number" min="0" step="0.5"></label>
+      <label>الحد الأعلى لأجر الاشتراك<em>GOSI wage cap</em><input id="s_cap" type="number" min="0" step="1"></label>
     </div>
     <p class="note">9.75% للمسجلين في التأمينات قبل 3 يوليو 2024، و10.75% فأعلى للمسجلين بعده. التأمينات على الأساسي + السكن.</p>
   </div>
@@ -252,7 +252,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     </div>
     <div class="how" id="s_how"></div>
     <div class="status" id="s_st"></div>
-    <button class="copy" data-copy="salary">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="salary">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -260,16 +260,16 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 <section id="v-nitaqat" class="calc" hidden>
   <div class="card"><h2>توزيع الراتب على حد نطاقات <small>Nitaqat Threshold</small></h2>
     <div class="grid">
-      <label>بدل السكن من الأساسي %<em>Housing %</em><input id="n_h" type="number" min="0" step="0.5" value="25"></label>
-      <label>بدل النقل من الأساسي %<em>Transport %</em><input id="n_t" type="number" min="0" step="0.5" value="10"></label>
-      <label>تأمينات الموظف %<em>Employee GOSI</em><select id="n_r"><option value="0">0 (غير سعودي)</option><option selected>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
-      <label>تأمينات صاحب العمل %<em>Employer GOSI</em><input id="n_er" type="number" min="0" step="0.05" value="11.75"></label>
+      <label>بدل السكن من الأساسي %<em>Housing %</em><input id="n_h" type="number" min="0" step="0.5"></label>
+      <label>بدل النقل من الأساسي %<em>Transport %</em><input id="n_t" type="number" min="0" step="0.5"></label>
+      <label>تأمينات الموظف %<em>Employee GOSI</em><select id="n_r"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
+      <label>تأمينات صاحب العمل %<em>Employer GOSI</em><input id="n_er" type="number" min="0" step="0.05"></label>
     </div>
     <p class="note">الأساسي = الحد ÷ (1 + نسبة السكن)، فيصير الأساسي + السكن = الحد بالضبط. تقدر تغيّر الحد من الجدول.</p>
   </div>
   <div class="card"><h2>التوزيع <small>Salary split</small></h2>
     <div class="two" id="n_tbl"></div>
-    <button class="copy" data-copy="nitaqat">نسخ النتيجة</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="nitaqat">نسخ النتيجة</button></div>
   </div>
 </section>
 
@@ -281,10 +281,10 @@ const $=id=>document.getElementById(id);
 const num=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:0};
 const dt=id=>{const v=$(id).value;if(!v)return null;const [y,m,d]=v.split('-').map(Number);return Date.UTC(y,m-1,d)};
 const DAY=864e5;
-const f2=x=>(Math.round((x+Number.EPSILON)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fd=x=>(Math.round(x*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
-const r2=x=>Math.round((x+Number.EPSILON)*100)/100;
-const t2=x=>Math.trunc(x*100+1e-7)/100;
+const f2=x=>(x=isFinite(x)?x:0,Math.round((x+Number.EPSILON)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fd=x=>(x=isFinite(x)?x:0,Math.round(x*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
+const r2=x=>!isFinite(x)?0:Math.round((x+Number.EPSILON)*100)/100;
+const t2=x=>!isFinite(x)?0:Math.trunc(x*100+1e-7)/100;
 function ymd(a,b){ // like Excel DATEDIF y / ym / md
   const A=new Date(a),B=new Date(b);let y=B.getUTCFullYear()-A.getUTCFullYear(),m=B.getUTCMonth()-A.getUTCMonth(),d=B.getUTCDate()-A.getUTCDate();
   if(d<0){m--;const pm=new Date(Date.UTC(B.getUTCFullYear(),B.getUTCMonth(),0)).getUTCDate();d+=pm}
@@ -296,7 +296,7 @@ const texts={};
 function leave(){
   $('l_custw').hidden=$('l_ent').value!=='c';
   const s=dt('l_start'),e=dt('l_end'),ent=$('l_ent').value==='c'?num('l_cust'):+$('l_ent').value,b=+$('l_basis').value,u=num('l_used');
-  const errs=[];if(s===null)errs.push('اكتب تاريخ البداية');if(e===null)errs.push('اكتب تاريخ النهاية');if(s!==null&&e!==null&&e<s)errs.push('تاريخ النهاية قبل البداية');
+  const errs=[];if(s===null)errs.push('اكتب تاريخ البداية');if(e===null)errs.push('اكتب تاريخ النهاية');if(s!==null&&e!==null&&e<s)errs.push('تاريخ النهاية قبل البداية');if(!ent)errs.push('اختر الاستحقاق السنوي');if(!b)errs.push('اختر أيام السنة');
   const ok=!errs.length,days=ok?(e-s)/DAY:0,acc=r2(days/b*ent),rem=r2(acc-u);
   if(ok&&rem<0)errs.push('المستخدم أكثر من المستحق');
   $('l_svc').textContent=ok?ymdTxt(ymd(s,e)):'-';$('l_days').textContent=fd(days);$('l_acc').textContent=fd(acc);$('l_u').textContent=fd(u);$('l_rem').textContent=fd(rem);
@@ -305,7 +305,7 @@ function leave(){
 }
 function lastday(){
   const c=num('d_cur'),a=dt('d_asof'),l=dt('d_last'),ent=+$('d_ent').value,b=+$('d_basis').value,u=num('d_used');
-  const errs=[];if(a===null)errs.push('اكتب تاريخ الرصيد');if(l===null)errs.push('اكتب آخر يوم عمل');
+  const errs=[];if(a===null)errs.push('اكتب تاريخ الرصيد');if(l===null)errs.push('اكتب آخر يوم عمل');if(!ent)errs.push('اختر الاستحقاق السنوي');if(!b)errs.push('اختر أيام السنة');
   const ok=!errs.length,add=ok?(l-a)/DAY:0,acc=r2(add/b*ent),fin=r2(c+acc-u);
   $('d_add').textContent=fd(add);$('d_acc').textContent=fd(acc);$('d_u').textContent=fd(u);$('d_fin').textContent=fd(fin);
   $('d_how').innerHTML=`<b>الأيام الإضافية</b> = آخر يوم عمل − تاريخ الرصيد = ${fd(add)} يوم<br><b>المستحق</b> = ${fd(add)} ÷ ${b} × ${ent} = ${fd(acc)}<br><b>الرصيد النهائي</b> = ${fd(c)} + ${fd(acc)} − ${fd(u)} = ${fd(fin)}`;
@@ -313,7 +313,7 @@ function lastday(){
 }
 function eos(){
   const w=num('e_wage'),s=dt('e_start'),e=dt('e_end'),b=$('e_basis').value,rs=$('e_reason').value;
-  const errs=[];if(w<=0)errs.push('اكتب الراتب');if(s===null||e===null)errs.push('اكتب التاريخين');else if(e<s)errs.push('تاريخ النهاية قبل البداية');
+  const errs=[];if(w<=0)errs.push('اكتب الراتب');if(s===null||e===null)errs.push('اكتب التاريخين');else if(e<s)errs.push('تاريخ النهاية قبل البداية');if(!b)errs.push('اختر طريقة حساب المدة');
   let yrs=0,svc='-';
   if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365}
   const p1=w/2*Math.min(yrs,5),p2=w*Math.max(yrs-5,0);
@@ -332,15 +332,15 @@ function salary(){
   g=r2(g);const bb=r2(g/k),hh=t2(bb*h),tt=r2(g-bb-hh),gw=Math.min(bb+hh,cap),d=r2(gw*r),n=r2(g-d);
   $('s_gross').textContent=f2(g);$('s_b').textContent=f2(bb);$('s_hh').textContent=f2(hh);$('s_tt').textContent=f2(tt);$('s_w').textContent=f2(gw);$('s_d').textContent=f2(d);$('s_net').textContent=f2(n);
   $('s_how').innerHTML=`<b>الأساسي</b> = الإجمالي ÷ (1 + ${fd(h*100)}% + ${fd(t*100)}%)<br>`+(net&&r>0?`<b>الإجمالي من الصافي</b> = الصافي ÷ (1 − ${fd(r*100)}% × (1 + السكن) ÷ (1 + السكن + النقل))`:`<b>التأمينات</b> = (الأساسي + السكن) × ${fd(r*100)}%`);
-  const errs=[];if(A<=0)errs.push('اكتب المبلغ');status('s_st',errs);
+  const errs=[];if(A<=0)errs.push('اكتب المبلغ');if(sa&&$('s_rate').value==='')errs.push('اختر نسبة التأمينات');status('s_st',errs);
   texts.salary=`هيكلة الراتب: الإجمالي ${f2(g)} | الأساسي ${f2(bb)} | السكن ${f2(hh)} | النقل ${f2(tt)} | التأمينات ${f2(d)} | الصافي ${f2(n)}`;
 }
-let thr=[5000,6000];const eff=['25 أبريل 2027','25 أبريل 2028'];
+let thr=[0,0];const eff=['25 أبريل 2027','25 أبريل 2028'];
 function nitaqat(){
   const h=num('n_h')/100,t=num('n_t')/100,r=num('n_r')/100,er=num('n_er')/100;
   const cols=thr.map(T=>{const b=r2(T/(1+h)),hh=r2(T-b),tt=r2(b*t),g=r2(b+hh+tt),d=r2((b+hh)*r),e=r2((b+hh)*er);return{b,hh,tt,g,d,n:r2(g-d),e,c:r2(g+e)}});
   const rows=[['الراتب الأساسي','b'],['بدل السكن','hh'],['بدل النقل','tt'],['الراتب الإجمالي','g'],['خصم التأمينات على الموظف','d'],['صافي الراتب','n'],['تأمينات صاحب العمل','e'],['التكلفة الشهرية على الشركة','c']];
-  let html='<div class="h">حد نطاقات (أساسي + سكن)</div>'+thr.map((T,i)=>`<div class="h n"><input aria-label="الحد ${i+1}" id="n_thr${i}" type="number" min="0" step="100" value="${T}"></div>`).join('');
+  let html='<div class="h">حد نطاقات (أساسي + سكن)</div>'+thr.map((T,i)=>`<div class="h n"><input aria-label="الحد ${i+1}" id="n_thr${i}" type="number" min="0" step="100" value="${T||''}" placeholder="مثال 5000"></div>`).join('');
   html+='<div>يبدأ من</div>'+eff.map(x=>`<div class="n">${x}</div>`).join('');
   rows.forEach(([lab,key])=>{html+=`<div${key==='g'||key==='n'?' class="h"':''}>${lab}</div>`+cols.map(c=>`<div class="n${key==='g'||key==='n'?' h':''}">${f2(c[key])}</div>`).join('')});
   const focus=document.activeElement&&document.activeElement.id;
@@ -354,7 +354,7 @@ function settle(){
   const B=$('m_method').value==='B',bs=num('m_basic'),hs=num('m_house'),tr=num('m_trans'),fd=num('m_food'),ot=num('m_oth');
   const W=bs+hs+tr+fd+ot,sa=$('m_nat').value==='سعودي',r=sa?num('m_rate')/100:0;
   const h=dt('m_hire'),e=dt('m_end'),md=+$('m_md').value,att=num('m_att'),mo=num('m_months');
-  const errs=[];if(W<=0)errs.push('اكتب الراتب');if(h===null||e===null)errs.push('اكتب تاريخ التعيين والنهاية');else if(e<h)errs.push('تاريخ النهاية قبل التعيين');if(att>md)errs.push('أيام الدوام أكثر من أيام الشهر');
+  const errs=[];if(W<=0)errs.push('اكتب الراتب');if(h===null||e===null)errs.push('اكتب تاريخ التعيين والنهاية');else if(e<h)errs.push('تاريخ النهاية قبل التعيين');if(!md)errs.push('اختر أيام الشهر');else if(att>md)errs.push('أيام الدوام أكثر من أيام الشهر');if(sa&&$('m_rate').value==='')errs.push('اختر نسبة التأمينات');
   const con=e!==null?new Date(e).getUTCDate():0,spec=hs+fd,oth=W-spec;
   const last=B?oth/md*att+spec/md*con:W/md*att;
   const gm=(bs+hs)*r,gp=mo+(B?con:att)/md,gosi=gm*gp;
@@ -391,5 +391,13 @@ function fallback(t){const ta=document.createElement('textarea');ta.value=t;docu
 const views=['salary','nitaqat','leave','lastday','settle','eos'];
 function route(){const h=location.hash.slice(1),v=views.includes(h)?h:'salary';
   views.forEach(x=>{$('v-'+x).hidden=x!==v;document.querySelector(`nav a[href="#${x}"]`).setAttribute('aria-current',x===v?'page':'false')})}
+
+document.querySelectorAll('.reset').forEach(b=>b.addEventListener('click',()=>{
+  const sec=b.closest('section');
+  sec.querySelectorAll('input').forEach(i=>{i.value=''});
+  sec.querySelectorAll('select').forEach(x=>{const d=[...x.options].findIndex(o=>o.defaultSelected);x.selectedIndex=d<0?0:d});
+  if(sec.id==='v-nitaqat'){thr=[0,0]}
+  all();
+}));
 window.addEventListener('hashchange',route);route();all();
 </script>
