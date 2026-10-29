@@ -234,9 +234,9 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <label>المبلغ المُدخل<em>Amount type</em><select id="s_type"><option value="gross">قبل خصم التأمينات (إجمالي)</option><option value="net" selected>بعد خصم التأمينات (صافي)</option></select></label>
       <label>المبلغ<em>Amount</em><input id="s_amt" type="number" min="0" step="0.01"></label>
       <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="s_rate"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
-      <label>بدل السكن من الأساسي %<em>Housing % of basic</em><input id="s_h" type="number" min="0" step="0.5"></label>
-      <label>بدل النقل من الأساسي %<em>Transport % of basic</em><input id="s_t" type="number" min="0" step="0.5"></label>
-      <label>الحد الأعلى لأجر الاشتراك<em>GOSI wage cap</em><input id="s_cap" type="number" min="0" step="1"></label>
+      <label>بدل السكن من الأساسي %<em>Housing % of basic</em><input id="s_h" type="number" min="0" step="0.5" value="25"></label>
+      <label>بدل النقل من الأساسي %<em>Transport % of basic</em><input id="s_t" type="number" min="0" step="0.5" value="10"></label>
+      <label>الحد الأعلى لأجر الاشتراك<em>GOSI wage cap</em><input id="s_cap" type="number" min="0" step="1" value="45000"></label>
     </div>
     <p class="note">9.75% للمسجلين في التأمينات قبل 3 يوليو 2024، و10.75% فأعلى للمسجلين بعده. التأمينات على الأساسي + السكن.</p>
   </div>
@@ -260,8 +260,8 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 <section id="v-nitaqat" class="calc" hidden>
   <div class="card"><h2>توزيع الراتب على حد نطاقات <small>Nitaqat Threshold</small></h2>
     <div class="grid">
-      <label>بدل السكن من الأساسي %<em>Housing %</em><input id="n_h" type="number" min="0" step="0.5"></label>
-      <label>بدل النقل من الأساسي %<em>Transport %</em><input id="n_t" type="number" min="0" step="0.5"></label>
+      <label>بدل السكن من الأساسي %<em>Housing %</em><input id="n_h" type="number" min="0" step="0.5" value="25"></label>
+      <label>بدل النقل من الأساسي %<em>Transport %</em><input id="n_t" type="number" min="0" step="0.5" value="10"></label>
       <label>تأمينات الموظف %<em>Employee GOSI</em><select id="n_r"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
       <label>تأمينات صاحب العمل %<em>Employer GOSI</em><input id="n_er" type="number" min="0" step="0.05"></label>
     </div>
@@ -326,7 +326,7 @@ function eos(){
   status('e_st',errs);texts.eos=`مكافأة نهاية الخدمة: ${f2(amt)} ريال (${yrs.toFixed(2)} سنة، ${why})`;
 }
 function salary(){
-  const sa=$('s_nat').value==='سعودي',net=$('s_type').value==='net',A=num('s_amt'),r=sa?num('s_rate')/100:0,h=num('s_h')/100,t=num('s_t')/100,cap=num('s_cap');
+  const sa=$('s_nat').value==='سعودي',net=$('s_type').value==='net',A=num('s_amt'),r=sa?num('s_rate')/100:0,h=num('s_h')/100,t=num('s_t')/100,cap=num('s_cap')||45000;
   const k=1+h+t;let g=0;
   if(A>0){if(!net||r===0)g=A;else{g=A/(1-r*(1+h)/k);if(g/k*(1+h)>cap)g=A+cap*r}}
   g=r2(g);const bb=r2(g/k),hh=t2(bb*h),tt=r2(g-bb-hh),gw=Math.min(bb+hh,cap),d=r2(gw*r),n=r2(g-d);
@@ -394,7 +394,7 @@ function route(){const h=location.hash.slice(1),v=views.includes(h)?h:'salary';
 
 document.querySelectorAll('.reset').forEach(b=>b.addEventListener('click',()=>{
   const sec=b.closest('section');
-  sec.querySelectorAll('input').forEach(i=>{i.value=''});
+  sec.querySelectorAll('input').forEach(i=>{i.value=i.defaultValue});
   sec.querySelectorAll('select').forEach(x=>{const d=[...x.options].findIndex(o=>o.defaultSelected);x.selectedIndex=d<0?0:d});
   if(sec.id==='v-nitaqat'){thr=[0,0]}
   all();
