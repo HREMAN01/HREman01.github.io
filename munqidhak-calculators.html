@@ -1,0 +1,374 @@
+<title>حاسبات منقذك</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@700;800;900&display=swap">
+<style>
+/* Layout: one column, a blue brand header band, tab strip, then a two-pane card per calculator (inputs | results) that stacks on phones */
+:root{
+  --bg:#F3F6FB; --surface:#FFFFFF; --ink:#0E1C36; --muted:#4D5B74; --line:#DCE3EE;
+  --brand:#1D4ED8; --brand-ink:#FFFFFF; --brand-soft:#E3EBFB;
+  --input:#FFF6C7; --input-line:#E8CF5A;
+  --ok:#157F3B; --ok-bg:#E2F4E8; --warn:#9A5B00; --warn-bg:#FDF0D8; --bad:#B42318; --bad-bg:#FCE4E2;
+  --display:'Tajawal','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --body:'IBM Plex Sans Arabic',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1324; --surface:#121D33; --ink:#E8EEF8; --muted:#A3B0C6; --line:#24324D;
+  --brand:#5B8CF0; --brand-ink:#0B1324; --brand-soft:#1A2A4A;
+  --input:#3A3315; --input-line:#8C7A2A;
+  --ok:#5BD08A; --ok-bg:#143322; --warn:#F2B357; --warn-bg:#3A2A10; --bad:#FF8A80; --bad-bg:#3D1A18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1324; --surface:#121D33; --ink:#E8EEF8; --muted:#A3B0C6; --line:#24324D;
+  --brand:#5B8CF0; --brand-ink:#0B1324; --brand-soft:#1A2A4A;
+  --input:#3A3315; --input-line:#8C7A2A;
+  --ok:#5BD08A; --ok-bg:#143322; --warn:#F2B357; --warn-bg:#3A2A10; --bad:#FF8A80; --bad-bg:#3D1A18; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+header.band{background:var(--brand);color:var(--brand-ink)}
+header .wrap{padding-block:28px 26px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:52px;height:52px;border-radius:14px;background:var(--brand-ink);color:var(--brand);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px}
+.brand h1{margin:0;font-family:var(--display);font-size:28px;font-weight:900;line-height:1.1}
+.brand p{margin:2px 0 0;font-size:14px;opacity:.9}
+.updated{font-size:13px;border:1px solid currentColor;border-radius:999px;padding:4px 12px;opacity:.9}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 18px}
+nav.tabs button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px;border-radius:12px;cursor:pointer;min-height:44px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25}
+nav.tabs button small{font-weight:400;color:var(--muted);font-size:12px}
+nav.tabs button[aria-selected="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+nav.tabs button[aria-selected="true"] small{color:var(--brand-ink);opacity:.85}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px}
+@media (max-width:760px){.panel{grid-template-columns:minmax(0,1fr);padding:18px}}
+.panel h2{margin:0 0 4px;font-family:var(--display);font-size:22px;font-weight:800;text-wrap:balance}
+.en{color:var(--muted);font-size:12.5px;font-weight:400}
+.lead{margin:0 0 16px;color:var(--muted);font-size:14px}
+.hint{display:inline-block;background:var(--input);border:1px solid var(--input-line);border-radius:8px;padding:2px 10px;font-size:12.5px;margin-bottom:14px}
+.fields{display:flex;flex-direction:column;gap:14px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:14px}
+input,select{font:inherit;font-variant-numeric:tabular-nums;border:1px solid var(--input-line);background:var(--input);color:var(--ink);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:inherit;flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--brand);color:var(--ink)}
+.results{display:flex;flex-direction:column;gap:14px;min-width:0}
+.big{border-radius:14px;background:var(--brand-soft);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.big .k{font-size:13px;color:var(--muted)}
+.big .v{font-family:var(--display);font-size:32px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:420px;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12.5px;color:var(--muted);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+tr.now td{font-weight:700}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:700}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
+.check{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.check .t{font-weight:600}
+.check .d{color:var(--muted);font-size:13.5px}
+.notes{border-top:1px dashed var(--line);padding-top:12px;font-size:13px;color:var(--muted)}
+.notes ul{margin:4px 0 0;padding-inline-start:18px}
+.emp{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 44px;gap:8px;align-items:end}
+.iconbtn{font:inherit;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center}
+.addbtn{font:inherit;font-weight:600;min-height:44px;border-radius:10px;border:1px dashed var(--brand);background:transparent;color:var(--brand);cursor:pointer}
+footer{margin-top:22px;font-size:12.5px;color:var(--muted);text-align:center}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">E</div>
+      <div>
+        <h1>منقذك — EMAN HR</h1>
+        <p>حاسبات موارد بشرية مجانية · Free HR Calculators</p>
+      </div>
+    </div>
+    <span class="updated">محدّثة بقرارات نوفمبر 2026</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav class="tabs" role="tablist" aria-label="الحاسبات">
+    <button role="tab" id="tab-gosi" aria-controls="p-gosi" aria-selected="true">التأمينات الاجتماعية<small>GOSI</small></button>
+    <button role="tab" id="tab-nitaqat" aria-controls="p-nitaqat" aria-selected="false">أثر قرار نطاقات<small>Nitaqat 2027–2028</small></button>
+    <button role="tab" id="tab-ot" aria-controls="p-ot" aria-selected="false">الأجر الإضافي<small>Overtime</small></button>
+    <button role="tab" id="tab-fine" aria-controls="p-fine" aria-selected="false">حد الجزاءات والخصم<small>Deduction limit</small></button>
+  </nav>
+
+  <!-- GOSI -->
+  <section class="panel" id="p-gosi" role="tabpanel" aria-labelledby="tab-gosi">
+    <div>
+      <h2>حاسبة التأمينات الاجتماعية <span class="en">GOSI Contributions</span></h2>
+      <p class="lead">كم ينخصم من الموظف، وكم تدفع المنشأة، وكيف يتغير المبلغ لين 2028.</p>
+      <span class="hint">عبّ الخانات الصفراء فقط · Fill in the yellow cells only</span>
+      <div class="fields">
+        <div>
+          <label id="g-nat-l">الجنسية <span class="en">Nationality</span></label>
+          <div class="seg" role="group" aria-labelledby="g-nat-l">
+            <button type="button" id="g-sa" aria-pressed="true">سعودي</button>
+            <button type="button" id="g-ns" aria-pressed="false">غير سعودي</button>
+          </div>
+        </div>
+        <div id="g-sys-wrap">
+          <label id="g-sys-l">نظام التأمينات <span class="en">GOSI system</span></label>
+          <div class="seg" role="group" aria-labelledby="g-sys-l">
+            <button type="button" id="g-new" aria-pressed="true">الجديد (أول تسجيل من 3 يوليو 2024)</button>
+            <button type="button" id="g-old" aria-pressed="false">القديم</button>
+          </div>
+        </div>
+        <div class="row2">
+          <label for="g-basic">الراتب الأساسي <span class="en">Basic</span><input id="g-basic" type="number" min="0" step="1" value="7000" inputmode="decimal"></label>
+          <label for="g-house">بدل السكن <span class="en">Housing</span><input id="g-house" type="number" min="0" step="1" value="1750" inputmode="decimal"></label>
+        </div>
+        <label for="g-other">بدلات أخرى (ما تدخل في الاشتراك) <span class="en">Other allowances</span><input id="g-other" type="number" min="0" step="1" value="500" inputmode="decimal"></label>
+      </div>
+    </div>
+    <div class="results" aria-live="polite">
+      <div class="grid2">
+        <div class="big"><span class="k">يُخصم من الموظف شهريًا</span><span class="v" id="g-emp">—</span></div>
+        <div class="big"><span class="k">تدفعه المنشأة شهريًا</span><span class="v" id="g-er">—</span></div>
+      </div>
+      <div class="big"><span class="k">صافي الراتب بعد التأمينات · Net salary</span><span class="v" id="g-net">—</span></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>الفترة</th><th>نسبة الموظف</th><th>خصم الموظف</th><th>نسبة المنشأة</th><th>على المنشأة</th></tr></thead>
+          <tbody id="g-rows"></tbody>
+        </table>
+      </div>
+      <div class="notes">ملاحظات
+        <ul>
+          <li>الأجر الخاضع = الأساسي + السكن، بحد أعلى 45,000 ريال.</li>
+          <li>السعودي: معاشات + ساند 0.75% على كل طرف، والمنشأة تدفع 2% أخطار مهنية.</li>
+          <li>النظام الجديد: نسبة المعاشات تزيد 0.5% كل يوليو لين توصل 11% في 2028.</li>
+          <li>غير السعودي: ما ينخصم منه شي، والمنشأة تدفع 2% أخطار مهنية.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- NITAQAT -->
+  <section class="panel" id="p-nitaqat" role="tabpanel" aria-labelledby="tab-nitaqat" hidden>
+    <div>
+      <h2>أثر قرار نطاقات الجديد <span class="en">Nitaqat Wage Threshold</span></h2>
+      <p class="lead">مين من موظفينك السعوديين ينحسب كامل الحين، وبعد أبريل 2027، وبعد أبريل 2028.</p>
+      <span class="hint">عبّ الخانات الصفراء فقط · Fill in the yellow cells only</span>
+      <div class="fields">
+        <label for="n-ns">عدد الموظفين غير السعوديين <span class="en">Non-Saudi headcount</span><input id="n-ns" type="number" min="0" step="1" value="8" inputmode="numeric"></label>
+        <div id="n-list" class="fields"></div>
+        <button type="button" class="addbtn" id="n-add">+ إضافة موظف سعودي</button>
+      </div>
+    </div>
+    <div class="results" aria-live="polite">
+      <div class="tbl">
+        <table>
+          <thead><tr><th>الفترة</th><th>الحد الأدنى</th><th>السعوديين المحتسبين</th><th>نسبة التوطين</th></tr></thead>
+          <tbody id="n-sum"></tbody>
+        </table>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>الموظف</th><th>الراتب</th><th>الحين</th><th>أبريل 2027</th><th>أبريل 2028</th></tr></thead>
+          <tbody id="n-rows"></tbody>
+        </table>
+      </div>
+      <div class="notes">ملاحظات
+        <ul>
+          <li>الحين: 4,000 فأكثر = موظف كامل، من 3,000 إلى أقل من 4,000 = نص موظف.</li>
+          <li>من 25 أبريل 2027 يصير الحد 5,000، ومن 25 أبريل 2028 يصير 6,000.</li>
+          <li>احتساب "نص موظف" تحت الحدود الجديدة مبني على المنشور في الأخبار (أقل من الحد بـ1,000 أو أقل). تأكد من الدليل الإجرائي الرسمي.</li>
+          <li>النسبة تقديرية على أساس الدوام الكامل. نسبة نطاقك الفعلية تظهر في قوى.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERTIME -->
+  <section class="panel" id="p-ot" role="tabpanel" aria-labelledby="tab-ot" hidden>
+    <div>
+      <h2>حاسبة الأجر الإضافي <span class="en">Overtime Pay</span></h2>
+      <p class="lead">حسب نظام العمل: أجر الساعة كامل + 50% من أجر الساعة الأساسي.</p>
+      <span class="hint">عبّ الخانات الصفراء فقط · Fill in the yellow cells only</span>
+      <div class="fields">
+        <div class="row2">
+          <label for="o-basic">الراتب الأساسي <span class="en">Basic</span><input id="o-basic" type="number" min="0" step="1" value="6000" inputmode="decimal"></label>
+          <label for="o-allow">مجموع البدلات <span class="en">Allowances</span><input id="o-allow" type="number" min="0" step="1" value="2000" inputmode="decimal"></label>
+        </div>
+        <div class="row2">
+          <label for="o-day">ساعات الدوام اليومية <span class="en">Daily hours</span><input id="o-day" type="number" min="1" max="12" step="1" value="8" inputmode="numeric"></label>
+          <label for="o-hrs">ساعات الأوفر تايم <span class="en">OT hours</span><input id="o-hrs" type="number" min="0" step="0.5" value="20" inputmode="decimal"></label>
+        </div>
+      </div>
+    </div>
+    <div class="results" aria-live="polite">
+      <div class="big"><span class="k">مستحق الأجر الإضافي · Total OT pay</span><span class="v" id="o-total">—</span></div>
+      <div class="tbl">
+        <table>
+          <tbody>
+            <tr><td>أجر الساعة (الراتب الكامل)</td><td id="o-h1">—</td></tr>
+            <tr><td>50% من أجر الساعة الأساسي</td><td id="o-h2">—</td></tr>
+            <tr class="now"><td>قيمة ساعة الأوفر تايم</td><td id="o-rate">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="notes">ملاحظات
+        <ul>
+          <li>أجر الساعة = الراتب ÷ 30 ÷ ساعات الدوام اليومية.</li>
+          <li>في رمضان ساعات العمل للمسلمين 6 ساعات يوميًا، فغيّر خانة الساعات.</li>
+          <li>بعض المنشآت تحسبه على الأساسي فقط × 1.5. هذا أقل من حد النظام، إلا إذا العقد أو اللائحة تعطي أكثر.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINE LIMIT -->
+  <section class="panel" id="p-fine" role="tabpanel" aria-labelledby="tab-fine" hidden>
+    <div>
+      <h2>حد الجزاءات والخصم <span class="en">Deduction Limit Check</span></h2>
+      <p class="lead">تأكد قبل ما تطبق الجزاء إنه ما يتجاوز الحد النظامي.</p>
+      <span class="hint">عبّ الخانات الصفراء فقط · Fill in the yellow cells only</span>
+      <div class="fields">
+        <label for="f-wage">الأجر الشهري <span class="en">Monthly wage</span><input id="f-wage" type="number" min="0" step="1" value="6000" inputmode="decimal"></label>
+        <div class="row2">
+          <label for="f-days">جزاء المخالفة الحالية (أيام) <span class="en">This fine (days)</span><input id="f-days" type="number" min="0" step="0.5" value="3" inputmode="decimal"></label>
+          <label for="f-prev">جزاءات سابقة هالشهر (أيام) <span class="en">Earlier fines (days)</span><input id="f-prev" type="number" min="0" step="0.5" value="1" inputmode="decimal"></label>
+        </div>
+        <label for="f-other">خصومات ثانية هالشهر (سلف، قروض…) <span class="en">Other deductions SAR</span><input id="f-other" type="number" min="0" step="1" value="1500" inputmode="decimal"></label>
+      </div>
+    </div>
+    <div class="results" aria-live="polite">
+      <div class="grid2">
+        <div class="big"><span class="k">قيمة الجزاء الحالي</span><span class="v" id="f-amt">—</span></div>
+        <div class="big"><span class="k">مجموع الخصم هالشهر</span><span class="v" id="f-tot">—</span></div>
+      </div>
+      <div id="f-checks" class="fields"></div>
+      <div class="notes">ملاحظات
+        <ul>
+          <li>الغرامة عن المخالفة الواحدة ما تتجاوز أجر 5 أيام.</li>
+          <li>مجموع الغرامات في الشهر ما يتجاوز أجر 5 أيام.</li>
+          <li>مجموع كل الخصومات ما يتجاوز نص الأجر، إلا في حالات يحددها النظام (مثل النفقة).</li>
+          <li>أجر اليوم = الأجر الشهري ÷ 30. لازم يكون الجزاء منصوص عليه في لائحة تنظيم العمل المعتمدة.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>منقذك — EMAN HR · الحاسبات استرشادية، والمرجع النهائي نظام العمل ومنصات قوى والتأمينات.</footer>
+</main>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const num = id => { const v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  const sar = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' ريال';
+  const pct = v => (Math.round(v*100)/100).toLocaleString('en-US',{maximumFractionDigits:2}) + '%';
+
+  // Tabs
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  function show(tab){
+    tabs.forEach(t=>{ const on = t===tab; t.setAttribute('aria-selected', on); $(t.getAttribute('aria-controls')).hidden = !on; });
+    try{ localStorage.setItem('mq-tab', tab.id); }catch(e){}
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>show(t)));
+  try{ const s = localStorage.getItem('mq-tab'); if(s && $(s)) show($(s)); }catch(e){}
+
+  // GOSI
+  let saudi = true, newSys = true;
+  function seg(a,b,val){ $(a).setAttribute('aria-pressed', val); $(b).setAttribute('aria-pressed', !val); }
+  $('g-sa').onclick=()=>{saudi=true;gosi()}; $('g-ns').onclick=()=>{saudi=false;gosi()};
+  $('g-new').onclick=()=>{newSys=true;gosi()}; $('g-old').onclick=()=>{newSys=false;gosi()};
+  function gosi(){
+    seg('g-sa','g-ns',saudi); seg('g-new','g-old',newSys);
+    $('g-sys-wrap').hidden = !saudi;
+    const basic=num('g-basic'), house=num('g-house'), other=num('g-other');
+    const wage = Math.min(basic+house, 45000);
+    const periods = [
+      {name:'الحين (حتى يونيو 2027)', a:10},
+      {name:'من يوليو 2027', a:10.5},
+      {name:'من يوليو 2028', a:11}
+    ];
+    let rows='', first=null;
+    periods.forEach((p,i)=>{
+      let e, r;
+      if(!saudi){ e=0; r=2; }
+      else { const a = newSys ? p.a : 9; e = a+0.75; r = a+0.75+2; }
+      const ea = wage*e/100, ra = wage*r/100;
+      if(i===0) first={ea,ra};
+      rows += `<tr class="${i===0?'now':''}"><td>${p.name}</td><td>${pct(e)}</td><td>${sar(ea)}</td><td>${pct(r)}</td><td>${sar(ra)}</td></tr>`;
+    });
+    $('g-rows').innerHTML = rows;
+    $('g-emp').textContent = sar(first.ea);
+    $('g-er').textContent = sar(first.ra);
+    $('g-net').textContent = sar(basic+house+other-first.ea);
+  }
+  ['g-basic','g-house','g-other'].forEach(id=>$(id).addEventListener('input',gosi));
+
+  // Nitaqat
+  let emps = [
+    {n:'موظف 1', s:3500},{n:'موظف 2', s:4200},{n:'موظف 3', s:4800},
+    {n:'موظف 4', s:5500},{n:'موظف 5', s:6500},{n:'موظف 6', s:9000}
+  ];
+  const regimes = [
+    {name:'الحين', full:4000, half:3000},
+    {name:'من 25 أبريل 2027', full:5000, half:4000},
+    {name:'من 25 أبريل 2028', full:6000, half:5000}
+  ];
+  const weight = (s,r) => s>=r.full ? 1 : s>=r.half ? 0.5 : 0;
+  const tag = w => w===1 ? '<span class="pill ok">كامل</span>' : w===0.5 ? '<span class="pill warn">نص</span>' : '<span class="pill bad">ما ينحسب</span>';
+  function renderList(){
+    $('n-list').innerHTML = emps.map((e,i)=>`
+      <div class="emp">
+        <label for="n-name-${i}">الاسم<input id="n-name-${i}" data-i="${i}" data-k="n" type="text" value="${e.n.replace(/"/g,'&quot;')}"></label>
+        <label for="n-sal-${i}">الراتب<input id="n-sal-${i}" data-i="${i}" data-k="s" type="number" min="0" step="1" value="${e.s}" inputmode="decimal"></label>
+        <button type="button" class="iconbtn" data-del="${i}" aria-label="حذف ${e.n.replace(/"/g,'&quot;')}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>`).join('');
+  }
+  $('n-list').addEventListener('input', ev=>{
+    const t=ev.target, i=+t.dataset.i; if(isNaN(i)) return;
+    if(t.dataset.k==='n') emps[i].n=t.value; else { const v=parseFloat(t.value); emps[i].s = isFinite(v)&&v>0?v:0; }
+    nitaqat();
+  });
+  $('n-list').addEventListener('click', ev=>{
+    const b=ev.target.closest('[data-del]'); if(!b) return;
+    emps.splice(+b.dataset.del,1); renderList(); nitaqat();
+  });
+  $('n-add').onclick=()=>{ emps.push({n:'موظف '+(emps.length+1), s:5000}); renderList(); nitaqat(); const l=$('n-sal-'+(emps.length-1)); if(l) l.focus(); };
+  $('n-ns').addEventListener('input',nitaqat);
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function nitaqat(){
+    const ns = Math.floor(num('n-ns'));
+    const total = emps.length + ns;
+    $('n-sum').innerHTML = regimes.map((r,i)=>{
+      const w = emps.reduce((a,e)=>a+weight(e.s,r),0);
+      const ratio = total ? w/total*100 : 0;
+      return `<tr class="${i===0?'now':''}"><td>${r.name}</td><td>${r.full.toLocaleString('en-US')}</td><td>${w} من ${emps.length}</td><td>${pct(ratio)}</td></tr>`;
+    }).join('');
+    $('n-rows').innerHTML = emps.length ? emps.map(e=>`<tr><td>${esc(e.n)}</td><td>${e.s.toLocaleString('en-US')}</td>${regimes.map(r=>`<td>${tag(weight(e.s,r))}</td>`).join('')}</tr>`).join('')
+      : '<tr><td colspan="5">أضف موظف سعودي عشان تشوف النتيجة.</td></tr>';
+  }
+
+  // Overtime
+  function ot(){
+    const b=num('o-basic'), al=num('o-allow'), d=num('o-day')||8, h=num('o-hrs');
+    const h1=(b+al)/30/d, h2=0.5*b/30/d, rate=h1+h2;
+    $('o-h1').textContent=sar(h1); $('o-h2').textContent=sar(h2); $('o-rate').textContent=sar(rate);
+    $('o-total').textContent=sar(rate*h);
+  }
+  ['o-basic','o-allow','o-day','o-hrs'].forEach(id=>$(id).addEventListener('input',ot));
+
+  // Fine limit
+  function fine(){
+    const w=num('f-wage'), d=num('f-days'), p=num('f-prev'), o=num('f-other');
+    const day=w/30, amt=d*day, fines=(d+p)*day, tot=fines+o;
+    $('f-amt').textContent=sar(amt); $('f-tot').textContent=sar(tot);
+    const checks=[
+      {ok:d<=5, t:'المخالفة الواحدة ما تتجاوز أجر 5 أيام', d: d<=5 ? `الجزاء ${d} يوم، ضمن الحد.` : `الجزاء ${d} يوم، يتجاوز الحد بـ ${d-5} يوم. أقصى جزاء ${sar(5*day)}.`},
+      {ok:d+p<=5, t:'مجموع الجزاءات هالشهر ما يتجاوز أجر 5 أيام', d: d+p<=5 ? `المجموع ${d+p} يوم، ضمن الحد.` : `المجموع ${d+p} يوم. المتاح هالشهر ${Math.max(0,5-p)} يوم فقط، والباقي يتأجل للشهر الجاي.`},
+      {ok:tot<=w/2, t:'مجموع الخصومات ما يتجاوز نص الأجر', d: tot<=w/2 ? `الخصم ${sar(tot)} من حد ${sar(w/2)}.` : `الخصم ${sar(tot)} يتجاوز نص الأجر (${sar(w/2)}) بـ ${sar(tot-w/2)}.`}
+    ];
+    $('f-checks').innerHTML = checks.map(c=>`<div class="check"><span class="pill ${c.ok?'ok':'bad'}">${c.ok?'نظامي':'يتجاوز'}</span><div><div class="t">${c.t}</div><div class="d">${c.d}</div></div></div>`).join('');
+  }
+  ['f-wage','f-days','f-prev','f-other'].forEach(id=>$(id).addEventListener('input',fine));
+
+  gosi(); renderList(); nitaqat(); ot(); fine();
+})();
+</script>
