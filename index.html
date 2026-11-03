@@ -188,7 +188,9 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       </select></label>
       <label>تاريخ بداية العمل<em>Start date</em><input id="e_start" type="date"></label>
       <label>تاريخ نهاية العمل<em>End date</em><input id="e_end" type="date"></label>
-      <label>طريقة حساب المدة<em>Year basis</em><select id="e_basis"><option value="" selected>اختر</option><option value="360">360 (سنة + شهر ÷ 12 + يوم ÷ 360)</option><option value="365">365 (الأيام ÷ 365)</option></select></label>
+      <label>نوع العقد (لتعويض الإنهاء لغير سبب مشروع)<em>Contract type</em><select id="e_ctype"><option value="ind" selected>غير محدد المدة</option><option value="fix">محدد المدة</option></select></label>
+      <label>الأيام الباقية من العقد (للعقد المحدد)<em>Remaining contract days</em><input id="e_remd" type="number" min="0" step="1"></label>
+      <label>طريقة حساب المدة<em>Year basis</em><select id="e_basis"><option value="d360" selected>عدد الأيام ÷ 360</option><option value="360">سنة + شهر ÷ 12 + يوم ÷ 360</option><option value="365">365</option></select></label>
     </div>
     <p class="note">المكافأة على الأجر الفعلي: الأساسي مع البدلات الثابتة.</p>
   </div>
@@ -200,6 +202,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <div class="row"><span class="k">أول 5 سنوات (نصف راتب لكل سنة)<i>First 5 years</i></span><span class="v" id="e_p1">0</span></div>
       <div class="row"><span class="k">بعد 5 سنوات (راتب كامل لكل سنة)<i>After 5 years</i></span><span class="v" id="e_p2">0</span></div>
       <div class="row"><span class="k">نسبة الاستحقاق<i>Entitlement</i></span><span class="v" id="e_fac">100%</span></div>
+      <div class="row"><span class="k">تعويض الإنهاء لغير سبب مشروع<i>Unjust termination</i></span><span class="v" id="e_c77">0</span></div>
     </div>
     <div class="how" id="e_how"></div>
     <div class="status" id="e_st"></div>
@@ -247,11 +250,13 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <label>أيام الدوام في الشهر الأخير<em>Days worked</em><input id="m_att" type="number" min="0" step="0.5"></label>
       <label>أشهر كاملة غير مدفوعة<em>Unpaid full months</em><input id="m_months" type="number" min="0" step="1"></label>
       <label>رصيد الإجازات (يوم)<em>Leave balance</em><input id="m_vac" type="number" min="0" step="0.001"></label>
-      <label>أجر الإجازة يُحسب على<em>Leave pay basis</em><select id="m_vb"><option value="nofood" selected>الإجمالي بدون بدل الطعام</option><option value="all">الإجمالي كامل</option><option value="bh">الأساسي + السكن</option><option value="b">الأساسي فقط</option></select></label>
+      <label>أجر الإجازة يُحسب على<em>Leave pay basis</em><select id="m_vb"><option value="all" selected>الإجمالي كامل</option><option value="nofood">الإجمالي بدون بدل الطعام</option><option value="bh">الأساسي + السكن</option><option value="b">الأساسي فقط</option></select></label>
+      <label>نوع العقد (لتعويض الإنهاء لغير سبب مشروع)<em>Contract type</em><select id="m_ctype"><option value="ind" selected>غير محدد المدة</option><option value="fix">محدد المدة</option></select></label>
+      <label>الأيام الباقية من العقد (للعقد المحدد)<em>Remaining contract days</em><input id="m_remd" type="number" min="0" step="1"></label>
       <label>ساعات إضافية<em>Overtime hours</em><input id="m_ot" type="number" min="0" step="0.5"></label>
       <label>أيام غياب<em>Absence days</em><input id="m_abs" type="number" min="0" step="0.5"></label>
       <label>سلف وخصومات أخرى<em>Loans & other</em><input id="m_ded" type="number" min="0" step="0.01"></label>
-      <label>طريقة مدة الخدمة<em>Year basis</em><select id="m_basis"><option value="auto" selected>حسب الطريقة (الأولى 360 · الثانية 365)</option><option value="360">360</option><option value="365">365</option></select></label>
+      <label>طريقة مدة الخدمة<em>Year basis</em><select id="m_basis"><option value="auto" selected>حسب الطريقة (الأولى: الأيام ÷ 360 · الثانية 365)</option><option value="d360">عدد الأيام ÷ 360</option><option value="360">سنة + شهر ÷ 12 + يوم ÷ 360</option><option value="365">365</option></select></label>
     </div>
     <p class="note">الطريقة الأولى: الراتب الأخير على الإجمالي ÷ أيام الشهر × أيام الدوام، والمكافأة على الإجمالي. الطريقة الثانية: الأساسي والبدلات الأخرى على أيام الدوام، والسكن والطعام لين آخر يوم في العقد، والمكافأة على الإجمالي بدون الطعام. الإجازات والإضافي والغياب نفسها في الطريقتين.</p>
   </div>
@@ -262,6 +267,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <div class="row"><span class="k">رصيد الإجازات<i>Leave balance</i></span><span class="v" id="m_v">0</span></div>
       <div class="row"><span class="k">الساعات الإضافية<i>Overtime</i></span><span class="v" id="m_o">0</span></div>
       <div class="row"><span class="k">مكافأة نهاية الخدمة<i>End of service</i></span><span class="v" id="m_e">0</span></div>
+      <div class="row"><span class="k">تعويض الإنهاء لغير سبب مشروع<i>Unjust termination</i></span><span class="v" id="m_c77">0</span></div>
       <div class="row neg"><span class="k">خصم الغياب<i>Absence</i></span><span class="v" id="m_a">0</span></div>
       <div class="row neg"><span class="k">سلف وخصومات أخرى<i>Loans & other</i></span><span class="v" id="m_dd">0</span></div>
     </div>
@@ -391,9 +397,9 @@ function lastday(){
 }
 function eos(){
   const w=num('e_wage'),s=dt('e_start'),e=dt('e_end'),b=$('e_basis').value,rs=$('e_reason').value;
-  const errs=[];if(w<=0)errs.push('اكتب الراتب');if(s===null||e===null)errs.push('اكتب التاريخين');else if(e<s)errs.push('تاريخ النهاية قبل البداية');if(!b)errs.push('اختر طريقة حساب المدة');
+  const errs=[];if(w<=0)errs.push('اكتب الراتب');if(s===null||e===null)errs.push('اكتب التاريخين');else if(e<s)errs.push('تاريخ النهاية قبل البداية');
   let yrs=0,svc='-';
-  if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
+  if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='d360'?((e-s)/DAY)/360:b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
   const p1=w/2*Math.min(yrs,5),p2=w*Math.max(yrs-5,0);
   let fac=1,why='استحقاق كامل';
   const fw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
@@ -403,9 +409,11 @@ function eos(){
   if(rs==='abs'){fac=0;why='الغياب بدون عذر: لا يستحق مكافأة'}
   if(rs==='resign'){if(yrs<2){fac=0;why='أقل من سنتين: لا يستحق'}else if(yrs<5){fac=1/3;why='من 2 إلى أقل من 5 سنوات: ثلث المكافأة'}else if(yrs<10){fac=2/3;why='من 5 إلى أقل من 10 سنوات: ثلثا المكافأة'}else{why='10 سنوات فأكثر: المكافأة كاملة'}}
   const amt=r2((p1+p2)*fac);
+  let c77=0,c77t='';if(rs==='f77'){const fix=$('e_ctype').value==='fix';c77=fix?w/30*num('e_remd'):w/2*yrs;c77t=fix?`${f2(w)} ÷ 30 × ${fd(num('e_remd'))} يوم باقي`:`${f2(w)} ÷ 2 × ${yrs.toFixed(4)} سنة (أجر 15 يوم عن كل سنة)`;if(c77<w*2){c77=w*2;c77t+=' · أقل من أجر شهرين، فيصير أجر شهرين'}c77=r2(c77)}
+  $('e_c77').textContent=f2(c77);
   $('e_svc').textContent=svc;$('e_yrs').textContent=yrs.toFixed(4);$('e_p1').textContent=f2(p1);$('e_p2').textContent=f2(p2);$('e_fac').textContent=Math.round(fac*1000)/10+'%';$('e_amt').textContent=f2(amt);
-  $('e_how').innerHTML=`<b>أول 5 سنوات</b> = ${f2(w)} ÷ 2 × ${Math.min(yrs,5).toFixed(4)} = ${f2(p1)}<br><b>بعد 5 سنوات</b> = ${f2(w)} × ${Math.max(yrs-5,0).toFixed(4)} = ${f2(p2)}<br><b>${why}</b>`;
-  status('e_st',errs);texts.eos=`مكافأة نهاية الخدمة: ${f2(amt)} ريال (${yrs.toFixed(2)} سنة، ${why})`;
+  $('e_how').innerHTML=`<b>أول 5 سنوات</b> = ${f2(w)} ÷ 2 × ${Math.min(yrs,5).toFixed(4)} = ${f2(p1)}<br><b>بعد 5 سنوات</b> = ${f2(w)} × ${Math.max(yrs-5,0).toFixed(4)} = ${f2(p2)}<br><b>${why}</b>`+(c77?`<br><b>تعويض الإنهاء لغير سبب مشروع</b> = ${c77t} = ${f2(c77)}`:'');
+  status('e_st',errs);texts.eos=`مكافأة نهاية الخدمة: ${f2(amt)} ريال (${yrs.toFixed(2)} سنة، ${why})`+(c77?` | تعويض الإنهاء لغير سبب مشروع: ${f2(c77)} ريال`:"");
 }
 function salary(){
   const sa=$('s_nat').value==='سعودي',net=$('s_type').value==='net',A=num('s_amt'),r=sa?num('s_rate')/100:0,h=num('s_h')/100,t=num('s_t')/100,cap=num('s_cap')||45000;
@@ -439,30 +447,32 @@ function settle(){
   const errs=[];if(W<=0)errs.push('اكتب الراتب');if(h===null||e===null)errs.push('اكتب تاريخ التعيين والنهاية');else if(e<h)errs.push('تاريخ النهاية قبل التعيين');if(!md)errs.push('اختر أيام الشهر');else if(att>md)errs.push('أيام الدوام أكثر من أيام الشهر');if(sa&&$('m_rate').value==='')errs.push('اختر نسبة التأمينات');
   const con=e!==null?new Date(e).getUTCDate():0,spec=hs+fd,oth=W-spec;
   const last=B?oth/md*att+spec/md*con:W/md*att;
-  const gm=(bs+hs)*r,gp=mo+(B?con:att)/md,gosi=gm*gp;
+  const gm=(bs+hs)*r,gp=mo+con/md,gosi=gm*gp;
   const sal=t2(mo*W+last-gosi);
   const vb=$('m_vb').value,vw=vb==='all'?W:vb==='bh'?bs+hs:vb==='b'?bs:W-fd,vlab=vb==='all'?'الإجمالي':vb==='bh'?'الأساسي + السكن':vb==='b'?'الأساسي':'الإجمالي بدون الطعام';
   const vac=t2(num('m_vac')*vw/30);
-  const otr=(W-fd)/240+0.5*bs/240,otv=t2(num('m_ot')*otr);
-  const ab=t2(num('m_abs')*oth/30);
-  let yrs=0,svc='-';const bsel=$('m_basis').value,basis=bsel==='auto'?(B?'365':'360'):bsel;
-  if(h!==null&&e!==null&&e>=h){const o=ymd(h,e+DAY);svc=ymdTxt(o);yrs=basis==='360'?o.y+o.m/12+o.d/360:((e-h)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
+  const otr=bs/240*1.5,otv=t2(num('m_ot')*otr);
+  const ab=t2(num('m_abs')*bs/(md||30));
+  let yrs=0,svc='-';const bsel=$('m_basis').value,basis=bsel==='auto'?(B?'365':'d360'):bsel;
+  if(h!==null&&e!==null&&e>=h){const o=ymd(h,e+DAY);svc=ymdTxt(o);yrs=basis==='d360'?((e-h)/DAY)/360:basis==='360'?o.y+o.m/12+o.d/360:((e-h)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
   const ew=B?W-fd:W,full=ew/2*Math.min(yrs,5)+ew*Math.max(yrs-5,0);
   const rs=$('m_reason').value;let fac=1,why='المكافأة كاملة';
   const mw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
   if(mw[rs])why=mw[rs];
   if(rs==='none'){fac=0;why='خلال فترة التجربة: لا مكافأة'}if(rs==='none80'){fac=0;why='فصل لمخالفة جسيمة: لا مكافأة'}if(rs==='none80a'){fac=0;why='الغياب بدون عذر: لا مكافأة'}
   if(rs==='resign'){if(yrs<2){fac=0;why='استقالة أقل من سنتين: لا مكافأة'}else if(yrs<5){fac=1/3;why='استقالة: ثلث المكافأة'}else if(yrs<10){fac=2/3;why='استقالة: ثلثا المكافأة'}else why='استقالة بعد 10 سنوات: كاملة'}
-  const eb=B?r2(full*fac):t2(full*fac),dd=num('m_ded'),net=r2(sal+vac+otv+eb-ab-dd);
-  $('m_sal').textContent=f2(sal);$('m_v').textContent=f2(vac);$('m_o').textContent=f2(otv);$('m_e').textContent=f2(eb);$('m_a').textContent=f2(ab);$('m_dd').textContent=f2(dd);$('m_net').textContent=f2(net);
+  const eb=B?r2(full*fac):t2(full*fac),dd=num('m_ded');
+  let c77=0,c77t='';if(rs==='f77'){const fix=$('m_ctype').value==='fix';c77=fix?W/30*num('m_remd'):W/2*yrs;const mn=W*2;c77t=fix?`${f2(W)} ÷ 30 × ${fd2(num('m_remd'))} يوم باقي`:`${f2(W)} ÷ 2 × ${yrs.toFixed(4)} سنة (أجر 15 يوم عن كل سنة)`;if(c77<mn){c77=mn;c77t+=' · أقل من أجر شهرين، فيصير أجر شهرين'}c77=r2(c77)}
+  const net=r2(sal+vac+otv+eb+c77-ab-dd);
+  $('m_sal').textContent=f2(sal);$('m_v').textContent=f2(vac);$('m_o').textContent=f2(otv);$('m_e').textContent=f2(eb);$('m_c77').textContent=f2(c77);$('m_a').textContent=f2(ab);$('m_dd').textContent=f2(dd);$('m_net').textContent=f2(net);
   const lastTxt=B?`(${f2(oth)} ÷ ${md} × ${fd2(att)}) + (السكن والطعام ${f2(spec)} ÷ ${md} × ${con} يوم لآخر العقد)`:`${f2(W)} ÷ ${md} × ${fd2(att)}`;
   $('m_how').innerHTML=`<b>الإجمالي</b> = ${f2(W)} · <b>مدة الخدمة</b> ${svc}<br>`+
    `<b>الرواتب</b> = ${mo?mo+' شهر × '+f2(W)+' + ':''}${lastTxt}${gosi>0?` − تأمينات ${f2(gosi)} (${f2(bs+hs)} × ${fd2(r*100)}% × ${gp.toFixed(4)} شهر)`:''}<br>`+
    `<b>الإجازات</b> = ${fd2(num('m_vac'))} × ${f2(vw)} (${vlab}) ÷ 30<br>`+
-   `<b>الإضافي</b> = ${fd2(num('m_ot'))} ساعة × ${otr.toFixed(2)}<br>`+
-   `<b>المكافأة</b> = ${f2(ew)} ÷ 2 × ${Math.min(yrs,5).toFixed(4)}${yrs>5?` + ${f2(ew)} × ${(yrs-5).toFixed(4)}`:''} (${basis}) · ${why}`;
+   `<b>الإضافي</b> = ${f2(bs)} ÷ 240 × ${fd2(num('m_ot'))} ساعة × 1.5<br><b>الغياب</b> = ${f2(bs)} ÷ ${md||30} × ${fd2(num('m_abs'))} يوم<br>`+
+   `<b>المكافأة</b> = ${f2(ew)} ÷ 2 × ${Math.min(yrs,5).toFixed(4)}${yrs>5?` + ${f2(ew)} × ${(yrs-5).toFixed(4)}`:''} (${basis==='d360'?'الأيام ÷ 360':basis}) · ${why}`+(c77?`<br><b>تعويض الإنهاء لغير سبب مشروع</b> = ${c77t} = ${f2(c77)}`:'');
   status('m_st',errs);
-  texts.settle=`المخالصة (${B?'الطريقة الثانية':'الطريقة الأولى'}): الرواتب ${f2(sal)} | الإجازات ${f2(vac)} | الإضافي ${f2(otv)} | المكافأة ${f2(eb)} | الغياب −${f2(ab)} | خصومات −${f2(dd)} | الصافي ${f2(net)}`;
+  texts.settle=`المخالصة (${B?'الطريقة الثانية':'الطريقة الأولى'}): الرواتب ${f2(sal)} | الإجازات ${f2(vac)} | الإضافي ${f2(otv)} | المكافأة ${f2(eb)}${c77?` | تعويض الإنهاء ${f2(c77)}`:''} | الغياب −${f2(ab)} | خصومات −${f2(dd)} | الصافي ${f2(net)}`;
 }
 const fd2=x=>fd(x);
 function cost(){
