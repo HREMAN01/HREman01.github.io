@@ -184,7 +184,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
         <option value="f87b">الموظفة خلال 3 أشهر من الولادة</option>
         <option value="prob">خلال فترة التجربة</option>
         <option value="none">فصل لارتكاب مخالفة جسيمة</option>
-        <option value="abs">الغياب بدون عذر (30 يوم متفرقة أو 15 متتالية في السنة)</option>
+        <option value="abs">الغياب بدون عذر: أكثر من 30 يوم في السنة العقدية أو أكثر من 15 يوم متتالية، بعد إنذار كتابي</option>
       </select></label>
       <label>تاريخ بداية العمل<em>Start date</em><input id="e_start" type="date"></label>
       <label>تاريخ نهاية العمل<em>End date</em><input id="e_end" type="date"></label>
@@ -239,7 +239,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
         <option value="f87b">الموظفة خلال 3 أشهر من الولادة</option>
         <option value="none" selected>خلال فترة التجربة</option>
         <option value="none80">فصل لارتكاب مخالفة جسيمة</option>
-        <option value="none80a">الغياب بدون عذر (30 يوم متفرقة أو 15 متتالية في السنة)</option>
+        <option value="none80a">الغياب بدون عذر: أكثر من 30 يوم في السنة العقدية أو أكثر من 15 يوم متتالية، بعد إنذار كتابي</option>
       </select></label>
       <label>تاريخ التعيين<em>Hiring date</em><input id="m_hire" type="date"></label>
       <label>تاريخ نهاية الخدمة<em>End of service</em><input id="m_end" type="date"></label>
@@ -247,6 +247,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <label>أيام الدوام في الشهر الأخير<em>Days worked</em><input id="m_att" type="number" min="0" step="0.5"></label>
       <label>أشهر كاملة غير مدفوعة<em>Unpaid full months</em><input id="m_months" type="number" min="0" step="1"></label>
       <label>رصيد الإجازات (يوم)<em>Leave balance</em><input id="m_vac" type="number" min="0" step="0.001"></label>
+      <label>أجر الإجازة يُحسب على<em>Leave pay basis</em><select id="m_vb"><option value="nofood" selected>الإجمالي بدون بدل الطعام</option><option value="all">الإجمالي كامل</option><option value="bh">الأساسي + السكن</option><option value="b">الأساسي فقط</option></select></label>
       <label>ساعات إضافية<em>Overtime hours</em><input id="m_ot" type="number" min="0" step="0.5"></label>
       <label>أيام غياب<em>Absence days</em><input id="m_abs" type="number" min="0" step="0.5"></label>
       <label>سلف وخصومات أخرى<em>Loans & other</em><input id="m_ded" type="number" min="0" step="0.01"></label>
@@ -392,7 +393,7 @@ function eos(){
   const w=num('e_wage'),s=dt('e_start'),e=dt('e_end'),b=$('e_basis').value,rs=$('e_reason').value;
   const errs=[];if(w<=0)errs.push('اكتب الراتب');if(s===null||e===null)errs.push('اكتب التاريخين');else if(e<s)errs.push('تاريخ النهاية قبل البداية');if(!b)errs.push('اختر طريقة حساب المدة');
   let yrs=0,svc='-';
-  if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365}
+  if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
   const p1=w/2*Math.min(yrs,5),p2=w*Math.max(yrs-5,0);
   let fac=1,why='استحقاق كامل';
   const fw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
@@ -440,11 +441,12 @@ function settle(){
   const last=B?oth/md*att+spec/md*con:W/md*att;
   const gm=(bs+hs)*r,gp=mo+(B?con:att)/md,gosi=gm*gp;
   const sal=t2(mo*W+last-gosi);
-  const vac=t2(num('m_vac')*(W-fd)/30);
+  const vb=$('m_vb').value,vw=vb==='all'?W:vb==='bh'?bs+hs:vb==='b'?bs:W-fd,vlab=vb==='all'?'الإجمالي':vb==='bh'?'الأساسي + السكن':vb==='b'?'الأساسي':'الإجمالي بدون الطعام';
+  const vac=t2(num('m_vac')*vw/30);
   const otr=(W-fd)/240+0.5*bs/240,otv=t2(num('m_ot')*otr);
   const ab=t2(num('m_abs')*oth/30);
   let yrs=0,svc='-';const bsel=$('m_basis').value,basis=bsel==='auto'?(B?'365':'360'):bsel;
-  if(h!==null&&e!==null&&e>=h){const o=ymd(h,e+DAY);svc=ymdTxt(o);yrs=basis==='360'?o.y+o.m/12+o.d/360:((e-h)/DAY+1)/365}
+  if(h!==null&&e!==null&&e>=h){const o=ymd(h,e+DAY);svc=ymdTxt(o);yrs=basis==='360'?o.y+o.m/12+o.d/360:((e-h)/DAY+1)/365;yrs=Math.round(yrs*1e6)/1e6}
   const ew=B?W-fd:W,full=ew/2*Math.min(yrs,5)+ew*Math.max(yrs-5,0);
   const rs=$('m_reason').value;let fac=1,why='المكافأة كاملة';
   const mw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
@@ -456,7 +458,7 @@ function settle(){
   const lastTxt=B?`(${f2(oth)} ÷ ${md} × ${fd2(att)}) + (السكن والطعام ${f2(spec)} ÷ ${md} × ${con} يوم لآخر العقد)`:`${f2(W)} ÷ ${md} × ${fd2(att)}`;
   $('m_how').innerHTML=`<b>الإجمالي</b> = ${f2(W)} · <b>مدة الخدمة</b> ${svc}<br>`+
    `<b>الرواتب</b> = ${mo?mo+' شهر × '+f2(W)+' + ':''}${lastTxt}${gosi>0?` − تأمينات ${f2(gosi)} (${f2(bs+hs)} × ${fd2(r*100)}% × ${gp.toFixed(4)} شهر)`:''}<br>`+
-   `<b>الإجازات</b> = ${fd2(num('m_vac'))} × (${f2(W)} − الطعام) ÷ 30<br>`+
+   `<b>الإجازات</b> = ${fd2(num('m_vac'))} × ${f2(vw)} (${vlab}) ÷ 30<br>`+
    `<b>الإضافي</b> = ${fd2(num('m_ot'))} ساعة × ${otr.toFixed(2)}<br>`+
    `<b>المكافأة</b> = ${f2(ew)} ÷ 2 × ${Math.min(yrs,5).toFixed(4)}${yrs>5?` + ${f2(ew)} × ${(yrs-5).toFixed(4)}`:''} (${basis}) · ${why}`;
   status('m_st',errs);
