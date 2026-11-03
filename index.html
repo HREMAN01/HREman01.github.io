@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="منقذك: حاسبات الموارد البشرية حسب نظام العمل السعودي — هيكلة الراتب، حد نطاقات، رصيد الإجازات، المخالصة، ومكافأة نهاية الخدمة.">
+<meta name="description" content="منقذك: حاسبات الموارد البشرية — هيكلة الراتب، حد نطاقات، رصيد الإجازات، المخالصة، ومكافأة نهاية الخدمة.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="منقذك | Your HR Lifesaver">
-<meta property="og:description" content="حاسبات الموارد البشرية حسب نظام العمل السعودي: هيكلة الراتب، حد نطاقات، رصيد الإجازات، المخالصة، ومكافأة نهاية الخدمة.">
+<meta property="og:description" content="حاسبات الموارد البشرية: هيكلة الراتب، حد نطاقات، رصيد الإجازات، المخالصة، ومكافأة نهاية الخدمة.">
 <meta property="og:url" content="https://hreman01.github.io/">
 <meta property="og:image" content="https://hreman01.github.io/munqithak-cover.jpg">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="627">
@@ -168,13 +168,23 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
     <div class="grid">
       <label>الراتب الإجمالي<em>Total monthly wage</em><input id="e_wage" type="number" min="0" step="0.01"></label>
       <label>سبب انتهاء العلاقة<em>Reason</em><select id="e_reason">
-        <option value="full" selected>انتهاء العقد / اتفاق الطرفين / إنهاء من صاحب العمل</option>
-        <option value="resign">استقالة الموظف (المادة 85)</option>
-        <option value="f81">ترك العمل لإخلال صاحب العمل (المادة 81)</option>
-        <option value="f87">ترك العمل لقوة قاهرة (المادة 87)</option>
-        <option value="f87m">الموظفة خلال 6 أشهر من الزواج (المادة 87)</option>
-        <option value="f87b">الموظفة خلال 3 أشهر من الولادة (المادة 87)</option>
-        <option value="none">فصل حسب المادة 80</option>
+        <option value="full" selected>انتهاء مدة العقد أو عدم تجديده</option>
+        <option value="f74a">اتفاق الطرفين</option>
+        <option value="f75">إنهاء من صاحب العمل لسبب مشروع</option>
+        <option value="f77">إنهاء من صاحب العمل لغير سبب مشروع</option>
+        <option value="f74r">بلوغ سن التقاعد</option>
+        <option value="f74c">إغلاق المنشأة نهائيًا</option>
+        <option value="fdeath">وفاة الموظف</option>
+        <option value="fdis">عجز الموظف كليًا عن العمل</option>
+        <option value="f82">إنهاء بسبب المرض بعد استنفاد الإجازة المرضية</option>
+        <option value="resign">استقالة الموظف</option>
+        <option value="f81">ترك العمل لإخلال صاحب العمل</option>
+        <option value="f87">ترك العمل لقوة قاهرة</option>
+        <option value="f87m">الموظفة خلال 6 أشهر من الزواج</option>
+        <option value="f87b">الموظفة خلال 3 أشهر من الولادة</option>
+        <option value="prob">خلال فترة التجربة</option>
+        <option value="none">فصل لارتكاب مخالفة جسيمة</option>
+        <option value="abs">الغياب بدون عذر (30 يوم متفرقة أو 15 متتالية في السنة)</option>
       </select></label>
       <label>تاريخ بداية العمل<em>Start date</em><input id="e_start" type="date"></label>
       <label>تاريخ نهاية العمل<em>End date</em><input id="e_end" type="date"></label>
@@ -213,14 +223,23 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <label>الجنسية<em>Nationality</em><select id="m_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
       <label>نسبة التأمينات (للسعودي) %<em>GOSI rate</em><select id="m_rate"><option value="" selected>اختر</option><option value="0">0 (غير سعودي)</option><option>9.75</option><option>10.25</option><option>10.75</option><option>11.25</option><option>11.75</option></select></label>
       <label>سبب انتهاء العلاقة<em>Reason</em><select id="m_reason">
-        <option value="full">انتهاء العقد / اتفاق الطرفين / إنهاء من صاحب العمل</option>
-        <option value="resign">استقالة الموظف (المادة 85)</option>
-        <option value="f81">ترك العمل لإخلال صاحب العمل (المادة 81)</option>
-        <option value="f87">ترك العمل لقوة قاهرة (المادة 87)</option>
-        <option value="f87m">الموظفة خلال 6 أشهر من الزواج (المادة 87)</option>
-        <option value="f87b">الموظفة خلال 3 أشهر من الولادة (المادة 87)</option>
-        <option value="none" selected>خلال فترة التجربة (المادة 53)</option>
-        <option value="none80">فصل حسب المادة 80</option>
+        <option value="full">انتهاء مدة العقد أو عدم تجديده</option>
+        <option value="f74a">اتفاق الطرفين</option>
+        <option value="f75">إنهاء من صاحب العمل لسبب مشروع</option>
+        <option value="f77">إنهاء من صاحب العمل لغير سبب مشروع</option>
+        <option value="f74r">بلوغ سن التقاعد</option>
+        <option value="f74c">إغلاق المنشأة نهائيًا</option>
+        <option value="fdeath">وفاة الموظف</option>
+        <option value="fdis">عجز الموظف كليًا عن العمل</option>
+        <option value="f82">إنهاء بسبب المرض بعد استنفاد الإجازة المرضية</option>
+        <option value="resign">استقالة الموظف</option>
+        <option value="f81">ترك العمل لإخلال صاحب العمل</option>
+        <option value="f87">ترك العمل لقوة قاهرة</option>
+        <option value="f87m">الموظفة خلال 6 أشهر من الزواج</option>
+        <option value="f87b">الموظفة خلال 3 أشهر من الولادة</option>
+        <option value="none" selected>خلال فترة التجربة</option>
+        <option value="none80">فصل لارتكاب مخالفة جسيمة</option>
+        <option value="none80a">الغياب بدون عذر (30 يوم متفرقة أو 15 متتالية في السنة)</option>
       </select></label>
       <label>تاريخ التعيين<em>Hiring date</em><input id="m_hire" type="date"></label>
       <label>تاريخ نهاية الخدمة<em>End of service</em><input id="m_end" type="date"></label>
@@ -331,7 +350,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   </div>
 </section>
 
-<footer><span style="font-weight:700;color:var(--ink)">© 2026 إيمان | EMAN HR — جميع الحقوق محفوظة، ويُمنع النسخ أو إعادة النشر دون ذكر المصدر</span><span>منقذك · Your HR Lifesaver</span><span>الحاسبات للتقدير، وقد تختلف بعض البنود حسب سياسة المنشأة وعقد العمل.</span></footer>
+<footer><span style="font-weight:700;color:var(--gold)">© 2026 إيمان | EMAN HR — جميع الحقوق محفوظة، ويُمنع النسخ أو إعادة النشر دون ذكر المصدر</span><span>منقذك · Your HR Lifesaver</span><span>الحاسبات للتقدير، وقد تختلف بعض البنود حسب سياسة المنشأة وعقد العمل.</span></footer>
 </div>
 
 <script>
@@ -376,9 +395,11 @@ function eos(){
   if(s!==null&&e!==null&&e>=s){const o=ymd(s,e+DAY);svc=ymdTxt(o);yrs=b==='360'?o.y+o.m/12+o.d/360:((e-s)/DAY+1)/365}
   const p1=w/2*Math.min(yrs,5),p2=w*Math.max(yrs-5,0);
   let fac=1,why='استحقاق كامل';
-  const fw={f81:'ترك العمل لإخلال صاحب العمل (المادة 81): المكافأة كاملة',f87:'قوة قاهرة (المادة 87): المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج (المادة 87): المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة (المادة 87): المكافأة كاملة'};
+  const fw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
   if(fw[rs])why=fw[rs];
-  if(rs==='none'){fac=0;why='لا يستحق مكافأة (المادة 80)'}
+  if(rs==='none'){fac=0;why='فصل لمخالفة جسيمة: لا يستحق مكافأة'}
+  if(rs==='prob'){fac=0;why='خلال فترة التجربة: لا يستحق مكافأة'}
+  if(rs==='abs'){fac=0;why='الغياب بدون عذر: لا يستحق مكافأة'}
   if(rs==='resign'){if(yrs<2){fac=0;why='أقل من سنتين: لا يستحق'}else if(yrs<5){fac=1/3;why='من 2 إلى أقل من 5 سنوات: ثلث المكافأة'}else if(yrs<10){fac=2/3;why='من 5 إلى أقل من 10 سنوات: ثلثا المكافأة'}else{why='10 سنوات فأكثر: المكافأة كاملة'}}
   const amt=r2((p1+p2)*fac);
   $('e_svc').textContent=svc;$('e_yrs').textContent=yrs.toFixed(4);$('e_p1').textContent=f2(p1);$('e_p2').textContent=f2(p2);$('e_fac').textContent=Math.round(fac*1000)/10+'%';$('e_amt').textContent=f2(amt);
@@ -426,9 +447,9 @@ function settle(){
   if(h!==null&&e!==null&&e>=h){const o=ymd(h,e+DAY);svc=ymdTxt(o);yrs=basis==='360'?o.y+o.m/12+o.d/360:((e-h)/DAY+1)/365}
   const ew=B?W-fd:W,full=ew/2*Math.min(yrs,5)+ew*Math.max(yrs-5,0);
   const rs=$('m_reason').value;let fac=1,why='المكافأة كاملة';
-  const mw={f81:'المادة 81: المكافأة كاملة',f87:'قوة قاهرة (المادة 87): المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج (المادة 87): المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة (المادة 87): المكافأة كاملة'};
+  const mw={f82:'إنهاء بسبب المرض بعد استنفاد الإجازة المرضية: المكافأة كاملة',f74a:'اتفاق الطرفين: المكافأة كاملة',f75:'إنهاء لسبب مشروع: المكافأة كاملة',f77:'إنهاء لغير سبب مشروع: المكافأة كاملة',f74r:'بلوغ سن التقاعد: المكافأة كاملة',f74c:'إغلاق المنشأة: المكافأة كاملة',fdeath:'وفاة الموظف: المكافأة كاملة',fdis:'عجز الموظف كليًا: المكافأة كاملة',f81:'ترك العمل لإخلال صاحب العمل: المكافأة كاملة',f87:'قوة قاهرة: المكافأة كاملة',f87m:'خلال 6 أشهر من الزواج: المكافأة كاملة',f87b:'خلال 3 أشهر من الولادة: المكافأة كاملة'};
   if(mw[rs])why=mw[rs];
-  if(rs==='none'){fac=0;why='خلال فترة التجربة: لا مكافأة'}if(rs==='none80'){fac=0;why='المادة 80: لا مكافأة'}
+  if(rs==='none'){fac=0;why='خلال فترة التجربة: لا مكافأة'}if(rs==='none80'){fac=0;why='فصل لمخالفة جسيمة: لا مكافأة'}if(rs==='none80a'){fac=0;why='الغياب بدون عذر: لا مكافأة'}
   if(rs==='resign'){if(yrs<2){fac=0;why='استقالة أقل من سنتين: لا مكافأة'}else if(yrs<5){fac=1/3;why='استقالة: ثلث المكافأة'}else if(yrs<10){fac=2/3;why='استقالة: ثلثا المكافأة'}else why='استقالة بعد 10 سنوات: كاملة'}
   const eb=B?r2(full*fac):t2(full*fac),dd=num('m_ded'),net=r2(sal+vac+otv+eb-ab-dd);
   $('m_sal').textContent=f2(sal);$('m_v').textContent=f2(vac);$('m_o').textContent=f2(otv);$('m_e').textContent=f2(eb);$('m_a').textContent=f2(ab);$('m_dd').textContent=f2(dd);$('m_net').textContent=f2(net);
