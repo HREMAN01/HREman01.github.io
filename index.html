@@ -105,6 +105,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   <a href="#lastday">الرصيد لآخر يوم عمل</a>
   <a href="#settle">المخالصة</a>
   <a href="#eos">مكافأة نهاية الخدمة</a>
+  <a href="#cost">تكلفة الموظف</a>
 </nav>
 <div class="hint"><span class="sw"></span> اكتب أرقامك في الخانات الزرقاء الفاتحة، والنتيجة تطلع على طول</div>
 
@@ -289,6 +290,39 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   </div>
 </section>
 
+<!-- 7 cost -->
+<section id="v-cost" class="calc" hidden>
+  <div class="card"><h2>تكلفة الموظف الفعلية <small>True Employee Cost</small></h2>
+    <div class="grid">
+      <label>الجنسية<em>Nationality</em><select id="c_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
+      <label>نظام التأمينات<em>GOSI system</em><select id="c_sys"><option value="new" selected>الجديد (من 3 يوليو 2024)</option><option value="old">القديم</option></select></label>
+      <label>الراتب الأساسي<em>Basic</em><input id="c_b" type="number" min="0" step="0.01"></label>
+      <label>بدل السكن<em>Housing</em><input id="c_h" type="number" min="0" step="0.01"></label>
+      <label>بدل النقل<em>Transport</em><input id="c_t" type="number" min="0" step="0.01"></label>
+      <label>بدلات أخرى<em>Other allowances</em><input id="c_o" type="number" min="0" step="0.01"></label>
+      <label>سنوات الخدمة<em>Years of service</em><input id="c_y" type="number" min="0" step="0.5"></label>
+      <label>التأمين الطبي سنويًا<em>Medical / year</em><input id="c_med" type="number" min="0" step="1"></label>
+      <label>رسوم حكومية سنويًا<em>Gov. fees / year</em><input id="c_gov" type="number" min="0" step="1"></label>
+      <label>تذاكر سفر سنويًا<em>Tickets / year</em><input id="c_tk" type="number" min="0" step="1"></label>
+      <label>تدريب ومصاريف أخرى سنويًا<em>Other / year</em><input id="c_x" type="number" min="0" step="1"></label>
+    </div>
+    <p class="note">تأمينات صاحب العمل على الأساسي + السكن بحد أعلى 45,000: السعودي النظام القديم 11.75%، والجديد 12.75% الحين (ترتفع 0.5% كل يوليو لين 2028)، وغير السعودي 2%. الرسوم والتأمين الطبي تختلف حسب المنشأة.</p>
+  </div>
+  <div class="card"><h2>النتيجة <small>Result</small></h2>
+    <div class="big"><span>التكلفة الشهرية الفعلية</span><b id="c_tot">0</b></div>
+    <div class="rows">
+      <div class="row"><span class="k">الراتب والبدلات<i>Salary</i></span><span class="v" id="c_sal">0</span></div>
+      <div class="row"><span class="k">تأمينات صاحب العمل<i>Employer GOSI</i></span><span class="v" id="c_g">0</span></div>
+      <div class="row"><span class="k">مخصص نهاية الخدمة الشهري<i>EOS provision</i></span><span class="v" id="c_e">0</span></div>
+      <div class="row"><span class="k">المصاريف السنوية ÷ 12<i>Yearly costs / 12</i></span><span class="v" id="c_yr">0</span></div>
+      <div class="row"><span class="k"><b>التكلفة السنوية</b><i>Annual cost</i></span><span class="v" id="c_ann">0</span></div>
+    </div>
+    <div class="how" id="c_how"></div>
+    <div class="status" id="c_st"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="cost">نسخ النتيجة</button></div>
+  </div>
+</section>
+
 <footer><span>هذه الحاسبات للتقدير والتوعية حسب نظام العمل السعودي، وقد تختلف بعض البنود حسب سياسة المنشأة وعقد العمل.</span><span>منقذك · Your HR Lifesaver — من EMAN HR</span></footer>
 </div>
 
@@ -396,7 +430,18 @@ function settle(){
   texts.settle=`المخالصة (${B?'الطريقة الثانية':'الطريقة الأولى'}): الرواتب ${f2(sal)} | الإجازات ${f2(vac)} | الإضافي ${f2(otv)} | المكافأة ${f2(eb)} | الغياب −${f2(ab)} | خصومات −${f2(dd)} | الصافي ${f2(net)}`;
 }
 const fd2=x=>fd(x);
-const all=()=>{leave();lastday();eos();settle();salary();nitaqat()};
+function cost(){
+  const sa=$('c_nat').value==='سعودي',bs=num('c_b'),hs=num('c_h'),sal=bs+hs+num('c_t')+num('c_o');
+  $('c_sys').disabled=!sa;
+  const rate=!sa?2:($('c_sys').value==='new'?12.75:11.75),gw=Math.min(bs+hs,45000),g=r2(gw*rate/100);
+  const y=num('c_y'),e=r2(y<5?sal/24:sal/12),yr=r2((num('c_med')+num('c_gov')+num('c_tk')+num('c_x'))/12);
+  const tot=r2(sal+g+e+yr),pct=sal>0?(tot-sal)/sal*100:0;
+  $('c_sal').textContent=f2(sal);$('c_g').textContent=f2(g);$('c_e').textContent=f2(e);$('c_yr').textContent=f2(yr);$('c_tot').textContent=f2(tot);$('c_ann').textContent=f2(tot*12);
+  $('c_how').innerHTML=`<b>التأمينات</b> = ${f2(gw)} × ${rate}%<br><b>مخصص نهاية الخدمة</b> = ${f2(sal)} ÷ ${y<5?'24 (أول 5 سنوات)':'12 (بعد 5 سنوات)'}<br><b>التكلفة أعلى من الراتب بـ</b> ${f2(tot-sal)} ريال شهريًا (${pct.toFixed(1)}%)`;
+  const errs=[];if(bs<=0)errs.push('اكتب الراتب الأساسي');status('c_st',errs);
+  texts.cost=`تكلفة الموظف: الراتب ${f2(sal)} | التأمينات ${f2(g)} | مخصص نهاية الخدمة ${f2(e)} | مصاريف سنوية/شهر ${f2(yr)} | الإجمالي الشهري ${f2(tot)} | السنوي ${f2(tot*12)}`;
+}
+const all=()=>{leave();lastday();eos();settle();salary();nitaqat();cost()};
 document.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',all);el.addEventListener('change',all)});
 document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
   const t=(texts[b.dataset.copy]||'')+'\n— منقذك · Your HR Lifesaver · من EMAN HR';
@@ -404,7 +449,7 @@ document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
   try{navigator.clipboard.writeText(t).then(done,()=>{fallback(t);done()})}catch(e){fallback(t);done()}
 }));
 function fallback(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove()}
-const views=['salary','nitaqat','leave','lastday','settle','eos'];
+const views=['salary','nitaqat','leave','lastday','settle','eos','cost'];
 function route(){const h=location.hash.slice(1),v=views.includes(h)?h:'salary';
   views.forEach(x=>{$('v-'+x).hidden=x!==v;document.querySelector(`nav a[href="#${x}"]`).setAttribute('aria-current',x===v?'page':'false')})}
 
