@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تكلفة الموظف الفعلية</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@700;800;900&display=swap">
+<style>
+/* Layout: brand band, then a two-pane card (inputs | results) that stacks on phones, rights bar at the bottom */
+:root{
+  --bg:#F3F6FB; --surface:#FFFFFF; --ink:#0E1C36; --muted:#4D5B74; --line:#DCE3EE;
+  --brand:#1D4ED8; --brand-ink:#FFFFFF; --brand-soft:#E3EBFB;
+  --input:#FFF6C7; --input-line:#E8CF5A;
+  --c1:#1D4ED8; --c2:#0E7490; --c3:#B45309; --c4:#7C3AED; --c5:#64748B;
+  --display:'Tajawal','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --body:'IBM Plex Sans Arabic',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1324; --surface:#121D33; --ink:#E8EEF8; --muted:#A3B0C6; --line:#24324D;
+  --brand:#5B8CF0; --brand-ink:#0B1324; --brand-soft:#1A2A4A;
+  --input:#3A3315; --input-line:#8C7A2A;
+  --c1:#5B8CF0; --c2:#22B8CF; --c3:#F59E0B; --c4:#A78BFA; --c5:#94A3B8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1324; --surface:#121D33; --ink:#E8EEF8; --muted:#A3B0C6; --line:#24324D;
+  --brand:#5B8CF0; --brand-ink:#0B1324; --brand-soft:#1A2A4A;
+  --input:#3A3315; --input-line:#8C7A2A;
+  --c1:#5B8CF0; --c2:#22B8CF; --c3:#F59E0B; --c4:#A78BFA; --c5:#94A3B8; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.band{background:var(--brand);color:var(--brand-ink)}
+header .wrap{padding-block:26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:52px;height:52px;border-radius:14px;background:var(--brand-ink);color:var(--brand);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px}
+.brand h1{margin:0;font-family:var(--display);font-size:26px;font-weight:900;line-height:1.15}
+.brand p{margin:2px 0 0;font-size:14px;opacity:.9}
+main.wrap{padding-block:24px 40px}
+.intro h2{margin:0 0 4px;font-family:var(--display);font-size:30px;font-weight:900;text-wrap:balance}
+.intro p{margin:0 0 18px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px}
+@media (max-width:760px){.panel{grid-template-columns:minmax(0,1fr);padding:18px}}
+.en{color:var(--muted);font-size:12.5px;font-weight:400}
+.hint{display:inline-block;background:var(--input);border:1px solid var(--input-line);border-radius:8px;padding:2px 10px;font-size:12.5px;margin-bottom:14px}
+.fields{display:flex;flex-direction:column;gap:14px}
+.group{font-family:var(--display);font-weight:800;font-size:17px;margin-top:4px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:14px}
+input{font:inherit;font-variant-numeric:tabular-nums;border:1px solid var(--input-line);background:var(--input);color:var(--ink);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:inherit;flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-weight:600;padding:6px 10px}
+.seg button[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--brand)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.results{display:flex;flex-direction:column;gap:14px;min-width:0}
+.big{border-radius:14px;background:var(--brand-soft);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.big .k{font-size:13px;color:var(--muted)}
+.big .v{font-family:var(--display);font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.bar{display:flex;height:22px;border-radius:999px;overflow:hidden;background:var(--line)}
+.bar span{display:block;height:100%}
+.legend{display:flex;flex-direction:column;gap:8px}
+.legend div{display:grid;grid-template-columns:14px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
+.legend i{width:14px;height:14px;border-radius:4px;display:block}
+.legend b{font-weight:700}
+.legend small{color:var(--muted);min-width:46px;text-align:left}
+.callout{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.callout strong{font-family:var(--display);font-size:18px}
+.notes{border-top:1px dashed var(--line);padding-top:12px;font-size:13px;color:var(--muted)}
+.notes ul{margin:4px 0 0;padding-inline-start:18px}
+footer.rights{margin-top:24px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-weight:700;font-size:14px}
+</style>
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">E</div>
+      <div><h1>منقذك — EMAN HR</h1><p>حاسبات موارد بشرية · HR Calculators</p></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h2>كم يكلّفك الموظف فعليًا؟ <span class="en">True Employee Cost</span></h2>
+    <p>الراتب جزء من التكلفة بس. هالحاسبة تجمع لك الراتب والتأمينات ومخصص نهاية الخدمة والمصاريف السنوية.</p>
+  </div>
+
+  <section class="panel">
+    <div>
+      <span class="hint">عبّ الخانات الصفراء فقط · Fill in the yellow cells only</span>
+      <div class="fields">
+        <div>
+          <label id="nat-l">الجنسية <span class="en">Nationality</span></label>
+          <div class="seg" role="group" aria-labelledby="nat-l">
+            <button type="button" id="sa" aria-pressed="true">سعودي</button>
+            <button type="button" id="ns" aria-pressed="false">غير سعودي</button>
+          </div>
+        </div>
+        <div id="sys-wrap">
+          <label id="sys-l">نظام التأمينات <span class="en">GOSI system</span></label>
+          <div class="seg" role="group" aria-labelledby="sys-l">
+            <button type="button" id="new" aria-pressed="true">الجديد (من 3 يوليو 2024)</button>
+            <button type="button" id="old" aria-pressed="false">القديم</button>
+          </div>
+        </div>
+
+        <span class="group">الراتب الشهري</span>
+        <div class="row2">
+          <label for="basic">الأساسي <span class="en">Basic</span><input id="basic" type="number" min="0" value="0" inputmode="decimal"></label>
+          <label for="house">بدل السكن <span class="en">Housing</span><input id="house" type="number" min="0" value="0" inputmode="decimal"></label>
+        </div>
+        <div class="row2">
+          <label for="trans">بدل النقل <span class="en">Transport</span><input id="trans" type="number" min="0" value="0" inputmode="decimal"></label>
+          <label for="other">بدلات أخرى <span class="en">Other</span><input id="other" type="number" min="0" value="0" inputmode="decimal"></label>
+        </div>
+        <label for="years">سنوات خدمته عندك <span class="en">Years of service</span><input id="years" type="number" min="0" step="0.5" value="0" inputmode="decimal"></label>
+
+        <span class="group">مصاريف سنوية (حسب منشأتك)</span>
+        <div class="row2">
+          <label for="med">التأمين الطبي <span class="en">Medical / yr</span><input id="med" type="number" min="0" value="0" inputmode="decimal"></label>
+          <label for="gov">رسوم حكومية <span class="en">Gov. fees / yr</span><input id="gov" type="number" min="0" value="0" inputmode="decimal"></label>
+        </div>
+        <div class="row2">
+          <label for="ticket">تذاكر سفر <span class="en">Tickets / yr</span><input id="ticket" type="number" min="0" value="0" inputmode="decimal"></label>
+          <label for="extra">تدريب ومصاريف أخرى <span class="en">Other / yr</span><input id="extra" type="number" min="0" value="0" inputmode="decimal"></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div class="grid2">
+        <div class="big"><span class="k">التكلفة الشهرية الفعلية</span><span class="v" id="m">—</span></div>
+        <div class="big"><span class="k">التكلفة السنوية</span><span class="v" id="y">—</span></div>
+      </div>
+      <div class="callout" id="call">—</div>
+      <div class="bar" id="bar" aria-hidden="true"></div>
+      <div class="legend" id="legend"></div>
+      <div class="notes">ملاحظات
+        <ul>
+          <li>التأمينات على صاحب العمل تنحسب من الأساسي + السكن، بحد أعلى 45,000 ريال.</li>
+          <li>السعودي، النظام القديم: 11.75% (معاشات 9% + ساند 0.75% + أخطار مهنية 2%).</li>
+          <li>السعودي، النظام الجديد: نسبة المعاشات الحين 10% وترتفع 0.5% كل يوليو لين 11% في 2028، والمجموع الحين 12.75%.</li>
+          <li>غير السعودي: 2% أخطار مهنية فقط.</li>
+          <li>مخصص نهاية الخدمة: نص راتب عن كل سنة من أول 5 سنوات، وراتب كامل عن كل سنة بعدها. محسوب هنا على إجمالي الراتب.</li>
+          <li>الرسوم الحكومية والتأمين الطبي تختلف من منشأة لثانية، فاكتبها حسب الواقع عندك.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="rights"><span>© 2026 إيمان | EMAN HR</span><span>جميع الحقوق محفوظة · يُمنع النسخ دون ذكر المصدر</span></footer>
+</main>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const n = id => { const v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  const sar = v => Math.round(v).toLocaleString('en-US') + ' ريال';
+  let saudi = true, newSys = true;
+  function seg(a,b,v){ $(a).setAttribute('aria-pressed', v); $(b).setAttribute('aria-pressed', !v); }
+  $('sa').onclick=()=>{saudi=true;calc()}; $('ns').onclick=()=>{saudi=false;calc()};
+  $('new').onclick=()=>{newSys=true;calc()}; $('old').onclick=()=>{newSys=false;calc()};
+  function calc(){
+    seg('sa','ns',saudi); seg('new','old',newSys);
+    $('sys-wrap').hidden = !saudi;
+    const basic=n('basic'), house=n('house'), trans=n('trans'), other=n('other');
+    const salary = basic+house+trans+other;
+    const gosiBase = Math.min(basic+house, 45000);
+    const rate = !saudi ? 2 : (newSys ? 10+0.75+2 : 9+0.75+2);
+    const gosi = gosiBase*rate/100;
+    const eos = n('years') < 5 ? salary/24 : salary/12;
+    const yearly = (n('med')+n('gov')+n('ticket')+n('extra'))/12;
+    const total = salary+gosi+eos+yearly;
+    $('m').textContent = sar(total);
+    $('y').textContent = sar(total*12);
+    const extraPct = salary ? (total-salary)/salary*100 : 0;
+    $('call').innerHTML = 'فوق الراتب بـ <strong>' + sar(total-salary) + '</strong> شهريًا، يعني التكلفة أعلى من الراتب بنسبة <strong>' + extraPct.toFixed(1) + '%</strong>';
+    const parts = [
+      {k:'الراتب والبدلات', v:salary, c:'var(--c1)'},
+      {k:'التأمينات على المنشأة ('+rate.toFixed(2).replace(/\.?0+$/,'')+'%)', v:gosi, c:'var(--c2)'},
+      {k:'مخصص نهاية الخدمة', v:eos, c:'var(--c3)'},
+      {k:'المصاريف السنوية (شهريًا)', v:yearly, c:'var(--c4)'}
+    ];
+    $('bar').innerHTML = parts.map(p=>`<span style="width:${total? p.v/total*100:0}%;background:${p.c}"></span>`).join('');
+    $('legend').innerHTML = parts.map(p=>`<div><i style="background:${p.c}"></i><span>${p.k}</span><b>${sar(p.v)}</b><small>${total?(p.v/total*100).toFixed(0):0}%</small></div>`).join('');
+  }
+  document.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+  calc();
+})();
+</script>
+</body>
+</html>
