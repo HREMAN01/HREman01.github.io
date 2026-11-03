@@ -334,7 +334,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
       <label>تذاكر سفر سنويًا<em>Tickets / year</em><input id="c_tk" type="number" min="0" step="1"></label>
       <label>تدريب ومصاريف أخرى سنويًا<em>Other / year</em><input id="c_x" type="number" min="0" step="1"></label>
     </div>
-    <p class="note">تأمينات صاحب العمل على الأساسي + السكن بحد أعلى 45,000: السعودي النظام القديم 11.75%، والجديد 12.75% الحين (ترتفع 0.5% كل يوليو لين 2028)، وغير السعودي 2%. الرسوم والتأمين الطبي تختلف حسب المنشأة.</p>
+    <p class="note">تأمينات صاحب العمل على الأساسي + السكن بحد أعلى 45,000: السعودي النظام القديم 11.75%، والجديد 12.75% وتتحدث تلقائيًا كل يوليو (13.25% من يوليو 2027، و13.75% من يوليو 2028)، وغير السعودي 2%. الرسوم والتأمين الطبي تختلف حسب المنشأة.</p>
   </div>
   <div class="card"><h2>النتيجة <small>Result</small></h2>
     <div class="big"><span>التكلفة الشهرية الفعلية</span><b id="c_tot">0</b></div>
@@ -362,7 +362,7 @@ const DAY=864e5;
 const f2=x=>(x=isFinite(x)?x:0,Math.round((x+Number.EPSILON)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fd=x=>(x=isFinite(x)?x:0,Math.round(x*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
 const r2=x=>!isFinite(x)?0:Math.round((x+Number.EPSILON)*100)/100;
-const t2=x=>!isFinite(x)?0:Math.trunc(x*100+1e-7)/100;
+const t2=x=>r2(x);
 function ymd(a,b){ // like Excel DATEDIF y / ym / md
   const A=new Date(a),B=new Date(b);let y=B.getUTCFullYear()-A.getUTCFullYear(),m=B.getUTCMonth()-A.getUTCMonth(),d=B.getUTCDate()-A.getUTCDate();
   if(d<0){m--;const pm=new Date(Date.UTC(B.getUTCFullYear(),B.getUTCMonth(),0)).getUTCDate();d+=pm}
@@ -468,7 +468,8 @@ const fd2=x=>fd(x);
 function cost(){
   const sa=$('c_nat').value==='سعودي',bs=num('c_b'),hs=num('c_h'),sal=bs+hs+num('c_t')+num('c_o');
   $('c_sys').disabled=!sa;
-  const rate=!sa?2:($('c_sys').value==='new'?12.75:11.75),gw=Math.min(bs+hs,45000),g=r2(gw*rate/100);
+  const now=new Date(),yy=now.getUTCFullYear(),mm=now.getUTCMonth(),step=Math.min(Math.max((mm>=6?yy:yy-1)-2026,0),2),newRate=12.75+0.5*step;
+  const rate=!sa?2:($('c_sys').value==='new'?newRate:11.75),gw=Math.min(bs+hs,45000),g=r2(gw*rate/100);
   const y=num('c_y'),e=r2(y<5?sal/24:sal/12),yr=r2((num('c_med')+num('c_gov')+num('c_tk')+num('c_x'))/12);
   const tot=r2(sal+g+e+yr),pct=sal>0?(tot-sal)/sal*100:0;
   $('c_sal').textContent=f2(sal);$('c_g').textContent=f2(g);$('c_e').textContent=f2(e);$('c_yr').textContent=f2(yr);$('c_tot').textContent=f2(tot);$('c_ann').textContent=f2(tot*12);
