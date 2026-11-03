@@ -447,7 +447,7 @@ function settle(){
   const errs=[];if(W<=0)errs.push('اكتب الراتب');if(h===null||e===null)errs.push('اكتب تاريخ التعيين والنهاية');else if(e<h)errs.push('تاريخ النهاية قبل التعيين');if(!md)errs.push('اختر أيام الشهر');else if(att>md)errs.push('أيام الدوام أكثر من أيام الشهر');if(sa&&$('m_rate').value==='')errs.push('اختر نسبة التأمينات');
   const con=e!==null?new Date(e).getUTCDate():0,spec=hs+fd,oth=W-spec;
   const last=B?oth/md*att+spec/md*con:W/md*att;
-  const gm=(bs+hs)*r,gp=mo+con/md,gosi=gm*gp;
+  const gm=(bs+hs)*r,gp=mo+(B?con:att)/md,gosi=gm*gp;
   const sal=t2(mo*W+last-gosi);
   const vb=$('m_vb').value,vw=vb==='all'?W:vb==='bh'?bs+hs:vb==='b'?bs:W-fd,vlab=vb==='all'?'الإجمالي':vb==='bh'?'الأساسي + السكن':vb==='b'?'الأساسي':'الإجمالي بدون الطعام';
   const vac=t2(num('m_vac')*vw/30);
