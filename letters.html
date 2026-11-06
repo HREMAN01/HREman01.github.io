@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="منقذك: خطابات الموارد البشرية — تعريف بالراتب، شهادة خبرة، إنذارات، عرض وظيفي، إخلاء طرف وغيرها.">
 <meta property="og:type" content="website">
@@ -181,10 +182,10 @@ textarea{font:inherit;font-size:15px;background:var(--input);border:1px solid va
 const $=id=>document.getElementById(id);
 const v=id=>{const e=$(id);return e?String(e.value||'').trim():''};
 const n=id=>{const x=parseFloat(v(id));return isFinite(x)?x:0};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const blank='……………';
 const f=id=>{const x=v(id);return x?esc(x):blank};
-const fdate=id=>{const x=v(id);if(!x)return blank;const [y,m,d]=x.split('-');return `${d}/${m}/${y}م`};
+const fdate=id=>{const x=v(id);if(!x)return blank;const [y,m,d]=x.split('-');return esc(`${d}/${m}/${y}م`)};
 const money=x=>Number(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const G=()=>v('gender')==='f';
 const g=(m,fm)=>G()?fm:m;
@@ -281,7 +282,7 @@ const L={
 };
 const order=[['salary','تعريف بالراتب'],['exp','شهادة خبرة'],['leave','موافقة على إجازة'],['notice','لفت نظر'],['invest','استدعاء للتحقيق'],['warn1','إنذار أول'],['warnF','إنذار نهائي'],['deduct','جزاء خصم'],['resign','استقالة'],['acceptR','قبول استقالة'],['term','إنهاء خدمة'],['clear','إخلاء طرف']];
 let cur='salary';
-let logo='';try{logo=localStorage.getItem('mq-logo')||''}catch(e){}
+const LOGO_OK=/^data:image\/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+\/=]+$/;let logo='';try{logo=localStorage.getItem('mq-logo')||'';if(!LOGO_OK.test(logo))logo=''}catch(e){}
 const store={};
 function saveSpecific(){document.querySelectorAll('#specific input,#specific textarea,#specific select').forEach(e=>{store[e.id]=e.type==='checkbox'?e.checked:e.value})}
 function renderTypes(){$('types').innerHTML=order.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${l}</button>`).join('')}
@@ -298,7 +299,7 @@ function renderFields(){
 function draw(){
   const T=L[cur];
   const meta=`<div class="meta">التاريخ: ${fdate('ldate')}${v('ref')?`<br>الرقم: ${esc(v('ref'))}`:''}</div>`;
-  const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${logo}" alt="">`:''}<b>${f('company')}</b><small>${v('city')?esc(v('city'))+' · ':''}المملكة العربية السعودية</small></div>${meta}</div>`;
+  const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${esc(logo)}" alt="">`:''}<b>${f('company')}</b><small>${v('city')?esc(v('city'))+' · ':''}المملكة العربية السعودية</small></div>${meta}</div>`;
   let sig;
   if(T.from==='emp')sig=`<div class="sig"><div><b>مقدم الطلب</b><br>الاسم: ${f('ename')}<br>التوقيع: ………………</div></div>`;
   else sig=`<div class="sig"><div><b>${f('stitle')}</b><br>الاسم: ${f('sname')}<br>التوقيع: ………………<br>الختم:</div>`+
@@ -318,9 +319,9 @@ $('clear').addEventListener('click',()=>{document.querySelectorAll('.lt input[ty
 function showLogo(){$('logoBox').hidden=!logo;if(logo)$('logoPrev').src=logo}
 $('logo').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;
   if(file.size>2*1024*1024){alert('حجم الشعار كبير، اختر صورة أقل من 2 ميجا');e.target.value='';return}
-  const r=new FileReader();r.onload=()=>{logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
+  const r=new FileReader();r.onload=()=>{if(!LOGO_OK.test(r.result)){alert('نوع الملف غير مدعوم');return}logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
 $('logoDel').addEventListener('click',()=>{logo='';$('logo').value='';try{localStorage.removeItem('mq-logo')}catch(x){}showLogo();draw()});
-const h=location.hash.slice(1);if(L[h])cur=h;
+const h=location.hash.slice(1);if(Object.prototype.hasOwnProperty.call(L,h))cur=h;
 showLogo();
 const t=new Date();$('ldate').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
 renderTypes();renderFields();draw();

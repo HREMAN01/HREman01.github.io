@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="منقذك: نماذج الموارد البشرية — طلب إجازة، سلفة، عهدة، تقييم أداء، تحقيق، إخلاء طرف وغيرها.">
 <meta property="og:type" content="website">
@@ -190,7 +191,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const EMP={h:'بيانات الموظف',f:[['اسم الموظف','text','w'],['الرقم الوظيفي','text'],['الإدارة / القسم','text'],['المسمى الوظيفي','text'],['تاريخ الطلب','date']]};
 const EMPS={h:'بيانات الموظف',f:[['اسم الموظف','text','w'],['الرقم الوظيفي','text'],['الإدارة / القسم','text'],['المسمى الوظيفي','text'],['تاريخ المباشرة','date']]};
 const RATE=['ممتاز (5)','جيد جدًا (4)','جيد (3)','مقبول (2)','ضعيف (1)'];
@@ -391,7 +392,7 @@ resign:{t:'نموذج طلب استقالة',g:'نهاية الخدمة',s:[EMPS
 const GR=['الإجازات والحضور','المالية','العُهد','التوظيف','السياسات والإقرارات','الأداء والتطوير','التأمين والسلامة','الانضباط','الطلبات والتواصل','نهاية الخدمة'];
 const order=Object.keys(F).map((k,i)=>[k,i]).sort((a,b)=>(GR.indexOf(F[a[0]].g)-GR.indexOf(F[b[0]].g))||a[1]-b[1]).map(x=>x[0]);
 let cur=order[0];const store={};
-let logo='';try{logo=localStorage.getItem('mq-logo')||''}catch(e){}
+const LOGO_OK=/^data:image\/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+\/=]+$/;let logo='';try{logo=localStorage.getItem('mq-logo')||'';if(!LOGO_OK.test(logo))logo=''}catch(e){}
 try{$('company').value=localStorage.getItem('mq-company')||''}catch(e){}
 
 function nm(i,j){return `${cur}|${i}|${j}`}
@@ -414,7 +415,7 @@ function section(s,i){
  return `<div class="sec"><h4>${s.h}</h4><div class="fl">${s.f.map((f,j)=>field(f,i,j)).join('')}</div></div>`}
 function avg(){F[cur].s.forEach((s,i)=>{if(!s.rating)return;const vals=s.rating.map((_,r)=>parseFloat(store[nm(i,'r'+r)])).filter(x=>isFinite(x));const cell=document.querySelector(`[data-avg="${i}"]`);if(cell)cell.textContent=vals.length?`${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2)} من 5 (${vals.length} من ${s.rating.length} معيار)`:'—'})}
 function draw(){const T=F[cur];const co=$('company').value.trim();
- const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${logo}" alt="">`:''}<div class="co">${co?esc(co):'اسم المنشأة'}</div></div><div class="meta">رقم النموذج: ………<br>التاريخ: ………</div></div>`;
+ const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${esc(logo)}" alt="">`:''}<div class="co">${co?esc(co):'اسم المنشأة'}</div></div><div class="meta">رقم النموذج: ………<br>التاريخ: ………</div></div>`;
  const sig=`<div class="sig" style="grid-template-columns:repeat(${Math.min(T.sig.length,4)},minmax(0,1fr))">${T.sig.map(x=>`<div><b>${x}</b><br>الاسم: …………<br>التوقيع: …………<br>التاريخ: …………</div>`).join('')}</div>`;
  const mark=$('mark').checked?`<div class="mark">نموذج من منقذك — EMAN HR · hreman01.github.io</div>`:'';
  $('paper').innerHTML=lh+`<h3>${T.t}</h3>`+T.s.map(section).join('')+sig+mark;avg()}
@@ -426,11 +427,11 @@ $('company').addEventListener('input',()=>{try{localStorage.setItem('mq-company'
 $('mark').addEventListener('change',draw);
 function showLogo(){$('logoDel').hidden=!logo}
 $('logo').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(file.size>2*1024*1024){alert('حجم الشعار كبير، اختر صورة أقل من 2 ميجا');e.target.value='';return}
- const r=new FileReader();r.onload=()=>{logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
+ const r=new FileReader();r.onload=()=>{if(!LOGO_OK.test(r.result)){alert('نوع الملف غير مدعوم');return}logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
 $('logoDel').addEventListener('click',()=>{logo='';$('logo').value='';try{localStorage.removeItem('mq-logo')}catch(x){}showLogo();draw()});
 $('print').addEventListener('click',()=>window.print());
 $('clear').addEventListener('click',()=>{Object.keys(store).forEach(k=>{if(k.startsWith(cur+'|'))delete store[k]});draw()});
-const h=location.hash.slice(1);if(F[h])cur=h;
+const h=location.hash.slice(1);if(Object.prototype.hasOwnProperty.call(F,h))cur=h;
 showLogo();nav();draw();
 })();
 </script>
