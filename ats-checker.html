@@ -95,6 +95,21 @@ ol.fix li:last-child{border:0}
 .addk{cursor:pointer}
 .wf{background:var(--bg);border-radius:10px;padding:10px;margin-top:8px;font-size:13.5px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:14mm 15mm}
+  body{background:#fff!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important;font-family:Arial,'Tajawal',sans-serif;color:#111;font-size:10.5pt;line-height:1.45}
+  #printArea .pn{text-align:center;font-size:20pt;font-weight:700;color:#0B3A8C;margin:0}
+  #printArea .pt{text-align:center;font-size:12pt;margin:2px 0}
+  #printArea .pc{text-align:center;font-size:9.5pt;margin:2px 0 10px}
+  #printArea h4{font-size:12pt;color:#1554C0;border-bottom:1.2px solid #1554C0;margin:12px 0 5px;padding-bottom:2px;page-break-after:avoid}
+  #printArea p{margin:2px 0}
+  #printArea p.b{font-weight:700;margin-top:6px}
+  #printArea ul{margin:2px 0;padding-inline-start:18px}
+  #printArea li{margin:1px 0}
+}
 footer{text-align:center;padding:24px 16px 34px;color:var(--mut);font-size:13px}
 footer b{color:var(--blue-d)}
 footer a{color:var(--blue);font-weight:700}
@@ -182,6 +197,7 @@ footer a{color:var(--blue);font-weight:700}
         <div id="weakFix"></div>
         <div class="hint" style="margin-top:10px">💡 اكتب كل نقطة في سطر يبدأ بـ (•) أو (-). السطر بدون نقطة في قسم الخبرات يظهر عريضاً (المسمى، الشركة، التاريخ). استبدل أي [قوسين مربعين] ببياناتك الحقيقية قبل التحميل.</div>
         <button class="btn" id="dl">⬇️ تحميل السيرة Word</button>
+        <button class="btn" id="pdfBtn" style="margin-top:10px;background:#fff;color:var(--blue);border:2px solid var(--blue)">📄 تحميل السيرة PDF</button>
         <div class="actions" style="margin-top:10px"><button class="btn2" id="cpCv">📋 نسخ السيرة كنص</button></div>
         <div class="err" id="dlErr"></div>
       </div>
@@ -200,6 +216,7 @@ footer a{color:var(--blue);font-weight:700}
   <div style="margin-top:6px">أدوات HR أخرى: <a href="https://hreman01.github.io" target="_blank" rel="noopener">hreman01.github.io</a></div>
 </footer>
 <div class="toast" id="toast"></div>
+<div id="printArea"></div>
 
 <script>
 (function(){
@@ -239,21 +256,68 @@ async function readPdf(f){
   const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
   let out=[];
   for(let p=1;p<=pdf.numPages;p++){
-    const tc=await (await pdf.getPage(p)).getTextContent();
-    const rows={};
-    tc.items.forEach(it=>{const y=Math.round(it.transform[5]/3);(rows[y]=rows[y]||[]).push(it)});
+    const tc=await (await pdf.getPage(p)).getTextContent({includeMarkedContent:true});
+    const rows={},stack=[],txt=[];
+    tc.items.forEach(it=>{
+      if(it.type==='beginMarkedContent'||it.type==='beginMarkedContentProps'){stack.push(it.tag);return}
+      if(it.type==='endMarkedContent'){stack.pop();return}
+      if(typeof it.str!=='string')return;
+      it._span=stack[stack.length-1]==='Span';it._rev=stack.includes('ReversedChars');txt.push(it);
+    });
+    txt.filter(it=>typeof it.str==='string'&&it.str!==''&&!/^[ً-ٰٟ\s]*[ً-ٰٟ][ً-ٰٟ\s]*$/.test(it.str))
+      .forEach(it=>{const y=Math.round(it.transform[5]/3);(rows[y]=rows[y]||[]).push(it)});
     Object.keys(rows).map(Number).sort((a,b)=>b-a).forEach(y=>{
-      const line=rows[y].sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(' ').replace(/\s+/g,' ').trim();
+      const row=rows[y],all=row.map(i=>i.str).join('').normalize('NFKC');
+      const ar=(all.match(/[؀-ۿ]/g)||[]).length>(all.match(/[A-Za-z]/g)||[]).length;
+      const arItems=row.filter(i=>/[؀-ۿﭐ-﻿]/.test(i.str));
+      const perGlyph=arItems.some(i=>i._rev)||(arItems.length>=4&&arItems.reduce((a,i)=>a+[...i.str.trim()].length,0)/arItems.length<=2.2);
+      row.sort((a,b)=>a.transform[4]-b.transform[4]);
+      const gapSp=(l,r,thr)=>{const fs=Math.abs(r.transform[0])||Math.abs(r.transform[3])||10;return r.transform[4]-(l.transform[4]+(l.width||0))>fs*thr};
+      // build the line in visual (left-to-right) order, then convert to logical reading order
+      let v='',prev=null;const thr=perGlyph?0.6:0.15;
+      row.forEach(it=>{
+        if(/^[\u0000-\u001F]*$/.test(it.str))return;
+        if(/^\s+$/.test(it.str)&&(it.width||0)<(Math.abs(it.transform[0])||10)*0.24)return; // zero-width/thin kerning spaces
+        // pdf.js gives RTL items in logical order; a lone ligature glyph inside its own Span is already visual
+        const piece=it.dir==='rtl'&&!(it._span&&[...it.str].length<=2)?[...it.str].reverse().join(''):it.str;
+        if(prev&&gapSp(prev,it,2.5))v=v.replace(/\s+$/,'')+' | ';
+        else if(prev&&gapSp(prev,it,thr)&&!/\s$/.test(v)&&!/^\s/.test(piece))v+=' ';
+        v+=piece;prev=it;
+      });
+      let line=visualToLogical(v,ar).normalize('NFKC');
+      line=line.normalize('NFKC').replace(/\s*@\s*/g,'@').replace(/\s+/g,' ').trim();
       if(line)out.push(line);
     });
   }
+  out=fixVisualOrder(out);
   return {text:out.join('\n'),meta:{type:'pdf',pages:pdf.numPages}};
+}
+const MIRROR={'(':')',')':'(','[':']',']':'[','{':'}','}':'{','<':'>','>':'<'};
+const LTR_RUN=/[A-Za-z0-9@._+\-\/:%#&]+(?:[ ][A-Za-z0-9@._+\-\/:%#&]+)*/g;
+function visualToLogical(v,rtlLine){
+  if(rtlLine){
+    return [...v].reverse().join('').replace(LTR_RUN,m=>[...m].reverse().join('')).replace(/[()[\]{}<>]/g,c=>MIRROR[c]);
+  }
+  return v.replace(/[؀-ۿﭐ-﷿ﹰ-﻿]+(?:[ ]+[؀-ۿﭐ-﷿ﹰ-﻿]+)*/g,m=>[...m].reverse().join(''));
+}
+// some PDFs store Arabic in visual (reversed) order — detect via common words and flip
+function fixVisualOrder(lines){
+  const words=lines.join(' ').split(/\s+/);
+  const N=new Set(['في','من','على','الى','إلى','مع','عن','التي','الموارد','البشرية','خبرة']),R=new Set([...N].map(w=>[...w].reverse().join('')));
+  let n=0,r=0;words.forEach(w=>{if(N.has(w))n++;else if(R.has(w))r++});
+  if(r<=n||r<2)return lines;
+  return lines.map(l=>{
+    if(!/[؀-ۿ]/.test(l))return l;
+    return [...l].reverse().join('').replace(/[A-Za-z0-9@._+\-\/:%#&]+/g,m=>[...m].reverse().join(''))
+      .replace(/[()[\]{}<>]/g,c=>({'(':')',')':'(','[':']',']':'[','{':'}','}':'{','<':'>','>':'<'}[c]));
+  });
 }
 async function readDocx(f){
   if(!window.JSZip) throw new Error('تعذر تحميل قارئ Word — جرّب لصق النص بدلاً من ذلك');
   const zip=await JSZip.loadAsync(await f.arrayBuffer());
   const docF=zip.file('word/document.xml'); if(!docF) throw new Error('ملف Word غير صالح');
-  const xml=await docF.async('string');
+  // drop legacy fallback copies of text boxes so content isn't counted twice
+  const xml=(await docF.async('string')).replace(/<mc:Fallback>[\s\S]*?<\/mc:Fallback>/g,'');
   const dom=new DOMParser().parseFromString(xml,'application/xml');
   const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
   const paras=[...dom.getElementsByTagNameNS(W,'p')].map(p=>{
@@ -272,7 +336,7 @@ async function readDocx(f){
 
 /* ---------- text utils ---------- */
 const AD='٠١٢٣٤٥٦٧٨٩';
-function norm(s){return s.toLowerCase().replace(/[٠-٩]/g,d=>AD.indexOf(d)).replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');}
+function norm(s){return s.normalize('NFKC').toLowerCase().replace(/[٠-٩]/g,d=>AD.indexOf(d)).replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');}
 function toks(s){return norm(s).split(/[^a-z0-9ء-ي+#]+/).filter(Boolean).map(w=>w.length>=5&&/^و[اتمنيب]/.test(w)?w.slice(1):w);}
 function stem(t){
   if(/^[ء-ي]/.test(t)){
@@ -284,7 +348,7 @@ function stem(t){
 const STOP=new Set(`a an the and or of to in on for with by at from as is are be been was were will would can could should may might must this that these those it its our your their we you they he she i me my us them his her not no yes do does did have has had having than then there here which who whom whose what when where why how all any each every more most other some such only own same so too very just also into over under about above below after before between during through up down out off again further once etc per via within without upon including include includes plus well able ability abilities strong good excellent great proven high highly level skills skill knowledge experience experienced years year minimum preferred required requirements requirement responsibilities responsibility job role position candidate candidates applicant ideal looking seeking join company team member work working environment etc e.g ie new must-have nice using use used based related relevant equivalent degree least least plus field
 في من على الى إلى عن مع ان أن إن او أو و ثم هذا هذه هذي التي الذي الذين ذلك تلك كل لدى عند بين حول ضمن خلال مثل قبل بعد غير لا ما لم لن قد كان كانت يكون تكون يجب ينبغي سنوات سنه سنة خبرة خبره مطلوب مطلوبة المتقدم المتقدمة الوظيفة وظيفة المرشح المرشحة القدرة قدرة القدره جيد جيدة ممتاز ممتازة عالية عالي مهارات مهارة المهارات العمل عمل لديه لديها أي اي هو هي نحن أنت انت عام أعلى اعلى أقل اقل حد الأدنى الادنى يفضل يفضّل الشركة شركة فريق ضمن تقل يقل لا متطلبات المتطلبات المسؤوليات المهام مهام وأن وان أيضا ايضا حيث كما إلى منها فيها عليها لها له به بها نبحث نحتاج يتطلب تتطلب الراغبين الراغبات للعمل لدينا وجود`.split(/\s+/).map(norm));
 const EN_VERBS=new Set('achieved accelerated administered advised analyzed architected assessed automated boosted built championed coached collaborated completed conducted consolidated coordinated created cut decreased defined delivered designed developed directed doubled drove eliminated enabled engineered established evaluated executed expanded facilitated forecasted founded generated grew guided handled headed hired identified implemented improved increased influenced initiated innovated installed introduced launched led leveraged maintained managed maximized mentored migrated minimized modernized monitored negotiated onboarded optimized orchestrated organized oversaw partnered performed pioneered planned prepared presented processed produced programmed promoted proposed published raised recruited redesigned reduced reengineered resolved restructured revamped saved scaled secured simplified spearheaded standardized streamlined strengthened supervised supported surpassed trained transformed tripled upgraded won wrote audited reconciled drafted resolved'.split(' '));
-const AR_VERBS=['ادرت','قدت','طورت','حققت','نفذت','اشرفت','انشات','صممت','اسست','حسنت','خفضت','رفعت','زدت','نظمت','دربت','وظفت','استقطبت','اعددت','ساهمت','نسقت','راجعت','حللت','بنيت','اطلقت','هيكلت','عالجت','انجزت','قلصت','وفرت','اعتمدت','قمت','ترات','مثلت','فاوضت','اشرف','ادار','اداره','تطوير','اعداد','تنفيذ','متابعه','تنسيق','اشراف','تحليل','تصميم','تدريب','توظيف','استقطاب','تحسين','قياده','بناء','اطلاق','تخفيض','رفع','زياده','تقليل','انشاء','تاسيس','مراجعه','تدقيق','معالجه','تنظيم','اعتماد','حساب','ادخال','تجهيز','صياغه','تطبيق','وضع','قيادة'].map(norm);
+const AR_VERBS=['ادرت','قدت','طورت','حققت','نفذت','اشرفت','انشات','صممت','اسست','حسنت','خفضت','رفعت','زدت','نظمت','دربت','وظفت','استقطبت','اعددت','ساهمت','نسقت','راجعت','حللت','بنيت','اطلقت','هيكلت','عالجت','انجزت','قلصت','وفرت','اعتمدت','قمت','ترات','مثلت','فاوضت','اشرف','ادار','اداره','تطوير','اعداد','تنفيذ','متابعه','تنسيق','اشراف','تحليل','تصميم','تدريب','توظيف','استقطاب','تحسين','قياده','بناء','اطلاق','تخفيض','رفع','زياده','تقليل','انشاء','تاسيس','مراجعه','تدقيق','معالجه','تنظيم','اعتماد','حساب','ادخال','تجهيز','صياغه','تطبيق','وضع','قيادة','تحديث','اصدار','نشر','فرز','اجراء','دعم','تفعيل','تقليص','توفير','ضبط','اعتماد','قياس','تقييم','توحيد','اتمته','رقمنه'].map(norm);
 const PASSIVE=/(responsible for|duties included|duties include|tasked with|in charge of|worked on|helped with|\bwas\b|\bwere\b|\bbeen\b|مسؤول عن|مسؤوله عن|مسوول عن|تم |يتم |من مهامي|كانت مهامي|المساعده في|ساعدت في)/;
 const BULLET_RE=/^\s*([•\-\*▪●◦○–—►✓✔➤■□·]|\d{1,2}[.)])\s*/;
 
@@ -334,7 +398,11 @@ function matchKeywords(kws,cv){
 /* ---------- bullets ---------- */
 function getBullets(text){
   const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
-  let b=lines.filter(l=>BULLET_RE.test(l)).map(l=>l.replace(BULLET_RE,'').trim()).filter(l=>l.split(/\s+/).length>=2);
+  const merged=[];
+  lines.forEach(l=>{const last=merged[merged.length-1];
+    if(last&&BULLET_RE.test(last)&&!BULLET_RE.test(l)&&!/[.!؟?]$/.test(last)&&l.split(/\s+/).length<=6&&!headOf(l)&&!/\b(19|20)\d\d\b/.test(l))merged[merged.length-1]=last+' '+l;
+    else merged.push(l)});
+  let b=merged.filter(l=>BULLET_RE.test(l)).map(l=>l.replace(BULLET_RE,'').trim()).filter(l=>l.split(/\s+/).length>=2);
   let detected=b.length>=3;
   if(!detected){b=lines.filter(l=>{const n=l.split(/\s+/).length;return n>=7&&n<=45&&!/@|http|linkedin/i.test(l)});}
   return {list:b.slice(0,60),detected};
@@ -505,8 +573,24 @@ function parseCV(text){
     if(!cur){head.push(l);continue}
     out.sec[cur].push(BULLET_RE.test(l)?'• '+l.replace(BULLET_RE,'').trim():l);
   }
+  // two-column blocks (e.g. languages: names on one row, levels on the next) → pair them up
+  for(const k in out.sec){const m=[];out.sec[k].forEach(l=>{const p=m[m.length-1];
+    if(p&&!/[.،:؛!?؟]$/.test(p)&&p.split(/\s+/).length>=8&&!/\|/.test(p)&&!/\b(19|20)\d\d\b/.test(p)&&!BULLET_RE.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&!/\|/.test(l))m[m.length-1]=p+' '+l;else m.push(l)});out.sec[k]=m;}
+  const L=out.sec.langs;
+  if(L.length===2){const a=L[0].split(/\s*\|\s*/),b=L[1].split(/\s*\|\s*/);if(a.length>=2&&a.length===b.length)out.sec.langs=a.map((x,i)=>x+' — '+b[i]);}
+  out.sec.skills=out.sec.skills.flatMap(l=>/\|/.test(l)&&!BULLET_RE.test(l)?l.split(/\s*\|\s*/).filter(Boolean).map(x=>'• '+x):[l]);
   const clean=s=>s.replace(EMAIL_RE,'').replace(LI_RE,'').replace(PHONE_RE,'').replace(/(email|e-mail|phone|mobile|tel|البريد( الالكتروني)?|الايميل|الإيميل|جوال|الجوال|هاتف|موبايل)\s*[:：]?/gi,'').replace(/[|•·,،]\s*[|•·,،]/g,'|').replace(/^[\s|•·,،:-]+|[\s|•·,،:-]+$/g,'').trim();
-  const rest=head.map(clean).filter(Boolean);
+  let rest=[];
+  head.forEach(h=>{
+    const parts=clean(h).split(/\s*\|\s*/).map(x=>x.replace(/^[+\s]+|[+\s]+$/g,'').trim()).filter(Boolean);
+    const contactLine=EMAIL_RE.test(h)||PHONE_RE.test(h)||LI_RE.test(h);
+    if(!contactLine&&parts.length<=1){if(parts[0])rest.push(parts[0]);return}
+    parts.forEach(x=>{
+      if(/^[a-z0-9][a-z0-9_.-]{2,}$/i.test(x)&&/[-_.]/.test(x)&&!out.li)out.li=x;
+      else if(x.split(/\s+/).length<=3&&!/\d/.test(x)&&!out.city)out.city=x;
+      else rest.push(x);
+    });
+  });
   if(rest.length)out.name=rest.shift();
   if(rest.length&&rest[0].split(/\s+/).length<=7)out.title=rest.shift();
   if(rest.length&&rest[0].split(/\s+/).length<=4&&!/\d/.test(rest[0]))out.city=rest.shift();
@@ -527,17 +611,52 @@ $('openB').onclick=()=>{
   const miss=lastR&&lastR.kw?lastR.kw.filter(k=>k.st!=='p'):[];
   $('kwAdd').innerHTML=miss.length?`<label class="l">🎯 أضف الكلمات الناقصة للمهارات (اضغط على الكلمة — أضف فقط ما ينطبق عليك)</label><div class="chips">${miss.map(k=>`<span class="chip m addk" data-k="${esc(k.k)}">+ ${esc(k.k)}</span>`).join('')}</div>`:'';
   document.querySelectorAll('.addk').forEach(c=>c.onclick=()=>{const t=$('s-skills');t.value=(t.value.trim()?t.value.trim()+'\n':'')+'• '+c.dataset.k;c.classList.remove('m');c.classList.add('p');c.onclick=null;toast('تمت الإضافة ✅')});
-  // weak bullets
-  const weak=lastR?lastR.scored.filter(b=>b.s<60).sort((a,b)=>a.s-b.s).slice(0,5):[];
-  $('weakFix').innerHTML=weak.length?`<label class="l">💥 نقاط تحتاج تقوية — اضغط «طبّق القالب» ثم عبّئ الأقواس</label>`+weak.map((b,i)=>`<div class="wf"><div dir="auto">«${esc(b.t)}» <b style="color:var(--bad)">${b.s}/100</b></div><button class="btn2" style="margin-top:6px;padding:5px 10px;font-size:13px" data-wi="${i}">طبّق القالب</button></div>`).join(''):'';
-  document.querySelectorAll('[data-wi]').forEach(btn=>btn.onclick=()=>{
-    const b=weak[+btn.dataset.wi],tpl=suggest(b).tpl.replace(/\.$/,'');let done=false;
-    for(const s of SECS){const ta=$('s-'+s[0]);if(ta.value.includes(b.t)){ta.value=ta.value.replace(b.t,tpl);done=true;break}}
-    if(!done){const ta=$('s-experience');ta.value+=(ta.value?'\n':'')+'• '+tpl}
-    btn.textContent='✓ تم';btn.disabled=true;
-  });
+  // auto-improve bullets (optional, user decides)
+  renderImprove();
   $('openB').style.display='none';$('builder').style.display='block';
 };
+
+/* ---------- rule-based bullet rewriter ---------- */
+const AR_MAP={'اداره':'أدرت','اعداد':'أعددت','تطبيق':'طبّقت','تحديث':'حدّثت','متابعه':'تابعت','رفع':'رفعت','مراجعه':'راجعت','تنسيق':'نسّقت','تنفيذ':'نفّذت','تطوير':'طوّرت','تحسين':'حسّنت','تدريب':'درّبت','توظيف':'وظّفت','استقطاب':'استقطبت','تحليل':'حلّلت','تصميم':'صمّمت','بناء':'بنيت','اطلاق':'أطلقت','اصدار':'أصدرت','نشر':'نشرت','فرز':'فرزت','اجراء':'أجريت','دعم':'دعمت','ادخال':'أدخلت','تنظيم':'نظّمت','معالجه':'عالجت','تقليل':'قلّلت','تخفيض':'خفّضت','خفض':'خفّضت','زياده':'زدت','انشاء':'أنشأت','تاسيس':'أسّست','قياده':'قدت','اشراف':'أشرفت على','تجهيز':'جهّزت','صياغه':'صغت','وضع':'وضعت','اعتماد':'اعتمدت','تقييم':'قيّمت','قياس':'قست','توحيد':'وحّدت','ضبط':'ضبطت','تفعيل':'فعّلت','توفير':'وفّرت','حساب':'حسبت','تدقيق':'دقّقت','استلام':'استلمت','اعداده':'أعددت','التعامل':'تعاملت','تعامل':'تعاملت','تمثيل':'مثّلت','التواصل':'تواصلت','تواصل':'تواصلت','عمل':'عملت','العمل':'عملت','المشاركه':'شاركت','مشاركه':'شاركت','المساهمه':'ساهمت','مساهمه':'ساهمت','توزيع':'وزّعت','ترتيب':'رتّبت','حفظ':'حفظت','ارشفه':'أرشفت','استقبال':'استقبلت','تسجيل':'سجّلت'};
+const EN_MAP={'responsible for':'Managed','in charge of':'Led','tasked with':'Led','worked on':'Delivered','helped with':'Supported','helped to':'Supported','helped':'Supported','duties included':'Handled','duties include':'Handled','assisted with':'Supported','assisted in':'Supported','managing':'Managed','leading':'Led','developing':'Developed','handling':'Handled','coordinating':'Coordinated','preparing':'Prepared','supporting':'Supported','creating':'Created','maintaining':'Maintained','processing':'Processed'};
+function improveBullet(t){
+  t=t.trim();let o=t;
+  if(isAr(t)){
+    o=o.replace(/^(من مهامي|كانت مهامي|مهامي)\s*[:：]?\s*/,'');
+    o=o.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة|المسؤول|المسؤولة)\s+عن\s+/,'أدرت ');
+    o=o.replace(/^(المساعدة|مساعدة|ساعدت)\s+في\s+/,'ساهمت في ');
+    o=o.replace(/^تم\s+/,'');
+    const m=o.match(/^(\S+)(\s+)([\s\S]*)$/);
+    if(m){let w=norm(m[1]);const key=w.replace(/^(ال|و)/,'');const k2=w.replace(/^وال/,'').replace(/^ال/,'');
+      const v=AR_MAP[w]||AR_MAP[k2]||AR_MAP[key];
+      if(v){let rest=m[3];
+        if(/على$/.test(v)){rest=rest.replace(/^(المباشر|المباشره|مباشر)\s+/,'');rest=rest.replace(/^على\s+/,'');
+          o=(/^(المباشر|مباشر)/.test(norm(m[3]))?'أشرفت مباشرةً على ':v+' ')+rest;}
+        else o=v+' '+rest;
+        // keep parallel structure: «و + مصدر» after the first verb → «و + فعل»
+        o=o.replace(/(^|\s)و(\S+)/g,(all,sp,w)=>{const vv=AR_MAP[norm(w)];return vv&&!/على$/.test(vv)?sp+'و'+vv:all});}
+    }
+  }else{
+    const low=o.toLowerCase();
+    for(const k of Object.keys(EN_MAP).sort((a,b)=>b.length-a.length)){if(low.startsWith(k+' ')||low===k){o=EN_MAP[k]+o.slice(k.length);break}}
+    o=o.replace(/^(I|We)\s+/,'');o=o.charAt(0).toUpperCase()+o.slice(1);
+  }
+  return o.replace(/[\u064B-\u0652]/g,'').replace(/\s+/g,' ').trim(); // no diacritics: ATS matches plain letters
+}
+function bulletLines(){const res=[];SECS.filter(s=>s[0]==='experience'||s[0]==='other').forEach(s=>{const ta=$('s-'+s[0]);if(!ta)return;ta.value.split('\n').forEach((l,i)=>{if(BULLET_RE.test(l)||(s[0]==='experience'&&l.split(/\s+/).length>=8))res.push({sec:s[0],i,raw:l,t:l.replace(BULLET_RE,'').trim()})})});return res}
+function applyFix(x,nt){const ta=$('s-'+x.sec);const L=ta.value.split('\n');L[x.i]=(BULLET_RE.test(x.raw)?'• ':'')+nt;ta.value=L.join('\n')}
+function renderImprove(){
+  const items=bulletLines().map(x=>({...x,n:improveBullet(x.t),sc:scoreBullet(x.t)})).filter(x=>x.n!==x.t||!x.sc.num);
+  const ch=items.filter(x=>x.n!==x.t),noNum=items.filter(x=>x.n===x.t&&!x.sc.num);
+  if(!items.length){$('weakFix').innerHTML='';return}
+  let h=`<label class="l">✨ تحسين النقاط تلقائياً <span style="font-weight:500;color:var(--mut)">(اختياري — راجع قبل التطبيق)</span></label>`;
+  if(ch.length>1)h+=`<button class="btn2" id="fixAll" style="width:100%;margin-bottom:6px">✨ حسّن كل النقاط (${ch.length})</button>`;
+  h+=ch.map((x,j)=>`<div class="wf"><div dir="auto" style="color:var(--mut);text-decoration:line-through">${esc(x.t)}</div><div dir="auto" style="font-weight:700;color:var(--ok);margin-top:4px">${esc(x.n)}</div>${x.sc.num?'':'<div style="font-size:12px;color:var(--warn);margin-top:3px">💡 لو تقدر أضف رقم (عدد، نسبة، مدة) يصير أقوى</div>'}<button class="btn2" style="margin-top:6px;padding:5px 10px;font-size:13px" data-fx="${j}">✨ حسّن تلقائياً</button></div>`).join('');
+  if(noNum.length)h+=`<div class="wf">💡 ${noNum.length} نقطة صياغتها جيدة لكن بدون أرقام — أضف عدد أو نسبة أو مدة إذا تقدر (مثل: وظّفت 25 موظفاً خلال 6 أشهر).</div>`;
+  $('weakFix').innerHTML=h;
+  document.querySelectorAll('[data-fx]').forEach(btn=>btn.onclick=()=>{applyFix(ch[+btn.dataset.fx],ch[+btn.dataset.fx].n);btn.textContent='✓ تم التحسين';btn.disabled=true;btn.style.color='var(--ok)';btn.style.borderColor='var(--ok)'});
+  const fa=$('fixAll');if(fa)fa.onclick=()=>{ch.forEach(x=>applyFix(x,x.n));document.querySelectorAll('[data-fx]').forEach(b=>{b.textContent='✓ تم التحسين';b.disabled=true});fa.textContent='✓ تم تحسين كل النقاط';fa.disabled=true;toast('تم التحسين ✅ راجع النص قبل التحميل')};
+}
 function collect(){
   const d={name:$('f-name').value.trim(),title:$('f-title').value.trim(),contact:[$('f-city').value,$('f-phone').value,$('f-email').value,$('f-li').value].map(x=>x.trim()).filter(Boolean),secs:[]};
   SECS.forEach(s=>{const t=$('s-'+s[0]).value.trim();if(t)d.secs.push({id:s[0],title:secTitle(s),lines:t.split('\n').map(x=>x.trim()).filter(Boolean)})});
@@ -561,7 +680,7 @@ async function buildDocx(d){
     b+=para(s.title,{rtl,bold:true,size:24,color:'1554C0',border:true,before:200,after:100});
     s.lines.forEach(l=>{
       if(BULLET_RE.test(l))b+=para('•  '+l.replace(BULLET_RE,''),{rtl:rtl||isAr(l),bullet:true,after:40});
-      else b+=para(l,{rtl:rtl||isAr(l),bold:s.id==='experience'||s.id==='education',after:40,before:s.id==='experience'?80:0});
+      else b+=para(l,{rtl:rtl||isAr(l),bold:(s.id==='experience'||s.id==='education')&&(/\||\b(19|20)\d\d\b/.test(l)||(l.split(/\s+/).length<=7&&!/[.،]$/.test(l))),after:40,before:s.id==='experience'?80:0});
     });
   });
   const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr>${rtl?'<w:bidi/>':''}<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1000" w:right="1100" w:bottom="1000" w:left="1100" w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>`;
@@ -591,6 +710,25 @@ $('dl').onclick=async()=>{
     }
     $('dlErr').style.cssText='display:block;background:var(--ok-l);color:var(--ok)';$('dlErr').textContent='✅ تم تجهيز الملف. إذا ما بدأ التحميل، استخدم «نسخ السيرة كنص» والصقها في Word.';
   }catch(e){$('dlErr').style.cssText='display:block';$('dlErr').textContent='تعذر التحميل هنا — استخدم «نسخ السيرة كنص» والصقها في Word.'}
+};
+$('pdfBtn').onclick=()=>{
+  const d=collect();
+  if(!d.secs.length){$('dlErr').style.cssText='display:block';$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';return}
+  const rtl=lang!=='en'&&(lang==='ar'||isAr(d.secs.map(s=>s.lines.join(' ')).join(' ')+d.name));
+  let h=`<div dir="${rtl?'rtl':'ltr'}">`;
+  if(d.name)h+=`<p class="pn">${esc(d.name)}</p>`;if(d.title)h+=`<p class="pt">${esc(d.title)}</p>`;
+  if(d.contact.length)h+=`<p class="pc" dir="auto">${d.contact.map(esc).join(' &nbsp;|&nbsp; ')}</p>`;
+  d.secs.forEach(s=>{h+=`<h4>${esc(s.title)}</h4>`;let ul=false;
+    s.lines.forEach(l=>{if(BULLET_RE.test(l)){if(!ul){h+='<ul>';ul=true}h+=`<li dir="auto">${esc(l.replace(BULLET_RE,''))}</li>`}
+      else{if(ul){h+='</ul>';ul=false}const bold=(s.id==='experience'||s.id==='education')&&(/\||\b(19|20)\d\d\b/.test(l)||(l.split(/\s+/).length<=7&&!/[.،]$/.test(l)));h+=`<p dir="auto" class="${bold?'b':''}">${esc(l)}</p>`}});
+    if(ul)h+='</ul>';});
+  $('printArea').innerHTML=h+'</div>';
+  const inClaude=window.top!==window.self;
+  const old=document.title;document.title=(d.name||'CV')+' - ATS CV';
+  try{window.print()}catch(e){}
+  document.title=old;
+  if(inClaude){$('dlErr').style.cssText='display:block;background:var(--warn-l);color:var(--warn)';$('dlErr').textContent='إذا ما ظهرت نافذة الحفظ: زر PDF يشتغل على موقع منقذك (hreman01.github.io) — أو حمّل Word واحفظه PDF من تطبيق Word.';}
+  else{$('dlErr').style.cssText='display:block;background:var(--ok-l);color:var(--ok)';$('dlErr').textContent='📄 في نافذة الطباعة اختر «حفظ كـ PDF». في الآيفون: اضغط مشاركة ↑ ثم «حفظ في الملفات».';}
 };
 $('cpCv').onclick=async()=>{try{await navigator.clipboard.writeText(cvText(collect()));toast('تم نسخ السيرة ✅')}catch(e){toast('تعذر النسخ')}};
 
