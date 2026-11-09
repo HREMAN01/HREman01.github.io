@@ -94,19 +94,23 @@ ol.fix li:last-child{border:0}
 .wf{background:var(--bg);border-radius:10px;padding:10px;margin-top:8px;font-size:13.5px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 #printArea{display:none}
+.cvp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 14px;font-family:Arial,'Tajawal',sans-serif;font-size:13px;line-height:1.55;color:#111;max-height:520px;overflow:auto;box-shadow:inset 0 -12px 12px -12px rgba(0,0,0,.12)}
+.cvp .pn{text-align:center;font-size:19px;font-weight:700;color:#0B3A8C;margin:0}.cvp .pt{text-align:center;font-size:14px;margin:2px 0}.cvp .pc{text-align:center;font-size:11.5px;margin:2px 0 8px;word-break:break-word}
+.cvp h4{font-size:14px;color:#1554C0;border-bottom:1.2px solid #1554C0;margin:12px 0 5px;padding-bottom:2px}.cvp p{margin:2px 0}.cvp p.b{font-weight:700;margin-top:6px}.cvp ul{margin:2px 0;padding-inline-start:18px}.cvp li{margin:1px 0}
 @media print{
-  @page{size:A4;margin:14mm 15mm}
+  @page{size:A4;margin:10mm 12mm}
   body{background:#fff!important}
   body>*:not(#printArea){display:none!important}
-  #printArea{display:block!important;font-family:Arial,'Tajawal',sans-serif;color:#111;font-size:10.5pt;line-height:1.45}
-  #printArea .pn{text-align:center;font-size:20pt;font-weight:700;color:#0B3A8C;margin:0}
-  #printArea .pt{text-align:center;font-size:12pt;margin:2px 0}
-  #printArea .pc{text-align:center;font-size:9.5pt;margin:2px 0 10px}
-  #printArea h4{font-size:12pt;color:#1554C0;border-bottom:1.2px solid #1554C0;margin:12px 0 5px;padding-bottom:2px;page-break-after:avoid}
-  #printArea p{margin:2px 0}
-  #printArea p.b{font-weight:700;margin-top:6px}
-  #printArea ul{margin:2px 0;padding-inline-start:18px}
-  #printArea li{margin:1px 0}
+  #printArea{display:block!important;font-family:Arial,'Tajawal',sans-serif;color:#111;font-size:9.6pt;line-height:1.36}
+  #printArea .pn{text-align:center;font-size:17pt;font-weight:700;color:#0B3A8C;margin:0}
+  #printArea .pt{text-align:center;font-size:11pt;margin:1px 0}
+  #printArea .pc{text-align:center;font-size:8.8pt;margin:1px 0 6px}
+  #printArea a{color:#1554C0}
+  #printArea h4{font-size:11pt;color:#1554C0;border-bottom:1.1px solid #1554C0;margin:8px 0 3px;padding-bottom:1px;page-break-after:avoid}
+  #printArea p{margin:1px 0}
+  #printArea p.b{font-weight:700;margin-top:4px}
+  #printArea ul{margin:1px 0;padding-inline-start:16px}
+  #printArea li{margin:0}
 }
 footer{text-align:center;padding:24px 16px 34px;color:var(--mut);font-size:13px}
 footer b{color:var(--blue-d)}
@@ -177,9 +181,19 @@ footer a{color:var(--blue);font-weight:700}
 
     <div class="card" id="bldCard" style="border:2px solid var(--blue)">
       <h3>✨ حوّل سيرتك لقالب ATS</h3>
-      <p style="margin:0 0 10px;color:var(--mut);font-size:14px">رتّبنا محتوى سيرتك في قالب نظيف يقرأه أي نظام ATS: عمود واحد، عناوين موحدة، بدون جداول ولا صور. راجع كل قسم وعدّله ثم حمّله Word.</p>
-      <button class="btn" id="openB" style="margin-top:0">✨ ابدأ التحويل</button>
+      <p style="margin:0 0 10px;color:var(--mut);font-size:14px">نحسّن صياغة نقاطك تلقائياً ونرتّب سيرتك في قالب نظيف يقرأه أي نظام ATS: عمود واحد، عناوين موحدة، بدون جداول ولا صور — وتحمّلها Word أو PDF.</p>
+      <button class="btn" id="openB" style="margin-top:0">✨ حسّن سيرتي تلقائياً</button>
       <div id="builder" style="display:none">
+        <div id="reRes" style="display:none;margin-top:4px;border-radius:12px;padding:12px;text-align:center;font-weight:800;font-size:17px"></div>
+        <h4 style="margin:16px 0 8px;font-size:16px">✨ سيرتك بعد التحسين — جاهزة بقالب ATS</h4>
+        <div id="cvPreview" class="cvp"></div>
+        <div id="suggest" style="margin-top:12px"></div>
+        <div class="hint" style="margin-top:8px">🔎 راجع سيرتك قبل التحميل — حسّنا الصياغة بأسلوب السيرة الرسمي تلقائياً بدون تغيير معلوماتك.</div>
+        <button class="btn" id="dl">⬇️ تحميل السيرة Word</button>
+        <button class="btn" id="pdfBtn" style="margin-top:10px;background:#fff;color:var(--blue);border:2px solid var(--blue)">📄 تحميل السيرة PDF</button>
+        <div class="actions" style="margin-top:10px"><button class="btn2" id="cpCv">📋 نسخ السيرة كنص</button></div>
+        <div class="err" id="dlErr"></div>
+        <details id="manual" style="margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:var(--blue)">✏️ تعديل يدوي (اختياري)</summary>
         <label class="l">لغة العناوين</label>
         <div class="tabs" style="margin:0"><button class="tab" data-lg="ar">العربية</button><button class="tab" data-lg="en">English</button><button class="tab" data-lg="bi">عربي + English</button></div>
         <div class="grid2">
@@ -193,11 +207,26 @@ footer a{color:var(--blue);font-weight:700}
         <div id="secFields"></div>
         <div id="kwAdd"></div>
         <div id="weakFix"></div>
+        <details class="tipsbox" style="background:var(--blue-l);border-radius:12px;padding:10px 12px;margin-top:10px"><summary style="cursor:pointer;font-weight:800;color:var(--blue-d)">💡 هل لازم أحط أرقام في كل نقطة؟</summary>
+<div style="font-size:13.5px;margin-top:8px;line-height:1.8">
+<b>لا، مو لازم.</b> الأرقام تقوّي السيرة لما تكون <b>حقيقية وتبيّن أثرك</b>، ولو حطيتها بكل سطر بتبان مصطنعة.
+<ul style="margin:6px 0;padding-inline-start:18px">
+<li><b>حط أرقام في أهم 2–3 نقاط بكل وظيفة</b> — الإنجازات اللي تميزك (مثل: إغلاق 12 شاغراً، تهيئة 20 موظفاً).</li>
+<li><b>المهام الروتينية خلها بدون أرقام</b> (تحديث الملفات، إدخال البيانات) — يكفيها بداية قوية مثل «إدارة» أو «إعداد».</li>
+<li><b>لا تخترع رقم أبداً</b> — ممكن تنسأل عنه بالمقابلة.</li>
+</ul>
+<b>ما عندك رقم؟ استخدم بديل:</b>
+<ul style="margin:6px 0;padding-inline-start:18px">
+<li><b>الحجم:</b> «لـ 3 إدارات»، «على نظامين Oracle وجسر»</li>
+<li><b>التكرار:</b> «بشكل شهري»، «يومياً»</li>
+<li><b>النتيجة:</b> «للحد من التعارضات»، «لدعم قرارات الإدارة»</li>
+</ul>
+<b>الترتيب المثالي للنقطة:</b> كلمة الإنجاز ← وش سويت ← الرقم أو النتيجة. مثال: «إغلاق 12 شاغراً خلال 3 أشهر».<br>
+<span style="color:var(--mut)">النقطة ببداية قوية وبدون رقم تاخذ 75، ومع النتيجة 87، ومع رقم حقيقي 100. الأرقام الشكلية مثل «خلال 1 أشهر» ما تنحسب. المهم إن الدرجة الإجمالية 80 أو أكثر.</span>
+</div></details>
         <div class="hint" style="margin-top:10px">💡 اكتب كل نقطة في سطر يبدأ بـ (•) أو (-). السطر بدون نقطة في قسم الخبرات يظهر عريضاً (المسمى، الشركة، التاريخ). استبدل أي [قوسين مربعين] ببياناتك الحقيقية قبل التحميل.</div>
-        <button class="btn" id="dl">⬇️ تحميل السيرة Word</button>
-        <button class="btn" id="pdfBtn" style="margin-top:10px;background:#fff;color:var(--blue);border:2px solid var(--blue)">📄 تحميل السيرة PDF</button>
-        <div class="actions" style="margin-top:10px"><button class="btn2" id="cpCv">📋 نسخ السيرة كنص</button></div>
-        <div class="err" id="dlErr"></div>
+        <button class="btn" id="reScan" style="background:linear-gradient(135deg,#14915a,#0d6b41)">🔄 حدّث الدرجة بعد تعديلي</button>
+        </details>
       </div>
     </div>
 
@@ -349,7 +378,10 @@ const AR_VERBS=['ادرت','قدت','طورت','حققت','نفذت','اشرفت
 const PASSIVE=/(responsible for|duties included|duties include|tasked with|in charge of|worked on|helped with|\bwas\b|\bwere\b|\bbeen\b|مسؤول عن|مسؤوله عن|مسوول عن|تم |يتم |من مهامي|كانت مهامي|المساعده في|ساعدت في)/;
 const BULLET_RE=/^\s*([•\-\*▪●◦○–—►✓✔➤■□·]|\d{1,2}[.)])\s*/;
 
-function isVerb(w){const n=norm(w).replace(/^و/,'');return EN_VERBS.has(n)||AR_VERBS.includes(n)||AR_VERBS.includes(n.replace(/^ال/,''))}
+function isVerb(w){const n=norm(w).replace(/^و/,'');if(!window.__AV){try{window.__AV=new Set([...Object.values(AR_MAP).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0]).replace(/^ال/,''))])}catch(e){window.__AV=new Set()}}if(EN_VERBS.has(n)||AR_VERBS.includes(n)||AR_VERBS.includes(n.replace(/^ال/,''))||window.__AV.has(n))return true;
+  // Arabic first-person past verb: أغلقت، تابعت، هيأت، استكملت… (not plurals ending in ـات)
+  if(/^[\u0621-\u064A]{2,5}[أإ]ت$/.test(String(w).replace(/^و/,'').replace(/[\u064B-\u0652]/g,'')))return true; // هيأت، أنشأت، بدأت
+  return /^[\u0621-\u064A]{3,7}ت$/.test(n)&&!/ات$/.test(n)&&!/^ال/.test(n)&&!['وقت','بيت','صوت','ثابت','مؤقت','سكوت'].includes(n)}
 function isAr(s){return (s.match(/[؀-ۿ]/g)||[]).length>(s.match(/[a-z]/gi)||[]).length}
 
 /* ---------- keywords ---------- */
@@ -394,22 +426,41 @@ function matchKeywords(kws,cv){
 
 /* ---------- bullets ---------- */
 function getBullets(text){
-  const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+  let lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+  // score achievement bullets from the experience section only (skills/courses lists aren't achievements)
+  try{const hs=lines.map(l=>headOf(l));const st=hs.indexOf('experience');
+    if(st>=0){let en=hs.findIndex((h,i)=>i>st&&h&&h!=='experience');if(en<0)en=lines.length;const sub=lines.slice(st+1,en);if(sub.length>=2)lines=sub;}}catch(e){}
   const merged=[];
   lines.forEach(l=>{const last=merged[merged.length-1];
     if(last&&BULLET_RE.test(last)&&!BULLET_RE.test(l)&&!/[.!؟?]$/.test(last)&&l.split(/\s+/).length<=6&&!headOf(l)&&!/\b(19|20)\d\d\b/.test(l))merged[merged.length-1]=last+' '+l;
     else merged.push(l)});
-  let b=merged.filter(l=>BULLET_RE.test(l)).map(l=>l.replace(BULLET_RE,'').trim()).filter(l=>l.split(/\s+/).length>=2);
+  let b=merged.filter(l=>BULLET_RE.test(l)).map(l=>l.replace(BULLET_RE,'').trim()).filter(l=>l.split(/\s+/).length>=5); // short items = skills lists, not achievements
   let detected=b.length>=3;
-  if(!detected){b=lines.filter(l=>{const n=l.split(/\s+/).length;return n>=7&&n<=45&&!/@|http|linkedin/i.test(l)});}
+  if(!detected){
+    // no bullet characters (e.g. PDFs with drawn list markers): join wrapped lines, skip title/company/date lines
+    const isHead=l=>/\|/.test(l)||/\b(19|20)\d\d\b/.test(l)||!!headOf(l);
+    const m2=[];lines.forEach(l=>{const p=m2[m2.length-1];
+      if(p&&!isHead(p)&&!isHead(l)&&!/[.،:؛!?؟]$/.test(p)&&p.split(/\s+/).length>=8)m2[m2.length-1]=p+' '+l;else m2.push(l)});
+    b=m2.filter(l=>{const n=l.split(/\s+/).length;return n>=7&&n<=60&&!isHead(l)&&!/@|http|linkedin/i.test(l)});
+    if(b.filter(l=>isVerb(l.split(/\s+/)[0])).length>=3)detected=true;}
   return {list:b.slice(0,60),detected};
+}
+// a number counts only if it says something: % or a quantity ≥2 that isn't a year; "1 أشهر"-style filler doesn't count
+const RESULT_RE=/(لدعم|للحد|لتحسين|لتقليل|لضمان|لرفع|لتسريع|لتحقيق|مما (أدى|ساهم|ساعد)|بهدف|بشكل (دوري|شهري|يومي|أسبوعي)|شهري[اًا]?|يومي[اًا]?|أسبوعي[اًا]?|resulting in|to (improve|reduce|support|ensure|increase)|monthly|weekly|daily)/i;
+function numInfo(t){
+  const n=t.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/(\d),(\d{3})/g,'$1$2');
+  const nums=[...n.matchAll(/(\d+(?:\.\d+)?)\s*(%|٪)?/g)].map(m=>({v:+m[1],pct:!!m[2]}));
+  const real=nums.filter(x=>x.pct||(x.v>=2&&!(x.v>=1950&&x.v<=2040)));
+  const odd=/(^|\s)1\s+(أشهر|شهور|سنوات|أيام|اسابيع|أسابيع|موظفين|موظفا|موظفاً|ساعات)/.test(n);
+  return {real:real.length>0,odd};
 }
 function scoreBullet(t){
   const words=t.split(/\s+/),first=words.slice(0,2);
-  const verb=first.some(isVerb), num=/\d|%|٪|[٠-٩]/.test(t), pas=PASSIVE.test(norm(t)+' ');
-  let s=0;if(verb)s+=40;if(num)s+=35;if(!pas)s+=25;
-  if(words.length<6)s-=20;if(words.length>40)s-=10;
-  return {t,s:Math.max(0,Math.min(100,s)),verb,num,pas,thin:words.length<6,long:words.length>40};
+  const verb=first.some(isVerb),ni=numInfo(t),num=ni.real,pas=PASSIVE.test(norm(t)+' ');
+  const res=!num&&RESULT_RE.test(t);const unfinished=/[،,و]\s*$/.test(t.trim());
+  let s=10;if(verb)s+=40;if(num)s+=25;else if(res)s+=12;if(!pas)s+=25;
+  if(words.length<6)s-=20;if(words.length>40)s-=10;if(unfinished)s-=10;
+  return {t,s:Math.max(0,Math.min(100,s)),verb,num,res,odd:ni.odd,unfinished,pas,thin:words.length<6,long:words.length>40};
 }
 
 /* ---------- main analysis ---------- */
@@ -454,9 +505,11 @@ function analyze(cv,jd,meta){
   add('ضمير المتكلم',fp>3?'warn':'pass',2,fp>3?`ورد ${fp} مرة (I / my)`:'ممتاز',`ابدأ النقاط بالفعل مباشرة بدون "I" أو "My".`);
   const emo=(cv.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu)||[]).length;
   add('رموز خاصة وإيموجي',emo?'warn':'pass',2,emo?`${emo} رمز`:'لا توجد',`احذف الإيموجي والرموز الزخرفية واكتفِ بنقاط (•) بسيطة.`);
+  const GEN=[...cv.matchAll(/(أطمح|اطمح|أتطلع|اتطلع|أحب العمل|احب العمل|شخص(?:ية)? (?:طموح|مجتهد|اجتماعي)[ةه]?|أعمل بجد|اعمل بجد|العمل تحت الضغط|روح الفريق|سريع[ةه]? التعلم|hard[- ]?working|team player|passionate|highly motivated|self[- ]starter)/gi)].map(m=>m[0]);
+  add('عبارات عامة',GEN.length?'warn':'pass',4,GEN.length?`«${[...new Set(GEN)].slice(0,3).join('»، «')}»`:'لا توجد',`استبدل العبارات العامة بحقائق: تخصصك، سنوات خبرتك، الأنظمة اللي تتقنها، وأبرز إنجاز برقم — هذا أسلوب السيرة المهنية.`);
   const scored=B.list.map(scoreBullet);
   const q=scored.filter(b=>b.num).length;
-  add('الإنجازات بالأرقام',q>=3?'pass':q>=1?'warn':'fail',6,`${q} نقطة فيها أرقام`,`أضف أرقاماً لإنجازاتك: نسب، أعداد موظفين، مبالغ، مدد زمنية (مثل: خفّضت مدة التوظيف 30%).`);
+  add('الإنجازات بالأرقام',q>=3?'pass':q>=1?'warn':'fail',6,`${q} نقطة فيها أرقام`,`أضف أرقاماً حقيقية لأهم 2–3 إنجازات في كل وظيفة (عدد، نسبة، مدة) — مو لازم في كل نقطة.`);
 
   const fmtScore=Math.round(100*C.reduce((a,c)=>a+c.w*(c.st==='pass'?1:c.st==='warn'?.5:0),0)/C.reduce((a,c)=>a+c.w,0));
   const bScore=scored.length?Math.round(scored.reduce((a,b)=>a+b.s,0)/scored.length):25;
@@ -474,7 +527,7 @@ function analyze(cv,jd,meta){
     if(miss.length)F.push({w:kwScore<60?16:9,tag:'الكلمات المفتاحية',t:`أضف الكلمات الناقصة من الوصف الوظيفي (إذا كانت تنطبق عليك فعلاً) في الملخص والمهارات والخبرات: «${miss.slice(0,6).map(k=>k.k).join('»، «')}».`});
     const pa=kw.filter(k=>k.st==='pa');if(pa.length)F.push({w:5,tag:'الكلمات المفتاحية',t:`استخدم نفس صياغة الإعلان حرفياً لهذه الكلمات: «${pa.slice(0,5).map(k=>k.k).join('»، «')}».`});
   }else F.push({w:4,tag:'الكلمات المفتاحية',t:'أضف الوصف الوظيفي وأعد الفحص عشان تعرف الكلمات المفتاحية الناقصة لكل وظيفة تتقدم لها.'});
-  const nv=scored.filter(b=>!b.verb).length;if(scored.length&&nv/scored.length>.4)F.push({w:7,tag:'قوة النقاط',t:`${nv} من نقاطك لا تبدأ بفعل قوي — ابدأ كل نقطة بفعل إنجاز مثل: أدرت، طورت، حققت، خفّضت (Led, Developed, Achieved).`});
+  const nv=scored.filter(b=>!b.verb).length;if(scored.length&&nv/scored.length>.4)F.push({w:7,tag:'قوة النقاط',t:`${nv} من نقاطك لا تبدأ بفعل قوي — ابدأ كل نقطة بكلمة إنجاز مثل: إدارة، تطوير، تحقيق، خفض (Led, Developed, Achieved).`});
   const np=scored.filter(b=>b.pas).length;if(np)F.push({w:5,tag:'قوة النقاط',t:`${np} نقطة بصياغة سلبية مثل «مسؤول عن» أو «تم» — حوّلها لصياغة فاعلة تبرز دورك.`});
   F.sort((a,b)=>b.w-a.w);
   return {total,fmtScore,bScore,kwScore,C,kw,scored,detected:B.detected,F:F.slice(0,10),words};
@@ -491,11 +544,11 @@ function suggest(b){
   if(b.pas)tips.push(ar?'احذف «مسؤول عن / تم» واكتب ماذا فعلت أنت.':'Replace passive phrasing ("responsible for") with what you did.');
   if(b.thin)tips.push(ar?'النقطة قصيرة جداً — وضّح السياق والنتيجة.':'Too short — add context and result.');
   const core=b.t.replace(PASSIVE,'').replace(/^\s*(مسؤول|مسؤوله)\s*/,'').trim();
-  const tpl=ar?`[أدرت / طوّرت / نفّذت] ${core}${b.num?'':' — مما أدى إلى [تحسين/تقليل] [النتيجة] بنسبة [X%] خلال [المدة]'}.`
+  const tpl=ar?`[إدارة / تطوير / تنفيذ] ${core}${b.num?'':' — مما أدى إلى [تحسين/تقليل] [النتيجة] بنسبة [X%] خلال [المدة]'}.`
               :`[Led / Developed / Implemented] ${core}${b.num?'':', resulting in [X%] [improvement] in [metric] within [timeframe]'}.`;
   return {tips,tpl,ar};
 }
-function render(R){
+function render(R,noScroll){
   $('results').style.display='block';
   const g=$('gauge');g.style.background=`conic-gradient(${col(R.total)} ${R.total*3.6}deg,#e3e9f4 0)`;
   let k=0;const sc=$('score');sc.style.color=col(R.total);const iv=setInterval(()=>{k=Math.min(R.total,k+2);sc.textContent=k;if(k>=R.total)clearInterval(iv)},14);
@@ -528,12 +581,12 @@ function render(R){
     h+=`<div class="weak"><div style="font-size:13px;color:var(--bad);font-weight:800">أضعف نقطة في سيرتك — ${weak.s}/100</div><div class="q">«${esc(weak.t)}»</div>
       <div class="tip"><b>${sg.ar?'كيف تحسّنها:':'How to improve:'}</b><ul style="margin:4px 0;padding-inline-start:18px">${sg.tips.map(t=>`<li>${esc(t)}</li>`).join('')||'<li>جيدة — يمكنك إضافة نتيجة أوضح.</li>'}</ul>
       ${sg.ar?'قالب مقترح:':'Suggested template:'}<code dir="${sg.ar?'rtl':'ltr'}">${esc(sg.tpl)}</code></div></div>`;
-    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':'<em>✕ بدون أرقام</em>'}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div></div></div>`).join('')}</details></div>`;
-    $('bullets').innerHTML=h;
+    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div></div></div>`).join('')}</details></div>`;
+    h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">✏️ عدّلي نقاطك بنفسك مع اقتراحات</button>`;$('bullets').innerHTML=h;$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
   }
   lastReport=[`تقرير فحص السيرة الذاتية ATS — منقذك | EMAN HR`,`الدرجة الشاملة: ${R.total}/100 — ${v[0]}`,`التنسيق: ${R.fmtScore} | قوة النقاط: ${R.bScore} | الكلمات المفتاحية: ${R.kwScore==null?'—':R.kwScore}`,``,`أهم الإصلاحات:`,...R.F.map((f,i)=>`${i+1}. ${f.t}`),
     ...(R.kw?['',`الكلمات الناقصة: ${R.kw.filter(k=>k.st==='m').map(k=>k.k).join('، ')||'لا يوجد'}`]:[]),``,`© إيمان خالد — EMAN HR | hreman01.github.io`].join('\n');
-  setTimeout(()=>$('results').scrollIntoView({behavior:'smooth'}),60);
+  if(!noScroll)setTimeout(()=>$('results').scrollIntoView({behavior:'smooth'}),60);
 }
 
 /* ---------- ATS CV builder ---------- */
@@ -560,7 +613,7 @@ function parseCV(text){
   const lines=text.split('\n').map(l=>l.replace(/\t+/g,' ').trim()).filter(Boolean);
   const out={name:'',title:'',email:'',phone:'',li:'',city:'',sec:{}};SECS.forEach(s=>out.sec[s[0]]=[]);
   const em=text.match(EMAIL_RE);if(em)out.email=em[0];
-  const li=text.match(LI_RE);if(li)out.li=li[0];
+  const li=text.match(LI_RE);if(li)out.li=li[0].replace(/^https?:\/\/(www\.)?/,'').replace(/[?#].*$/,'').replace(/\/$/,'');
   const ph=text.replace(EMAIL_RE,'').replace(LI_RE,'').match(PHONE_RE);if(ph)out.phone=ph[0].trim();
   let cur=null;const head=[];
   for(const l of lines){
@@ -572,7 +625,7 @@ function parseCV(text){
   }
   // two-column blocks (e.g. languages: names on one row, levels on the next) → pair them up
   for(const k in out.sec){const m=[];out.sec[k].forEach(l=>{const p=m[m.length-1];
-    if(p&&!/[.،:؛!?؟]$/.test(p)&&p.split(/\s+/).length>=8&&!/\|/.test(p)&&!/\b(19|20)\d\d\b/.test(p)&&!BULLET_RE.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&!/\|/.test(l))m[m.length-1]=p+' '+l;else m.push(l)});out.sec[k]=m;}
+    if(p&&!/[.،:؛!?؟]$/.test(p)&&p.split(/\s+/).length>=(k==='summary'||k==='experience'||k==='other'?8:14)&&!/\|/.test(p)&&!/\b(19|20)\d\d\b/.test(p)&&!BULLET_RE.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&!/\|/.test(l))m[m.length-1]=p+' '+l;else m.push(l)});out.sec[k]=m;}
   const L=out.sec.langs;
   if(L.length===2){const a=L[0].split(/\s*\|\s*/),b=L[1].split(/\s*\|\s*/);if(a.length>=2&&a.length===b.length)out.sec.langs=a.map((x,i)=>x+' — '+b[i]);}
   out.sec.skills=out.sec.skills.flatMap(l=>/\|/.test(l)&&!BULLET_RE.test(l)?l.split(/\s*\|\s*/).filter(Boolean).map(x=>'• '+x):[l]);
@@ -611,51 +664,177 @@ $('openB').onclick=()=>{
   // auto-improve bullets (optional, user decides)
   renderImprove();
   $('openB').style.display='none';$('builder').style.display='block';
+  try{const sm=$('s-summary');sm.value=improveSummary(sm.value)}catch(e){}
+  // apply the automatic improvements straight away, then show the result
+  try{$('fixAll').click()}catch(e){}
+  doRescan(false);updatePreview();try{renderSuggest()}catch(e){console.warn(e)}
+  setTimeout(()=>$('reRes').scrollIntoView({behavior:'smooth',block:'start'}),250);
 };
 
 /* ---------- rule-based bullet rewriter ---------- */
-const AR_MAP={'اداره':'أدرت','اعداد':'أعددت','تطبيق':'طبّقت','تحديث':'حدّثت','متابعه':'تابعت','رفع':'رفعت','مراجعه':'راجعت','تنسيق':'نسّقت','تنفيذ':'نفّذت','تطوير':'طوّرت','تحسين':'حسّنت','تدريب':'درّبت','توظيف':'وظّفت','استقطاب':'استقطبت','تحليل':'حلّلت','تصميم':'صمّمت','بناء':'بنيت','اطلاق':'أطلقت','اصدار':'أصدرت','نشر':'نشرت','فرز':'فرزت','اجراء':'أجريت','دعم':'دعمت','ادخال':'أدخلت','تنظيم':'نظّمت','معالجه':'عالجت','تقليل':'قلّلت','تخفيض':'خفّضت','خفض':'خفّضت','زياده':'زدت','انشاء':'أنشأت','تاسيس':'أسّست','قياده':'قدت','اشراف':'أشرفت على','تجهيز':'جهّزت','صياغه':'صغت','وضع':'وضعت','اعتماد':'اعتمدت','تقييم':'قيّمت','قياس':'قست','توحيد':'وحّدت','ضبط':'ضبطت','تفعيل':'فعّلت','توفير':'وفّرت','حساب':'حسبت','تدقيق':'دقّقت','استلام':'استلمت','اعداده':'أعددت','التعامل':'تعاملت','تعامل':'تعاملت','تمثيل':'مثّلت','التواصل':'تواصلت','تواصل':'تواصلت','عمل':'عملت','العمل':'عملت','المشاركه':'شاركت','مشاركه':'شاركت','المساهمه':'ساهمت','مساهمه':'ساهمت','توزيع':'وزّعت','ترتيب':'رتّبت','حفظ':'حفظت','ارشفه':'أرشفت','استقبال':'استقبلت','تسجيل':'سجّلت'};
+const AR_MAP={'اداره':'أدرت','اعداد':'أعددت','تطبيق':'طبّقت','تحديث':'حدّثت','متابعه':'تابعت','رفع':'رفعت','مراجعه':'راجعت','تنسيق':'نسّقت','تنفيذ':'نفّذت','تطوير':'طوّرت','تحسين':'حسّنت','تدريب':'درّبت','توظيف':'وظّفت','استقطاب':'استقطبت','تحليل':'حلّلت','تصميم':'صمّمت','بناء':'بنيت','اطلاق':'أطلقت','اصدار':'أصدرت','نشر':'نشرت','فرز':'فرزت','اجراء':'أجريت','دعم':'دعمت','ادخال':'أدخلت','تنظيم':'نظّمت','معالجه':'عالجت','تقليل':'قلّلت','تخفيض':'خفّضت','خفض':'خفّضت','زياده':'زدت','انشاء':'أنشأت','تاسيس':'أسّست','قياده':'قدت','اشراف':'أشرفت على','تجهيز':'جهّزت','صياغه':'صغت','وضع':'وضعت','اعتماد':'اعتمدت','تقييم':'قيّمت','قياس':'قست','توحيد':'وحّدت','ضبط':'ضبطت','تفعيل':'فعّلت','توفير':'وفّرت','حساب':'حسبت','تدقيق':'دقّقت','استلام':'استلمت','اعداده':'أعددت','التعامل':'تعاملت','تعامل':'تعاملت','تمثيل':'مثّلت','التواصل':'تواصلت','تواصل':'تواصلت','عمل':'عملت','العمل':'عملت','المشاركه':'شاركت','مشاركه':'شاركت','المساهمه':'ساهمت','مساهمه':'ساهمت','توزيع':'وزّعت','ترتيب':'رتّبت','حفظ':'حفظت','ارشفه':'أرشفت','استقبال':'استقبلت','تسجيل':'سجّلت','ضمان':'ضمنت','استكمال':'استكملت','تحقيق':'حققت','اداره':'أدرت'};
 const EN_MAP={'responsible for':'Managed','in charge of':'Led','tasked with':'Led','worked on':'Delivered','helped with':'Supported','helped to':'Supported','helped':'Supported','duties included':'Handled','duties include':'Handled','assisted with':'Supported','assisted in':'Supported','managing':'Managed','leading':'Led','developing':'Developed','handling':'Handled','coordinating':'Coordinated','preparing':'Prepared','supporting':'Supported','creating':'Created','maintaining':'Maintained','processing':'Processed'};
+// formal Arabic CV style: bullets start with a verbal noun (إدارة، إعداد، تطبيق…)
+const AR_M_SRC={'أدرت':'إدارة','أعددت':'إعداد','طبقت':'تطبيق','حدثت':'تحديث','تابعت':'متابعة','رفعت':'رفع','راجعت':'مراجعة','نسقت':'تنسيق','نفذت':'تنفيذ','طورت':'تطوير','حسنت':'تحسين','دربت':'تدريب','وظفت':'توظيف','استقطبت':'استقطاب','حللت':'تحليل','صممت':'تصميم','بنيت':'بناء','أطلقت':'إطلاق','أصدرت':'إصدار','نشرت':'نشر','فرزت':'فرز','أجريت':'إجراء','دعمت':'دعم','أدخلت':'إدخال','نظمت':'تنظيم','عالجت':'معالجة','قللت':'تقليل','خفضت':'خفض','زدت':'زيادة','أنشأت':'إنشاء','أسست':'تأسيس','قدت':'قيادة','أشرفت':'الإشراف','جهزت':'تجهيز','صغت':'صياغة','وضعت':'وضع','اعتمدت':'اعتماد','قيمت':'تقييم','قست':'قياس','وحدت':'توحيد','ضبطت':'ضبط','فعلت':'تفعيل','وفرت':'توفير','حسبت':'حساب','دققت':'تدقيق','استلمت':'استلام','تعاملت':'التعامل','مثلت':'تمثيل','تواصلت':'التواصل','عملت':'العمل','شاركت':'المشاركة','ساهمت':'المساهمة','وزعت':'توزيع','رتبت':'ترتيب','حفظت':'حفظ','أرشفت':'أرشفة','استقبلت':'استقبال','سجلت':'تسجيل','ضمنت':'ضمان','استكملت':'استكمال','حققت':'تحقيق','أغلقت':'إغلاق','هيأت':'تهيئة','عينت':'تعيين','قابلت':'مقابلة','أنهيت':'إنهاء','ساعدت':'المساعدة','تحققت':'التحقق','أشرفت مباشرة':'الإشراف المباشر'};
+const AR_M={};Object.entries(AR_M_SRC).forEach(([v,m])=>AR_M[norm(v)]=m);
 function improveBullet(t){
   t=t.trim();let o=t;
   if(isAr(t)){
     o=o.replace(/^(من مهامي|كانت مهامي|مهامي)\s*[:：]?\s*/,'');
-    o=o.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة|المسؤول|المسؤولة)\s+عن\s+/,'أدرت ');
-    o=o.replace(/^(المساعدة|مساعدة|ساعدت)\s+في\s+/,'ساهمت في ');
+    o=o.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة|المسؤول|المسؤولة)\s+عن\s+/,'إدارة ');
+    o=o.replace(/^(ساعدت|المساعدة)\s+في\s+/,'المساهمة في ');
     o=o.replace(/^تم\s+/,'');
+    o=o.replace(/^(أشرفت|اشرفت)\s+مباشرة\s+على\s+/,'الإشراف المباشر على ');
     const m=o.match(/^(\S+)(\s+)([\s\S]*)$/);
-    if(m){let w=norm(m[1]);const key=w.replace(/^(ال|و)/,'');const k2=w.replace(/^وال/,'').replace(/^ال/,'');
-      const v=AR_MAP[w]||AR_MAP[k2]||AR_MAP[key];
-      if(v){let rest=m[3];
-        if(/على$/.test(v)){rest=rest.replace(/^(المباشر|المباشره|مباشر)\s+/,'');rest=rest.replace(/^على\s+/,'');
-          o=(/^(المباشر|مباشر)/.test(norm(m[3]))?'أشرفت مباشرةً على ':v+' ')+rest;}
-        else o=v+' '+rest;
-        // keep parallel structure: «و + مصدر» after the first verb → «و + فعل»
-        o=o.replace(/(^|\s)و(\S+)/g,(all,sp,w)=>{const vv=AR_MAP[norm(w)];return vv&&!/على$/.test(vv)?sp+'و'+vv:all});}
-    }
+    if(m){const ms=AR_M[norm(m[1].replace(/[ً-ْ]/g,''))];if(ms)o=ms+' '+m[3];}
+    // keep parallel structure: «و + فعل ماضٍ» → «و + مصدر»
+    const toM=w=>{const n0=norm(w.replace(/[\u064B-\u0652]/g,''));let ms=AR_M[n0];if(ms&&!/^ال/.test(ms))return ms;
+      const mm=n0.match(/^(.+ت)(هم|ها|هن|ه)$/);if(mm&&AR_M[mm[1]]&&!/^ال/.test(AR_M[mm[1]])){return AR_M[mm[1]].replace(/ة$/,'ت')+mm[2]}return null};
+    o=o.replace(/(^|\s)و(\S+)/g,(all,sp,w)=>{const ms=toM(w);return ms?sp+'و'+ms:all});
   }else{
     const low=o.toLowerCase();
     for(const k of Object.keys(EN_MAP).sort((a,b)=>b.length-a.length)){if(low.startsWith(k+' ')||low===k){o=EN_MAP[k]+o.slice(k.length);break}}
     o=o.replace(/^(I|We)\s+/,'');o=o.charAt(0).toUpperCase()+o.slice(1);
   }
-  return o.replace(/[\u064B-\u0652]/g,'').replace(/\s+/g,' ').trim(); // no diacritics: ATS matches plain letters
+  return o.replace(/[ً-ْ]/g,'').replace(/\s+/g,' ').trim(); // no diacritics: ATS matches plain letters
 }
-function bulletLines(){const res=[];SECS.filter(s=>s[0]==='experience'||s[0]==='other').forEach(s=>{const ta=$('s-'+s[0]);if(!ta)return;ta.value.split('\n').forEach((l,i)=>{if(BULLET_RE.test(l)||(s[0]==='experience'&&l.split(/\s+/).length>=8))res.push({sec:s[0],i,raw:l,t:l.replace(BULLET_RE,'').trim()})})});return res}
+function improveSummary(t){
+  return t.replace(/(^|[\s،,])مسؤولة\s+عن\s+/g,'$1متخصصة في ').replace(/(^|[\s،,])مسؤول\s+عن\s+/g,'$1متخصص في ')
+    .replace(/(^|[.\s])(أطمح|اطمح|أتطلع|اتطلع)\s+(إلى|الى|ل)\s*/g,'$1أسعى إلى ')
+    .replace(/(^|[.\s])(أحب|احب)\s+العمل\s+(في|على)\s+/g,'$1خبرة في ')
+    .replace(/\bresponsible for\b/gi,'specialized in').replace(/\bI am (a |an )?/g,'').replace(/\s+/g,' ').replace(/ \n/g,'\n').trim();
+}
+
+/* ---------- content suggestions: summary, skills, basics ---------- */
+const FIELDS={
+ 'الموارد البشرية':{areas:['التوظيف والاستقطاب','شؤون الموظفين','الرواتب','الانضباط الوظيفي','تقييم الأداء','التدريب والتطوير','علاقات الموظفين','تهيئة الموظفين'],kw:/(موارد بشري|شؤون الموظفين|توظيف|استقطاب|رواتب|hr\b|human resources|recruit|payroll|onboarding)/i,
+   skills:['نظام العمل السعودي','التوظيف والاستقطاب','إدارة شؤون الموظفين','الرواتب والتعويضات','التأمينات الاجتماعية (GOSI)','منصة قوى','منصة مدد','منصة مقيم','تقييم الأداء','التدريب والتطوير','تهيئة الموظفين (Onboarding)','علاقات الموظفين','السعودة ونطاقات','أنظمة HRIS','Microsoft Excel','إعداد مؤشرات الأداء (KPI)']},
+ 'المحاسبة والمالية':{kw:/(محاسب|مالي|ميزانية|قيود|فواتير|ضريبة|زكاة|accounting|accountant|finance|audit)/i,
+   skills:['إعداد القوائم المالية','القيود اليومية','التسويات البنكية','الحسابات الدائنة والمدينة','ضريبة القيمة المضافة','الزكاة والضريبة','إعداد الميزانيات','التدقيق الداخلي','الفوترة الإلكترونية (فاتورة)','أنظمة ERP','SAP','Microsoft Excel']},
+ 'المبيعات':{kw:/(مبيعات|بيع|عملاء|تارجت|مستهدف|sales|account manager)/i,
+   skills:['تحقيق المستهدفات البيعية','إدارة علاقات العملاء (CRM)','التفاوض','عروض الأسعار','تطوير الأعمال','خدمة ما بعد البيع','تحليل السوق','إعداد تقارير المبيعات','Salesforce','Microsoft Excel']},
+ 'التسويق':{kw:/(تسويق|حملات|محتوى|سوشيال|marketing|campaign|content|social media)/i,
+   skills:['التسويق الرقمي','إدارة حسابات التواصل الاجتماعي','صناعة المحتوى','الحملات الإعلانية','تحسين محركات البحث (SEO)','Google Ads','تحليل البيانات التسويقية','الهوية البصرية','Canva','Meta Business Suite']},
+ 'تقنية المعلومات':{kw:/(برمج|تقنية المعلومات|شبكات|دعم فني|سيرفر|developer|software|it support|network|python|java)/i,
+   skills:['الدعم الفني','إدارة الشبكات','أنظمة التشغيل','الأمن السيبراني','قواعد البيانات (SQL)','البرمجة','Microsoft 365','حل المشكلات التقنية','التوثيق الفني','ITIL']},
+ 'الإدارة والسكرتارية':{kw:/(إداري|اداري|سكرتير|مكتب|أرشفة|ارشفه|مراسلات|administrative|secretary|office)/i,
+   skills:['إدارة المراسلات','الأرشفة والتوثيق','تنظيم الاجتماعات','إدارة الجداول','إعداد التقارير','خدمة العملاء','Microsoft Office','إدخال البيانات']},
+ 'المشتريات وسلاسل الإمداد':{kw:/(مشتريات|موردين|توريد|مخزون|مستودع|procurement|purchasing|supply chain|inventory)/i,
+   skills:['إدارة الموردين','طلبات الشراء','التفاوض مع الموردين','إدارة المخزون','سلاسل الإمداد','تحليل التكاليف','العقود والمناقصات','أنظمة ERP','SAP']},
+ 'خدمة العملاء':{kw:/(خدمة العملاء|كول سنتر|شكاوى|call center|customer service)/i,
+   skills:['خدمة العملاء','معالجة الشكاوى','مهارات التواصل','إدارة علاقات العملاء (CRM)','حل المشكلات','العمل تحت ضغط المواعيد','قياس رضا العملاء']}
+};
+const SYSTEMS=['Oracle','SAP','Odoo','Zoho','Microsoft Office','Microsoft Excel','Excel','Power BI','HRIS','ERP','Salesforce','جسر','مايكروسوفت أوفيس','قوى','مدد','مقيم','التأمينات الاجتماعية','أبشر','Canva'];
+function hasSkill(nA,k){const core=norm(k.split(' (')[0]).replace(/^(منصه|نظام|انظمه|اداره)\s+/,'');const c2=core.replace(/^ال/,'');
+  if(nA.includes(c2))return true;const first=c2.split(' ')[0];return first.length>=4&&c2.split(' ').length>1&&nA.includes(first.replace(/^ال/,''))&&/و/.test(c2)?false:false}
+function detectField(txt){let best=null,bc=0;for(const [f,o] of Object.entries(FIELDS)){const c=(txt.match(new RegExp(o.kw.source,'gi'))||[]).length;if(c>bc){bc=c;best=f}}return bc>=2?best:null}
+function yearsOf(txt){const now=new Date().getFullYear();const ys=[...txt.matchAll(/\b(19[89]\d|20[0-3]\d)\b/g)].map(m=>+m[1]).filter(y=>y<=now);if(!ys.length)return 0;
+  const end=/(present|الآن|الان|حتى الآن|حاليا|حالياً|current)/i.test(txt)?now:Math.max(...ys);return Math.max(0,end-Math.min(...ys))}
+function yearsAr(n){return n<=1?'سنة':n===2?'سنتين':n<=10?n+' سنوات':n+' سنة'}
+function isFem(txt){return (txt.match(/(متمكنة|مسؤولة|متخصصة|حاصلة|ملتزمة|قادرة|موظفة|خبيرة|مهتمة|أخصائية|اخصائية|مشرفة|مديرة|منسقة|مساعدة إدارية)/g)||[]).length>=1}
+function suggestSummary(){
+  const d=collect(),exp=$('s-experience').value,all=cvText(d),fem=isFem(all);
+  const ar=isAr(all);if(!ar)return null;
+  const title=d.title||((exp.split('\n').find(l=>!BULLET_RE.test(l)&&l.trim())||'').split('|')[0].trim());
+  const y=yearsOf(exp);const field=detectField(all);
+  const lib=field?FIELDS[field].skills:[];const nA=norm(all);
+  const pool=(field&&FIELDS[field].areas)||lib;const areas=pool.filter(k=>hasSkill(nA,k)).slice(0,3);
+  const sys=SYSTEMS.filter(x=>new RegExp(x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(all));
+  const best=(lastR&&lastR.scored?lastR.scored:[]).filter(b=>b.num).sort((a,b)=>b.s-a.s)[0];
+  let ach=best?improveBullet(best.t).split(/[،,:]/)[0].replace(/[.،]+$/,'').trim():'';if(ach.split(/\s+/).length>14)ach=ach.split(/\s+/).slice(0,14).join(' ').replace(/[،,]$/,'');
+  const ym=$('s-summary').value.match(/(?:بخبرة|خبرة)\s+(?:تزيد\s+على|تزيد\s+عن|تتجاوز|أكثر\s+من|اكثر\s+من)?\s*[^.،,]{0,12}?(?:سنوات|سنة|سنتين|عام|أعوام|اعوام)/);
+  const yTxt=ym?' '+ym[0].replace(/^خبرة/,'بخبرة'):(y?` بخبرة تزيد على ${yearsAr(y)}`:'');
+  let s1=(title||(fem?'أخصائية':'أخصائي'))+yTxt+(areas.length?(yTxt?' في ':`، ${fem?'متخصصة':'متخصص'} في `)+areas.join(' و'):'');
+  s1+=ach?`، مع ${ach.replace(/^إدارة/,'خبرة في إدارة')}.`:'.';
+  let s2=sys.length?` ${fem?'متمكنة':'متمكن'} من ${sys.slice(0,5).join(' و')}.`:'';
+  const s3=field?` ${fem?'أسعى':'أسعى'} إلى المساهمة في تطوير ${field==='الموارد البشرية'?'عمليات الموارد البشرية ورفع كفاءتها':'الأداء ورفع الكفاءة في مجال '+field}.`:'';
+  return (s1+s2+s3).replace(/\s+/g,' ').trim();
+}
+function renderSuggest(){
+  const box=$('suggest');if(!box)return;const d=collect(),all=cvText(d),nA=norm(all),field=detectField(all);
+  let h='<div style="background:#fff8e6;border:1px solid #f3d79c;border-radius:12px;padding:12px"><h4 style="margin:0 0 8px;font-size:15px">💡 اقتراحات لسيرتك</h4>';
+  // summary
+  const sm=suggestSummary(),cur=$('s-summary').value.trim();
+  if(sm&&norm(sm)!==norm(cur))h+=`<div style="margin-bottom:10px"><b style="font-size:13.5px">📝 ملخص مهني مقترح</b> <span style="font-size:12px;color:var(--mut)">(مبني من بياناتك)</span><div dir="auto" style="background:#fff;border-radius:8px;padding:8px 10px;margin-top:5px;font-size:13.5px">${esc(sm)}</div><button class="btn2" id="useSum" style="margin-top:6px;padding:5px 12px;font-size:13px">استخدمه بدل الملخص الحالي</button></div>`;
+  // skills
+  if(field){const have=FIELDS[field].skills.filter(k=>!hasSkill(nA,k));
+    if(have.length)h+=`<div style="margin-bottom:10px"><b style="font-size:13.5px">🧩 مهارات شائعة في مجال ${field}</b> <span style="font-size:12px;color:var(--mut)">— أضف بس اللي تتقنه فعلاً</span><div class="chips" style="margin-top:6px;gap:6px">${have.slice(0,10).map(k=>`<span class="chip pa addk" data-sk="${esc(k)}" style="font-size:12.5px;padding:4px 10px">+ ${esc(k)}</span>`).join('')}</div></div>`;}
+  // basics
+  const miss=[];
+  if(!d.title){const t=(($('s-experience').value.split('\n').find(l=>!BULLET_RE.test(l)&&l.trim())||'').split('|')[0]||'').trim();if(t)miss.push(`<span class="chip pa addk" data-ttl="${esc(t)}" style="font-size:12.5px;padding:4px 10px">+ المسمى: ${esc(t)}</span>`)}
+  if(!$('s-langs').value.trim()){miss.push(`<span style="font-size:13px">🌐 اللغات: الإنجليزية —</span> ${['ممتاز','جيد جداً','جيد','متوسط'].map(l=>`<span class="chip pa addk" data-lng="${l}" style="font-size:12.5px;padding:3px 9px">${l}</span>`).join(' ')}`)}
+  if(!$('f-li').value.trim())miss.push(`<span style="font-size:13px">🔗 أضف رابط LinkedIn من «تعديل يدوي» بالأسفل</span>`);
+  if(!$('f-city').value.trim())miss.push(`<span style="font-size:13px">📍 أضف المدينة من «تعديل يدوي» بالأسفل</span>`);
+  if(miss.length)h+=`<div><b style="font-size:13.5px">✅ أساسيات ناقصة</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${miss.map(x=>`<div class="chips" style="gap:5px;align-items:center">${x}</div>`).join('')}</div></div>`;
+  h+='</div>';
+  const any=/useSum|data-sk|data-ttl|data-lng|LinkedIn|المدينة/.test(h);box.innerHTML=any?h:'';
+  const after=()=>{updatePreview();doRescan(false);renderSuggest()};
+  const us=$('useSum');if(us)us.onclick=()=>{$('s-summary').value=sm;after();toast('تم ✅')};
+  box.querySelectorAll('[data-sk]').forEach(c=>c.onclick=()=>{const t=$('s-skills');t.value=(t.value.trim()?t.value.trim()+'\n':'')+'• '+c.dataset.sk;after()});
+  box.querySelectorAll('[data-ttl]').forEach(c=>c.onclick=()=>{$('f-title').value=c.dataset.ttl;after()});
+  box.querySelectorAll('[data-lng]').forEach(c=>c.onclick=()=>{$('s-langs').value='العربية — اللغة الأم\nالإنجليزية — '+c.dataset.lng;after()});
+}
+function bulletLines(){const res=[];SECS.filter(s=>s[0]==='experience'||s[0]==='other').forEach(s=>{const ta=$('s-'+s[0]);if(!ta)return;ta.value.split('\n').forEach((l,i)=>{if(BULLET_RE.test(l)||(s[0]==='experience'&&l.split(/\s+/).length>=8&&!/\|/.test(l)&&!/\b(19|20)\d\d\b/.test(l)))res.push({sec:s[0],i,raw:l,t:l.replace(BULLET_RE,'').trim()})})});return res}
 function applyFix(x,nt){const ta=$('s-'+x.sec);const L=ta.value.split('\n');L[x.i]=(BULLET_RE.test(x.raw)?'• ':'')+nt;ta.value=L.join('\n')}
+function syncLine(sec,oldT,newT){const ta=$('s-'+sec);const L=ta.value.split('\n');const i=L.findIndex(l=>l.replace(BULLET_RE,'').trim()===oldT);
+  if(i>=0){L[i]=(BULLET_RE.test(L[i])?'• ':'')+newT;ta.value=L.join('\n');return true}return false}
+function liveTips(sc,ar){const t=[];
+  if(!sc.verb)t.push(ar?'ابدئي بفعل قوي (أدرت، طورت، حققت…)':'Start with a strong verb');
+  if(sc.pas)t.push(ar?'احذفي «مسؤول عن / تم» واكتبي ماذا فعلتِ':'Remove passive phrasing');
+  if(!sc.num&&!sc.res)t.push(ar?'أضيفي رقماً حقيقياً (كم؟ كم نسبة؟) أو النتيجة (لدعم…، للحد من…، بشكل شهري) — للمهام الروتينية مو لازم':'Add a real number or the result (optional for routine tasks)');
+  else if(!sc.num&&sc.res)t.push(ar?'ممتاز إنك ذكرتِ النتيجة — رقم حقيقي يخليها أقوى (اختياري)':'Good result phrase — a real number would make it stronger');
+  if(sc.thin)t.push(ar?'قصيرة — وضّحي النتيجة':'Too short — add the result');
+  if(sc.odd)t.push(ar?'«1 أشهر» صيغة غير صحيحة — اكتبي «خلال شهر» أو رقماً حقيقياً':'Check the number wording');
+  if(sc.unfinished)t.push(ar?'النقطة تبدو غير مكتملة — كمّلي الجملة':'Sentence looks unfinished');
+  if(sc.long)t.push(ar?'طويلة — اختصريها لسطرين':'Too long — trim it');
+  return t}
+const VERB_CHIPS_AR=['إدارة','تطوير','تحقيق','خفض','رفع','إعداد','تنفيذ','تنسيق'],VERB_CHIPS_EN=['Led','Managed','Developed','Achieved','Reduced','Increased','Implemented','Coordinated'];
 function renderImprove(){
-  const items=bulletLines().map(x=>({...x,n:improveBullet(x.t),sc:scoreBullet(x.t)})).filter(x=>x.n!==x.t||!x.sc.num);
-  const ch=items.filter(x=>x.n!==x.t),noNum=items.filter(x=>x.n===x.t&&!x.sc.num);
+  const items=bulletLines().map(x=>({...x,cur:x.t}));
   if(!items.length){$('weakFix').innerHTML='';return}
-  let h=`<label class="l">✨ تحسين النقاط تلقائياً <span style="font-weight:500;color:var(--mut)">(اختياري — راجع قبل التطبيق)</span></label>`;
-  if(ch.length>1)h+=`<button class="btn2" id="fixAll" style="width:100%;margin-bottom:6px">✨ حسّن كل النقاط (${ch.length})</button>`;
-  h+=ch.map((x,j)=>`<div class="wf"><div dir="auto" style="color:var(--mut);text-decoration:line-through">${esc(x.t)}</div><div dir="auto" style="font-weight:700;color:var(--ok);margin-top:4px">${esc(x.n)}</div>${x.sc.num?'':'<div style="font-size:12px;color:var(--warn);margin-top:3px">💡 لو تقدر أضف رقم (عدد، نسبة، مدة) يصير أقوى</div>'}<button class="btn2" style="margin-top:6px;padding:5px 10px;font-size:13px" data-fx="${j}">✨ حسّن تلقائياً</button></div>`).join('');
-  if(noNum.length)h+=`<div class="wf">💡 ${noNum.length} نقطة صياغتها جيدة لكن بدون أرقام — أضف عدد أو نسبة أو مدة إذا تقدر (مثل: وظّفت 25 موظفاً خلال 6 أشهر).</div>`;
+  let h=`<label class="l">✏️ عدّلي نقاطك — التقييم يتحدث وأنتِ تكتبين <span style="font-weight:500;color:var(--mut)">(اختياري)</span></label>
+  <button class="btn2" id="fixAll" style="width:100%;margin-bottom:6px">✨ طبّق الاقتراح التلقائي على كل النقاط</button>`;
+  h+=items.map((x,j)=>{const ar=isAr(x.t);return `<div class="wf" data-card="${j}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><b style="font-size:13px">نقطة ${j+1}</b><span class="sc" data-sc="${j}"></span></div>
+    <textarea data-ed="${j}" dir="auto" style="min-height:70px;font-size:14px;background:#fff"></textarea>
+    <div data-tips="${j}" style="font-size:12.5px;color:var(--warn);margin-top:4px"></div>
+    <div data-sug="${j}" style="display:none;margin-top:6px;background:var(--ok-l);border-radius:8px;padding:7px 9px;font-size:13px"></div>
+    <div class="chips" data-vrow="${j}" style="margin-top:6px;gap:5px;display:none"><span style="font-size:12px;color:var(--mut);align-self:center">ابدئي بـ:</span>
+      ${(ar?VERB_CHIPS_AR:VERB_CHIPS_EN).slice(0,5).map(v=>`<span class="chip pa addk" data-vb="${j}" data-v="${v}" style="font-size:12px;padding:3px 9px">${v}</span>`).join('')}</div>
+    <div data-nwrap="${j}" style="margin-top:6px;display:none"><span class="addk" data-ntog="${j}" style="font-size:12.5px;color:var(--blue);font-weight:700;cursor:pointer">➕ عندك رقم؟ (اختياري)</span>
+      <div class="chips" data-nrow="${j}" style="gap:5px;margin-top:5px;display:none">${(ar?['عدد','نسبة %','مدة']:['#','%','time']).map((n,k)=>`<span class="chip addk" data-nm="${j}" data-k="${k}" style="font-size:12px;padding:3px 9px;background:var(--blue-l);color:var(--blue-d);border-color:#c5d6f5">+ ${n}</span>`).join('')}</div></div>
+    </div>`}).join('');
   $('weakFix').innerHTML=h;
-  document.querySelectorAll('[data-fx]').forEach(btn=>btn.onclick=()=>{applyFix(ch[+btn.dataset.fx],ch[+btn.dataset.fx].n);btn.textContent='✓ تم التحسين';btn.disabled=true;btn.style.color='var(--ok)';btn.style.borderColor='var(--ok)'});
-  const fa=$('fixAll');if(fa)fa.onclick=()=>{ch.forEach(x=>applyFix(x,x.n));document.querySelectorAll('[data-fx]').forEach(b=>{b.textContent='✓ تم التحسين';b.disabled=true});fa.textContent='✓ تم تحسين كل النقاط';fa.disabled=true;toast('تم التحسين ✅ راجع النص قبل التحميل')};
+  const refresh=j=>{const x=items[j],ta=document.querySelector(`[data-ed="${j}"]`),t=ta.value.trim(),ar=isAr(t||x.t),sc=scoreBullet(t||' ');
+    const b=document.querySelector(`[data-sc="${j}"]`);const cs=sc.s>=75?85:sc.s;b.textContent=sc.s+'/100';b.style.background=colL(cs);b.style.color=col(cs);b.style.padding='2px 8px';
+    ta.style.height='auto';ta.style.height=(ta.scrollHeight+4)+'px';
+    const probs=[];if(!sc.verb)probs.push(ar?'ابدئي بكلمة إنجاز (إدارة، تطوير، إعداد…)':'Start with a strong verb');if(sc.pas)probs.push(ar?'استبدلي «مسؤول عن / تم» بكلمة إنجاز مثل «إدارة»':'Remove passive phrasing');
+    if(sc.odd)probs.push(ar?'«1 أشهر» صيغة غير صحيحة — اكتبي «خلال شهر» أو رقماً حقيقياً':'Check the number wording');if(sc.unfinished)probs.push(ar?'الجملة غير مكتملة — كمّليها':'Sentence looks unfinished');
+    if(sc.thin)probs.push(ar?'قصيرة — وضّحي النتيجة':'Too short');if(sc.long)probs.push(ar?'طويلة — اختصريها':'Too long');
+    const td=document.querySelector(`[data-tips="${j}"]`);
+    if(probs.length)td.innerHTML='<span style="color:var(--warn)">⚠️ '+probs.map(esc).join(' • ')+'</span>';
+    else if(sc.num)td.innerHTML='<span style="color:var(--ok)">✅ نقطة قوية</span>';
+    else td.innerHTML='<span style="color:var(--ok)">✅ جيدة</span>'+(sc.res?'':' <span style="color:var(--mut)">— الرقم اختياري، أضيفيه بس إذا عندك رقم حقيقي</span>');
+    document.querySelector(`[data-vrow="${j}"]`).style.display=sc.verb?'none':'flex';
+    document.querySelector(`[data-nwrap="${j}"]`).style.display=sc.num?'none':'block';
+    const sug=improveBullet(t),sd=document.querySelector(`[data-sug="${j}"]`);
+    if(sug&&sug!==t){sd.style.display='block';sd.innerHTML=`<b>✨ اقتراح:</b> <span dir="auto">${esc(sug)}</span> <button class="btn2" data-use="${j}" style="padding:2px 9px;font-size:12px;margin-top:4px">استخدمه</button>`;
+      sd.querySelector('[data-use]').onclick=()=>{ta.value=sug;commit(j)};}else sd.style.display='none';};
+  const commit=j=>{const x=items[j],ta=document.querySelector(`[data-ed="${j}"]`),nt=ta.value.replace(/\s*\n\s*/g,' ').trim();if(!nt)return;
+    if(syncLine(x.sec,x.cur,nt))x.cur=nt;refresh(j)};
+  items.forEach((x,j)=>{const ta=document.querySelector(`[data-ed="${j}"]`);ta.value=x.t;ta.oninput=()=>commit(j);refresh(j)});
+  document.querySelectorAll('[data-vb]').forEach(c=>c.onclick=()=>{const j=+c.dataset.vb,ta=document.querySelector(`[data-ed="${j}"]`);let t=ta.value.trim();
+    const w=t.split(/\s+/)[0]||'';const stripped=t.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة)\s+عن\s+/,'').replace(/^(responsible for|in charge of)\s+/i,'');
+    if(stripped!==t)t=stripped;else if(isVerb(w)||AR_MAP[norm(w).replace(/^ال/,'')])t=t.split(/\s+/).slice(1).join(' ');
+    ta.value=c.dataset.v+' '+t;commit(j);ta.focus()});
+  document.querySelectorAll('[data-ntog]').forEach(c=>c.onclick=()=>{const r=document.querySelector(`[data-nrow="${c.dataset.ntog}"]`);r.style.display=r.style.display==='none'?'flex':'none'});
+  document.querySelectorAll('[data-nm]').forEach(c=>c.onclick=()=>{const j=+c.dataset.nm,ta=document.querySelector(`[data-ed="${j}"]`),ar=isAr(ta.value);
+    const add=ar?[' لعدد __ موظفاً',' بنسبة __%',' خلال __ أشهر'][+c.dataset.k]:[' for __ employees',' by __%',' within __ months'][+c.dataset.k];
+    ta.value=ta.value.trim().replace(/[.]$/,'')+add;commit(j);ta.focus();const i=ta.value.lastIndexOf('__');try{ta.setSelectionRange(i,i+2)}catch(e){}});
+  $('fixAll').onclick=()=>{items.forEach((x,j)=>{const ta=document.querySelector(`[data-ed="${j}"]`);const n=improveBullet(ta.value);if(n!==ta.value.trim()){ta.value=n;commit(j)}});0};
 }
 function collect(){
-  const d={name:$('f-name').value.trim(),title:$('f-title').value.trim(),contact:[$('f-city').value,$('f-phone').value,$('f-email').value,$('f-li').value].map(x=>x.trim()).filter(Boolean),secs:[]};
+  const d={name:$('f-name').value.trim(),title:$('f-title').value.trim(),contact:[$('f-city').value,$('f-phone').value,$('f-email').value,(v=>{v=v.replace(/^https?:\/\/(www\.)?/,'').replace(/[?#].*$/,'').replace(/\/$/,'').trim();return v&&!/linkedin\.com/i.test(v)&&/^[a-z0-9][a-z0-9_-]{2,}$/i.test(v)?'linkedin.com/in/'+v:v})($('f-li').value)].map(x=>x.trim()).filter(Boolean),secs:[]};
   SECS.forEach(s=>{const t=$('s-'+s[0]).value.trim();if(t)d.secs.push({id:s[0],title:secTitle(s),lines:t.split('\n').map(x=>x.trim()).filter(Boolean)})});
   return d;
 }
@@ -670,29 +849,42 @@ function para(text,o={}){
 async function buildDocx(d){
   const rtl=lang!=='en'&&(lang==='ar'||isAr(d.secs.map(s=>s.lines.join(' ')).join(' ')+d.name));
   let b='';
-  if(d.name)b+=para(d.name,{rtl,bold:true,size:36,center:true,after:40,color:'0B3A8C'});
-  if(d.title)b+=para(d.title,{rtl,size:24,center:true,after:40});
-  if(d.contact.length)b+=para(d.contact.join('  |  '),{rtl,size:19,center:true,after:160});
-  d.secs.forEach(s=>{
-    b+=para(s.title,{rtl,bold:true,size:24,color:'1554C0',border:true,before:200,after:100});
+  if(d.name)b+=para(d.name,{rtl,bold:true,size:32,center:true,after:20,color:'0B3A8C'});
+  if(d.title)b+=para(d.title,{rtl,size:22,center:true,after:20});
+  const rels=[];
+  if(d.contact.length){
+    const rp=(c,u)=>`<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>${u?'<w:color w:val="1554C0"/><w:u w:val="single"/>':''}<w:sz w:val="18"/><w:szCs w:val="18"/>${rtl&&isAr(c)?'<w:rtl/>':''}</w:rPr>`;
+    let runs='';
+    d.contact.forEach((x,i)=>{
+      if(i)runs+=`<w:r>${rp('  |  ')}<w:t xml:space="preserve">  |  </w:t></w:r>`;
+      const u=linkOf(x);
+      if(u){const id='rIdL'+(rels.length+1);rels.push(`<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="${xe(u)}" TargetMode="External"/>`);
+        runs+=`<w:hyperlink r:id="${id}"><w:r>${rp(x,1)}<w:t xml:space="preserve">${xe(x)}</w:t></w:r></w:hyperlink>`;}
+      else runs+=`<w:r>${rp(x)}<w:t xml:space="preserve">${xe(x)}</w:t></w:r>`;
+    });
+    b+=`<w:p><w:pPr>${rtl?'<w:bidi/>':''}<w:spacing w:before="0" w:after="80"/><w:jc w:val="center"/></w:pPr>${runs}</w:p>`;
+  }
+  compactSecs(d.secs).forEach(s=>{
+    b+=para(s.title,{rtl,bold:true,size:22,color:'1554C0',border:true,before:130,after:50});
     s.lines.forEach(l=>{
-      if(BULLET_RE.test(l))b+=para('•  '+l.replace(BULLET_RE,''),{rtl:rtl||isAr(l),bullet:true,after:40});
-      else b+=para(l,{rtl:rtl||isAr(l),bold:(s.id==='experience'||s.id==='education')&&(/\||\b(19|20)\d\d\b/.test(l)||(l.split(/\s+/).length<=7&&!/[.،]$/.test(l))),after:40,before:s.id==='experience'?80:0});
+      if(BULLET_RE.test(l))b+=para('•  '+l.replace(BULLET_RE,''),{rtl:rtl||isAr(l),bullet:true,after:10,size:19});
+      else b+=para(l,{rtl:rtl||isAr(l),size:19,bold:(s.id==='experience'||s.id==='education')&&(/\||\b(19|20)\d\d\b/.test(l)||(l.split(/\s+/).length<=7&&!/[.،]$/.test(l))),after:15,before:s.id==='experience'?50:0});
     });
   });
-  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr>${rtl?'<w:bidi/>':''}<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1000" w:right="1100" w:bottom="1000" w:left="1100" w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${b}<w:sectPr>${rtl?'<w:bidi/>':''}<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="680" w:right="760" w:bottom="680" w:left="760" w:header="400" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const z=new JSZip();
   z.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>');
   z.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>');
   z.file('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>${xe(d.name||'CV')} - CV</dc:title><dc:creator>${xe(d.name||'')}</dc:creator></cp:coreProperties>`);
   z.file('word/document.xml',doc);
+  z.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${rels.join('')}</Relationships>`);
   return z.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
 }
 $('dl').onclick=async()=>{
   $('dlErr').style.display='none';
   const d=collect();
   if(!d.secs.length){$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';$('dlErr').style.display='block';return}
-  if(/\[[^\]]+\]/.test(cvText(d)))toast('⚠️ تذكير: فيه [أقواس] ما عبّأتها');
+  if(/\[[^\]]+\]|__/.test(cvText(d)))toast('⚠️ تذكير: فيه __ أو [أقواس] ما عبّأتها');
   try{
     if(!window.JSZip)throw new Error('nozip');
     const blob=await buildDocx(d);const fname=((d.name||'CV').replace(/[\\/:*?"<>|]+/g,'').trim()||'CV')+' - ATS CV.docx';
@@ -708,18 +900,60 @@ $('dl').onclick=async()=>{
     $('dlErr').style.cssText='display:block;background:var(--ok-l);color:var(--ok)';$('dlErr').textContent='✅ تم تجهيز الملف. إذا ما بدأ التحميل، استخدم «نسخ السيرة كنص» والصقها في Word.';
   }catch(e){$('dlErr').style.cssText='display:block';$('dlErr').textContent='تعذر التحميل هنا — استخدم «نسخ السيرة كنص» والصقها في Word.'}
 };
-$('pdfBtn').onclick=()=>{
-  const d=collect();
-  if(!d.secs.length){$('dlErr').style.cssText='display:block';$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';return}
+let firstScore=null;
+function doRescan(scroll){
+  const d=collect();if(!d.secs.length)return;
+  if(firstScore==null&&lastR)firstScore=lastR.total;
+  const txt=cvText(d);
+  const R=analyze(txt,$('jd').value,{type:'built'});lastR=R;lastCV=txt;
+  render(R,true);
+  const up=R.total-(firstScore||0);
+  const box=$('reRes');box.style.display='block';box.style.background=up>0?'var(--ok-l)':'var(--blue-l)';box.style.color=up>0?'var(--ok)':'var(--blue-d)';
+  box.innerHTML=`الدرجة قبل: ${firstScore} ← بعد التحسين: <span style="font-size:24px">${R.total}</span>/100 ${up>0?'🎉 (+'+up+')':''}<div style="font-size:13px;font-weight:500;margin-top:4px">${R.total<80?'للوصول إلى 80+: راجع قائمة الإصلاحات بالأعلى، أو افتح «تعديل يدوي» بالأسفل':'سيرتك جاهزة للتحميل ✅'}</div>`;
+  if(scroll)setTimeout(()=>box.scrollIntoView({behavior:'smooth',block:'center'}),300);
+}
+$('reScan').onclick=()=>{doRescan(true);updatePreview()};
+// LinkedIn field: whatever is pasted (full app share link with ?utm…) is shortened to linkedin.com/in/name
+const cleanLi=v=>{v=String(v).trim().replace(/^https?:\/\/(www\.)?/i,'').replace(/[?#].*$/,'').replace(/\/$/,'');return v&&!/linkedin\.com/i.test(v)&&/^[a-z0-9][a-z0-9_-]{2,}$/i.test(v)?'linkedin.com/in/'+v:v};
+['input','change','blur'].forEach(ev=>$('f-li').addEventListener(ev,()=>{const c=cleanLi($('f-li').value);if(c!==$('f-li').value&&(ev!=='input'||/[?#]|https?:/i.test($('f-li').value)))$('f-li').value=c;updatePreview()}));
+let pvT=null;function updatePreview(){clearTimeout(pvT);pvT=setTimeout(()=>{try{$('cvPreview').innerHTML=cvHTML(collect())}catch(e){}},150)}
+$('manual').addEventListener('input',updatePreview);$('manual').addEventListener('click',()=>setTimeout(updatePreview,50));
+// one-page layout: title+company+date on one line; skills/languages as a single line
+function compactSecs(secs){
+  return secs.map(s=>{
+    let L=s.lines.slice();
+    if(s.id==='experience'||s.id==='education'){
+      const out=[];
+      for(let i=0;i<L.length;i++){const l=L[i],n=L[i+1];
+        const isHead=x=>!BULLET_RE.test(x)&&(/\|/.test(x)||/\b(19|20)\d\d\b/.test(x));
+        const isTitle=x=>x&&!BULLET_RE.test(x)&&!/\|/.test(x)&&!/\b(19|20)\d\d\b/.test(x)&&x.split(/\s+/).length<=8&&!/[.،:]$/.test(x);
+        if(isHead(l)&&isTitle(n)){out.push(n+' | '+l);i++}else out.push(l)}
+      L=out;
+    }
+    if((s.id==='skills'||s.id==='langs')&&L.length>2&&L.every(x=>x.replace(BULLET_RE,'').split(/\s+/).length<=7))
+      L=[L.map(x=>x.replace(BULLET_RE,'').trim()).join(s.id==='skills'?'  •  ':'  |  ')];
+    if(s.id==='langs'&&L.length===2&&L.every(x=>x.split(/\s+/).length<=6))L=[L.map(x=>x.replace(BULLET_RE,'').trim()).join('  |  ')];
+    return {...s,lines:L};
+  });
+}
+function linkOf(x){x=String(x).trim();if(/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(x))return 'mailto:'+x;
+  if(/linkedin\.com\//i.test(x))return 'https://'+x.replace(/^https?:\/\//i,'').replace(/^(?!www\.)/i,'www.');
+  if(/^(https?:\/\/|www\.)/i.test(x))return /^https?:/i.test(x)?x:'https://'+x;return null}
+function cvHTML(d){
   const rtl=lang!=='en'&&(lang==='ar'||isAr(d.secs.map(s=>s.lines.join(' ')).join(' ')+d.name));
   let h=`<div dir="${rtl?'rtl':'ltr'}">`;
   if(d.name)h+=`<p class="pn">${esc(d.name)}</p>`;if(d.title)h+=`<p class="pt">${esc(d.title)}</p>`;
-  if(d.contact.length)h+=`<p class="pc" dir="auto">${d.contact.map(esc).join(' &nbsp;|&nbsp; ')}</p>`;
-  d.secs.forEach(s=>{h+=`<h4>${esc(s.title)}</h4>`;let ul=false;
+  if(d.contact.length)h+=`<p class="pc" dir="auto">${d.contact.map(x=>{const u=linkOf(x);return u?`<a href="${esc(u)}" target="_blank" rel="noopener" style="color:#1554C0;text-decoration:underline" dir="ltr">${esc(x)}</a>`:`<span dir="auto">${esc(x)}</span>`}).join(' &nbsp;|&nbsp; ')}</p>`;
+  compactSecs(d.secs).forEach(s=>{h+=`<h4>${esc(s.title)}</h4>`;let ul=false;
     s.lines.forEach(l=>{if(BULLET_RE.test(l)){if(!ul){h+='<ul>';ul=true}h+=`<li dir="auto">${esc(l.replace(BULLET_RE,''))}</li>`}
       else{if(ul){h+='</ul>';ul=false}const bold=(s.id==='experience'||s.id==='education')&&(/\||\b(19|20)\d\d\b/.test(l)||(l.split(/\s+/).length<=7&&!/[.،]$/.test(l)));h+=`<p dir="auto" class="${bold?'b':''}">${esc(l)}</p>`}});
     if(ul)h+='</ul>';});
-  $('printArea').innerHTML=h+'</div>';
+  return h+'</div>';
+}
+$('pdfBtn').onclick=()=>{
+  const d=collect();
+  if(!d.secs.length){$('dlErr').style.cssText='display:block';$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';return}
+  $('printArea').innerHTML=cvHTML(d);
   const inClaude=window.top!==window.self;
   const old=document.title;document.title=(d.name||'CV')+' - ATS CV';
   try{window.print()}catch(e){}
@@ -736,7 +970,7 @@ $('go').onclick=async()=>{
   else{cv=$('cvText').value;if(cv.trim().length<80){showErr('الصق نص السيرة الذاتية كاملاً (النص قصير جداً).');return}}
   $('go').disabled=true;$('go').textContent='⏳ جاري الفحص...';
   await new Promise(r=>setTimeout(r,350));
-  try{lastCV=cv;lastR=analyze(cv,$('jd').value,meta);render(lastR);$('builder').style.display='none';$('openB').style.display='';}catch(e){showErr('حدث خطأ أثناء التحليل: '+e.message)}
+  try{firstScore=null;$('reRes').style.display='none';lastCV=cv;lastR=analyze(cv,$('jd').value,meta);render(lastR);$('builder').style.display='none';$('openB').style.display='';}catch(e){showErr('حدث خطأ أثناء التحليل: '+e.message)}
   $('go').disabled=false;$('go').textContent='🔍 افحص سيرتي الآن';
 };
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText(lastReport);toast('تم نسخ التقرير ✅')}catch(e){toast('تعذر النسخ')}};
