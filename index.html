@@ -48,6 +48,14 @@ h1{font-size:clamp(24px,4.6vw,34px);margin:0;line-height:1.25;text-wrap:balance}
 nav{display:flex;gap:8px;flex-wrap:wrap}
 nav a{font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 16px;text-decoration:none;min-height:42px;display:inline-flex;align-items:center}
 nav a[aria-current="page"]{background:var(--navy);color:var(--navy-fg);border-color:var(--navy)}
+.hub{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.hub:hover{border-color:var(--gold)}
+.hub .ic{font-size:30px;width:56px;height:56px;display:grid;place-items:center;border-radius:14px;background:var(--navy);flex:none}
+.hub b{display:block;font-size:17px}.hub span{color:var(--muted);font-size:13px}
+.hub .go{margin-inline-start:auto;color:var(--gold);font-weight:700;white-space:nowrap}
+.seg{grid-column:1/-1;display:flex;gap:6px;padding:5px;border:1px solid var(--line);border-radius:999px;background:var(--surface);width:fit-content;max-width:100%}
+.seg a{flex:1;text-align:center;white-space:nowrap;font-weight:600;font-size:14px;color:var(--fg);text-decoration:none;padding:8px 14px;border-radius:999px}
+.seg a.on{background:var(--gold);color:#1a1a2e}
 a:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .hint{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
 .sw{width:14px;height:14px;border-radius:4px;background:var(--input);border:1px solid var(--input-line);display:inline-block}
@@ -100,38 +108,38 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 </header>
 
 <nav aria-label="الحاسبات">
-  <a href="#salary">هيكلة الراتب</a>
-  <a href="#nitaqat">حد نطاقات</a>
-  <a href="#leave">رصيد الإجازات</a>
-  <a href="#lastday">الرصيد لآخر يوم عمل</a>
-  <a href="#settle">المخالصة</a>
-  <a href="#eos">مكافأة نهاية الخدمة</a>
-  <a href="#cost">تكلفة الموظف</a>
-  <a href="letters.html" style="background:var(--gold);color:#fff;border-color:var(--gold)">الخطابات ✉</a>
-  <a href="forms.html" style="background:var(--navy);color:#fff;border-color:var(--navy)">النماذج 📋</a>
-  <a href="dashboard.html" style="background:var(--navy);color:#fff;border-color:var(--navy)">لوحة المؤشرات 📊</a>
-  <a href="performance.html" style="background:var(--navy);color:#fff;border-color:var(--navy)">أداء الموظف 🎯</a>
-  <a href="ats-checker.html" style="background:var(--navy);color:#fff;border-color:var(--navy)">فاحص السيرة الذاتية ATS 📄</a>
+  <a href="ats-checker.html">منقذ السيرة 🛟</a>
+  <a href="#nitaqat">حد نطاقات 📈</a>
+  <a href="#salary">هيكلة الراتب والتكلفة 💰</a>
+  <a href="greetings.html">بطاقات منقذك 🎉</a>
+  <a href="#docs">الخطابات والنماذج ✉</a>
+  <a href="#leave">رصيد الإجازات 🌴</a>
+  <a href="#kpi">لوحة المؤشرات والأداء 📊</a>
+  <a href="#settle">المخالصة ونهاية الخدمة 🤝</a>
 </nav>
 <div class="hint"><span class="sw"></span> اكتب أرقامك في الخانات الزرقاء الفاتحة، والنتيجة تطلع على طول</div>
 
-<!-- 1 leave -->
+<!-- 1 leave (merged with last working day) -->
 <section id="v-leave" class="calc" hidden>
   <div class="card"><h2>رصيد الإجازات <small>Leave Balance</small></h2>
     <div class="grid">
-      <label>تاريخ البداية (المباشرة)<em>Start date</em><input id="l_start" type="date"></label>
-      <label>تاريخ النهاية (الاحتساب)<em>End date</em><input id="l_end" type="date"></label>
+      <label>طريقة الحساب<em>Method</em><select id="l_mode"><option value="s" selected>من تاريخ المباشرة</option><option value="b">من رصيد حالي (لآخر يوم عمل)</option></select></label>
+      <label id="l_startw">تاريخ البداية (المباشرة)<em>Start date</em><input id="l_start" type="date"></label>
+      <label id="l_curw" hidden>الرصيد الحالي (يوم)<em>Current balance</em><input id="l_cur" type="number" step="0.01"></label>
+      <label id="l_asofw" hidden>الرصيد محسوب لين تاريخ<em>Balance as of</em><input id="l_asof" type="date"></label>
+      <label><span id="l_endL">تاريخ النهاية (الاحتساب أو آخر يوم عمل)</span><em>End date / Last working day</em><input id="l_end" type="date"></label>
       <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="l_ent"><option value="" selected>اختر</option><option>21</option><option>30</option><option value="c">رقم آخر</option></select></label>
       <label id="l_custw" hidden>اكتب الاستحقاق<em>Custom days</em><input id="l_cust" type="number" min="0" step="0.5"></label>
       <label>أيام السنة<em>Days per year</em><select id="l_basis"><option value="" selected>اختر</option><option>360</option><option>365</option></select></label>
-      <label>الأيام المستخدمة<em>Used days</em><input id="l_used" type="number" min="0" step="0.5"></label>
+      <label><span id="l_usedL">الأيام المستخدمة</span><em>Used days</em><input id="l_used" type="number" min="0" step="0.5"></label>
     </div>
-    <p class="note">نظام العمل: 21 يوم في السنة، و30 يوم بعد إكمال 5 سنوات. اختر اللي ينطبق عليك.</p>
+    <p class="note" id="l_note">نظام العمل: 21 يوم في السنة، و30 يوم بعد إكمال 5 سنوات. اختر اللي ينطبق عليك.</p>
   </div>
   <div class="card"><h2>النتيجة <small>Result</small></h2>
-    <div class="big"><span>الرصيد المتبقي</span><b id="l_rem">0</b></div>
+    <div class="big"><span id="l_remL">الرصيد المتبقي</span><b id="l_rem">0</b></div>
     <div class="rows">
-      <div class="row"><span class="k">مدة الخدمة<i>Service period</i></span><span class="v" id="l_svc">-</span></div>
+      <div class="row" id="l_svcR"><span class="k">مدة الخدمة<i>Service period</i></span><span class="v" id="l_svc">-</span></div>
+      <div class="row" id="l_baseR" hidden><span class="k">الرصيد الحالي<i>Current balance</i></span><span class="v" id="l_base">0</span></div>
       <div class="row"><span class="k">عدد الأيام<i>Days</i></span><span class="v" id="l_days">0</span></div>
       <div class="row"><span class="k">الأيام المستحقة<i>Accrued days</i></span><span class="v" id="l_acc">0</span></div>
       <div class="row neg"><span class="k">الأيام المستخدمة<i>Used</i></span><span class="v" id="l_u">0</span></div>
@@ -142,34 +150,9 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   </div>
 </section>
 
-<!-- 2 last working day -->
-<section id="v-lastday" class="calc" hidden>
-  <div class="card"><h2>الرصيد لآخر يوم عمل <small>Balance to Last Working Day</small></h2>
-    <div class="grid">
-      <label>الرصيد الحالي (يوم)<em>Current balance</em><input id="d_cur" type="number" step="0.01"></label>
-      <label>الرصيد محسوب لين تاريخ<em>Balance as of</em><input id="d_asof" type="date"></label>
-      <label>تاريخ آخر يوم عمل<em>Last working day</em><input id="d_last" type="date"></label>
-      <label>الاستحقاق السنوي (يوم)<em>Annual entitlement</em><select id="d_ent"><option value="" selected>اختر</option><option>21</option><option>30</option></select></label>
-      <label>أيام السنة<em>Days per year</em><select id="d_basis"><option value="" selected>اختر</option><option>360</option><option>365</option></select></label>
-      <label>إجازات بعد تاريخ الرصيد<em>Leave taken after</em><input id="d_used" type="number" min="0" step="0.5"></label>
-    </div>
-    <p class="note">إذا آخر يوم عمل قبل تاريخ الرصيد، تنخصم الأيام الزايدة من الرصيد.</p>
-  </div>
-  <div class="card"><h2>النتيجة <small>Result</small></h2>
-    <div class="big"><span>الرصيد في آخر يوم عمل</span><b id="d_fin">0</b></div>
-    <div class="rows">
-      <div class="row"><span class="k">الأيام الإضافية<i>Additional days</i></span><span class="v" id="d_add">0</span></div>
-      <div class="row"><span class="k">المستحق عن الأيام الإضافية<i>Accrued</i></span><span class="v" id="d_acc">0</span></div>
-      <div class="row neg"><span class="k">إجازات بعد تاريخ الرصيد<i>Used</i></span><span class="v" id="d_u">0</span></div>
-    </div>
-    <div class="how" id="d_how"></div>
-    <div class="status" id="d_st"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="copy reset" type="button">تصفير</button><button class="copy" data-copy="lastday">نسخ النتيجة</button></div>
-  </div>
-</section>
-
 <!-- 3 end of service -->
 <section id="v-eos" class="calc" hidden>
+  <div class="seg"><a href="#settle">المخالصة الكاملة</a><a href="#eos" class="on">المكافأة فقط</a></div>
   <div class="card"><h2>مكافأة نهاية الخدمة <small>End of Service Benefit</small></h2>
     <div class="grid">
       <label>الراتب الإجمالي<em>Total monthly wage</em><input id="e_wage" type="number" min="0" step="0.01"></label>
@@ -218,6 +201,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 
 <!-- 6 settlement -->
 <section id="v-settle" class="calc" hidden>
+  <div class="seg"><a href="#settle" class="on">المخالصة الكاملة</a><a href="#eos">المكافأة فقط</a></div>
   <div class="card"><h2>المخالصة النهائية <small>Final Settlement</small></h2>
     <label>طريقة الحساب<em>Method</em><select id="m_method">
       <option value="A" selected>الطريقة الأولى: على الراتب الإجمالي</option>
@@ -283,8 +267,23 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
   </div>
 </section>
 
+<!-- hubs -->
+<section id="v-docs" class="calc" hidden>
+  <div class="card" style="grid-column:1/-1"><h2>الخطابات والنماذج <small>Letters &amp; Forms</small></h2>
+    <a class="hub" href="letters.html"><span class="ic">✉</span><span><b>الخطابات <small style="color:var(--muted);font-weight:500;font-size:12px">Letters</small></b><span>خطابات الموارد البشرية الجاهزة</span></span><span class="go">فتح ←</span></a>
+    <a class="hub" href="forms.html"><span class="ic">📋</span><span><b>النماذج <small style="color:var(--muted);font-weight:500;font-size:12px">Forms</small></b><span>نماذج الموارد البشرية للتعبئة والطباعة</span></span><span class="go">فتح ←</span></a>
+  </div>
+</section>
+<section id="v-kpi" class="calc" hidden>
+  <div class="card" style="grid-column:1/-1"><h2>لوحة المؤشرات والأداء <small>KPIs &amp; Performance</small></h2>
+    <a class="hub" href="dashboard.html"><span class="ic">📊</span><span><b>لوحة المؤشرات <small style="color:var(--muted);font-weight:500;font-size:12px">HR Dashboard</small></b><span>مؤشرات الموارد البشرية الشهرية</span></span><span class="go">فتح ←</span></a>
+    <a class="hub" href="performance.html"><span class="ic">🎯</span><span><b>أداء الموظف <small style="color:var(--muted);font-weight:500;font-size:12px">Performance</small></b><span>تقييم ومتابعة أداء الموظفين</span></span><span class="go">فتح ←</span></a>
+  </div>
+</section>
+
 <!-- 4 salary structure -->
 <section id="v-salary" class="calc" hidden>
+  <div class="seg"><a href="#salary" class="on">هيكلة الراتب</a><a href="#cost">تكلفة الموظف</a></div>
   <div class="card"><h2>هيكلة الراتب <small>Salary Structure</small></h2>
     <div class="grid">
       <label>الجنسية<em>Nationality</em><select id="s_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
@@ -332,6 +331,7 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padd
 
 <!-- 7 cost -->
 <section id="v-cost" class="calc" hidden>
+  <div class="seg"><a href="#salary">هيكلة الراتب</a><a href="#cost" class="on">تكلفة الموظف</a></div>
   <div class="card"><h2>تكلفة الموظف الفعلية <small>True Employee Cost</small></h2>
     <div class="grid">
       <label>الجنسية<em>Nationality</em><select id="c_nat"><option selected>سعودي</option><option>غير سعودي</option></select></label>
@@ -384,22 +384,27 @@ function status(id,errs){const el=$(id);if(errs.length){el.className='status bad
 const texts={};
 
 function leave(){
+  const m=$('l_mode').value,B=m==='b';
   $('l_custw').hidden=$('l_ent').value!=='c';
-  const s=dt('l_start'),e=dt('l_end'),ent=$('l_ent').value==='c'?num('l_cust'):+$('l_ent').value,b=+$('l_basis').value,u=num('l_used');
-  const errs=[];if(s===null)errs.push('اكتب تاريخ البداية');if(e===null)errs.push('اكتب تاريخ النهاية');if(s!==null&&e!==null&&e<s)errs.push('تاريخ النهاية قبل البداية');if(!ent)errs.push('اختر الاستحقاق السنوي');if(!b)errs.push('اختر أيام السنة');
-  const ok=!errs.length,days=ok?(e-s)/DAY:0,acc=r2(days/b*ent),rem=r2(acc-u);
-  if(ok&&rem<0)errs.push('المستخدم أكثر من المستحق');
-  $('l_svc').textContent=ok?ymdTxt(ymd(s,e)):'-';$('l_days').textContent=fd(days);$('l_acc').textContent=fd(acc);$('l_u').textContent=fd(u);$('l_rem').textContent=fd(rem);
-  $('l_how').innerHTML=`<b>المستحق</b> = ${fd(days)} يوم ÷ ${b} × ${fd(ent)} = ${fd(acc)}<br><b>المتبقي</b> = ${fd(acc)} − ${fd(u)} = ${fd(rem)}`;
-  status('l_st',errs);texts.leave=`رصيد الإجازات: ${fd(rem)} يوم (المستحق ${fd(acc)} − المستخدم ${fd(u)})`;
-}
-function lastday(){
-  const c=num('d_cur'),a=dt('d_asof'),l=dt('d_last'),ent=+$('d_ent').value,b=+$('d_basis').value,u=num('d_used');
-  const errs=[];if(a===null)errs.push('اكتب تاريخ الرصيد');if(l===null)errs.push('اكتب آخر يوم عمل');if(!ent)errs.push('اختر الاستحقاق السنوي');if(!b)errs.push('اختر أيام السنة');
-  const ok=!errs.length,add=ok?(l-a)/DAY:0,acc=r2(add/b*ent),fin=r2(c+acc-u);
-  $('d_add').textContent=fd(add);$('d_acc').textContent=fd(acc);$('d_u').textContent=fd(u);$('d_fin').textContent=fd(fin);
-  $('d_how').innerHTML=`<b>الأيام الإضافية</b> = آخر يوم عمل − تاريخ الرصيد = ${fd(add)} يوم<br><b>المستحق</b> = ${fd(add)} ÷ ${b} × ${ent} = ${fd(acc)}<br><b>الرصيد النهائي</b> = ${fd(c)} + ${fd(acc)} − ${fd(u)} = ${fd(fin)}`;
-  status('d_st',errs);texts.lastday=`الرصيد في آخر يوم عمل: ${fd(fin)} يوم`;
+  $('l_startw').hidden=B;$('l_curw').hidden=!B;$('l_asofw').hidden=!B;$('l_svcR').hidden=B;$('l_baseR').hidden=!B;
+  $('l_usedL').textContent=B?'إجازات بعد تاريخ الرصيد':'الأيام المستخدمة';
+  $('l_remL').textContent=B?'الرصيد في آخر يوم عمل':'الرصيد المتبقي';
+  $('l_note').textContent=B?'إذا آخر يوم عمل قبل تاريخ الرصيد، تنخصم الأيام الزايدة من الرصيد.':'نظام العمل: 21 يوم في السنة، و30 يوم بعد إكمال 5 سنوات. اختر اللي ينطبق عليك.';
+  const s=B?dt('l_asof'):dt('l_start'),e=dt('l_end'),ent=$('l_ent').value==='c'?num('l_cust'):+$('l_ent').value,b=+$('l_basis').value,u=num('l_used'),c=B?num('l_cur'):0;
+  const errs=[];
+  if(s===null)errs.push(B?'اكتب تاريخ الرصيد':'اكتب تاريخ البداية');
+  if(e===null)errs.push(B?'اكتب آخر يوم عمل':'اكتب تاريخ النهاية');
+  if(!B&&s!==null&&e!==null&&e<s)errs.push('تاريخ النهاية قبل البداية');
+  if(!ent)errs.push('اختر الاستحقاق السنوي');if(!b)errs.push('اختر أيام السنة');
+  const ok=!errs.length,days=ok?(e-s)/DAY:0,acc=r2(days/b*ent),rem=r2(c+acc-u);
+  if(ok&&!B&&rem<0)errs.push('المستخدم أكثر من المستحق');
+  $('l_svc').textContent=ok&&!B?ymdTxt(ymd(s,e)):'-';$('l_base').textContent=fd(c);
+  $('l_days').textContent=fd(days);$('l_acc').textContent=fd(acc);$('l_u').textContent=fd(u);$('l_rem').textContent=fd(rem);
+  $('l_how').innerHTML=B
+    ?`<b>الأيام الإضافية</b> = آخر يوم عمل − تاريخ الرصيد = ${fd(days)} يوم<br><b>المستحق</b> = ${fd(days)} ÷ ${b} × ${fd(ent)} = ${fd(acc)}<br><b>الرصيد النهائي</b> = ${fd(c)} + ${fd(acc)} − ${fd(u)} = ${fd(rem)}`
+    :`<b>المستحق</b> = ${fd(days)} يوم ÷ ${b} × ${fd(ent)} = ${fd(acc)}<br><b>المتبقي</b> = ${fd(acc)} − ${fd(u)} = ${fd(rem)}`;
+  status('l_st',errs);
+  texts.leave=B?`الرصيد في آخر يوم عمل: ${fd(rem)} يوم (الحالي ${fd(c)} + المستحق ${fd(acc)} − المستخدم ${fd(u)})`:`رصيد الإجازات: ${fd(rem)} يوم (المستحق ${fd(acc)} − المستخدم ${fd(u)})`;
 }
 function eos(){
   const w=num('e_wage'),s=dt('e_start'),e=dt('e_end'),b=$('e_basis').value,rs=$('e_reason').value;
@@ -493,7 +498,7 @@ function cost(){
   const errs=[];if(bs<=0)errs.push('اكتب الراتب الأساسي');status('c_st',errs);
   texts.cost=`تكلفة الموظف: الراتب ${f2(sal)} | التأمينات ${f2(g)} | مخصص نهاية الخدمة ${f2(e)} | مصاريف سنوية/شهر ${f2(yr)} | الإجمالي الشهري ${f2(tot)} | السنوي ${f2(tot*12)}`;
 }
-const all=()=>{leave();lastday();eos();settle();salary();nitaqat();cost()};
+const all=()=>{leave();eos();settle();salary();nitaqat();cost()};
 document.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',all);el.addEventListener('change',all)});
 document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
   const t=(texts[b.dataset.copy]||'')+'\n— منقذك · Your HR Lifesaver · من EMAN HR';
@@ -501,9 +506,9 @@ document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
   try{navigator.clipboard.writeText(t).then(done,()=>{fallback(t);done()})}catch(e){fallback(t);done()}
 }));
 function fallback(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove()}
-const views=['salary','nitaqat','leave','lastday','settle','eos','cost'];
-function route(){const h=location.hash.slice(1),v=views.includes(h)?h:'salary';
-  views.forEach(x=>{$('v-'+x).hidden=x!==v;document.querySelector(`nav a[href="#${x}"]`).setAttribute('aria-current',x===v?'page':'false')})}
+const views=['salary','nitaqat','leave','settle','eos','cost','docs','kpi'];
+function route(){let h=location.hash.slice(1);if(h==='lastday'){h='leave';$('l_mode').value='b';leave()}const v=views.includes(h)?h:'salary';
+  views.forEach(x=>{$('v-'+x).hidden=x!==v;{const n=document.querySelector(`nav a[href="#${x}"]`);if(n)n.setAttribute('aria-current',(x===v||(x==='settle'&&v==='eos')||(x==='salary'&&v==='cost'))?'page':'false')}})}
 
 document.querySelectorAll('.reset').forEach(b=>b.addEventListener('click',()=>{
   const sec=b.closest('section');
