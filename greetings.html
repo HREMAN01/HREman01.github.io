@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بطاقات منقذك | Your HR Lifesaver Cards</title>
+<meta name="description" content="بطاقات تهنئة وإيميلات جاهزة للموظفين بشعار شركتك — اليوم الوطني، يوم التأسيس، الأعياد، الترحيب والتقدير. من منقذك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0B1230;--panel:#121A3A;--panel2:#18224A;--line:#26315E;--pill:#1E2B63;--gold:#D9B76A;--txt:#F3F5FB;--muted:#9AA6C8;--in:#0F1736;--inLine:#2F4A8F;--r:22px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'IBM Plex Sans Arabic','Tajawal',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}
+  header{padding:22px 18px 10px;max-width:1100px;margin:auto}
+  .top{display:flex;justify-content:space-between;align-items:flex-start}
+  .brand{font-weight:800;font-size:2rem;line-height:1.2;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .brand span{font-weight:400!important;font-size:.95rem;color:var(--muted);opacity:1!important;letter-spacing:.5px}
+  .brand small{display:block;width:100%;font-weight:400;font-size:1rem;color:var(--muted)}
+  .home{color:var(--txt);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:7px 14px;border-radius:999px;font-size:.85rem;white-space:nowrap}
+  .hero{margin:18px 0 0}
+  .hero h1{margin:0 0 4px;font-size:1.5rem;font-weight:800}
+  .hero{border-top:1px solid var(--line);padding-top:16px}
+  .hero{text-align:center}
+  .hero h1 span.en{display:block;color:var(--gold);font-weight:500;font-size:.62em;letter-spacing:.5px;margin-top:2px}
+  .hero p{margin-top:8px!important}
+  .hero p{margin:0;color:var(--muted);font-size:.95rem}
+  main{max-width:1100px;margin:14px auto 30px;padding:0 12px;display:grid;gap:14px;grid-template-columns:1fr}
+  @media(min-width:900px){main{grid-template-columns:400px 1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  h2{font-size:1.15rem;color:var(--txt);margin:0 0 12px;display:flex;align-items:center;gap:8px;font-weight:800}
+  h2 .n{background:var(--gold);color:#1a1a2e;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:.85rem}
+  label{display:block;font-size:.95rem;font-weight:700;color:var(--txt);margin:12px 0 5px}
+  input[type=text],select,textarea{width:100%;font-family:inherit;font-size:1rem;border:1.5px solid var(--inLine);border-radius:14px;padding:11px 12px;background:var(--in);color:var(--txt);outline:none}
+  input[type=text]:focus,textarea:focus{border-color:var(--gold)}
+  textarea{min-height:220px;resize:vertical;line-height:1.8}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .cat{border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:999px;padding:9px 16px;font-family:inherit;font-size:.92rem;font-weight:700;cursor:pointer}
+  .cat.on{background:var(--pill);border-color:var(--pill)}
+  .occ{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .o{border:1px solid var(--line);border-radius:16px;padding:10px 8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;color:var(--txt);background:var(--pill);text-align:center;min-height:54px;display:flex;align-items:center;justify-content:center;gap:7px}
+  .o i{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.15)}
+  .o.on{background:var(--gold);color:#1a1a2e;border-color:var(--gold)}
+  .upload{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--inLine);border-radius:16px;padding:10px;background:var(--in);cursor:pointer}
+  .upload img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:10px}
+  .upload span{font-size:.88rem;color:var(--muted)}
+  canvas{width:100%;height:auto;border-radius:12px;display:block;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{flex:1;min-width:120px;border:0;border-radius:999px;padding:12px 16px;font-family:inherit;font-weight:800;font-size:.98rem;cursor:pointer;background:var(--gold);color:#1a1a2e;text-decoration:none;text-align:center}
+  .btn.alt{background:var(--pill);color:var(--txt);border:1px solid var(--pill)}
+  .subj{background:var(--in)}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1a2e;font-weight:700;padding:10px 18px;border-radius:999px;font-size:.9rem;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+  footer{text-align:center;font-size:.8rem;color:var(--muted);padding:20px 12px 30px}
+  footer b{color:var(--gold)}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">منقذك <span>Your HR Lifesaver</span><small>حاسبات وأدوات الموارد البشرية</small></div>
+    <a class="home" href="index.html">← الرئيسية</a>
+  </div>
+  <div class="hero">
+    <h1>بطاقات منقذك<span class="en">Your HR Lifesaver Cards</span></h1>
+    <p>بطاقة رسمية بالعربي والإنجليزي بشعار شركتك، مع إيميل رسمي جاهز.</p>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2><span class="n">1</span> اختر المناسبة</h2>
+    <div class="cats" id="cats"></div>
+    <div class="occ" id="occ"></div>
+
+    <h2 style="margin-top:18px"><span class="n">2</span> بيانات شركتك</h2>
+    <label>شعار الشركة</label>
+    <label class="upload" for="logo" style="margin:0">
+      <img id="logoPrev" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%239dc3e6' d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z'/%3E%3C/svg%3E">
+      <span>اضغط لرفع الشعار (PNG بخلفية شفافة أفضل)</span>
+    </label>
+    <input type="file" id="logo" accept="image/*" hidden>
+    
+
+    <div class="row">
+      <div><label for="coAR">اسم الشركة بالعربي</label><input type="text" id="coAR"></div>
+      <div><label for="coEN">Company name (EN)</label><input type="text" id="coEN" dir="ltr"></div>
+    </div>
+    <label for="coShort">اختصار الشركة (اختياري) — يظهر في العنوان</label>
+    <input type="text" id="coShort" dir="ltr">
+    <div id="empFields">
+      <div class="row">
+        <div><label for="person">اسم الموظف</label><input type="text" id="person"></div>
+        <div><label for="job">المسمى الوظيفي</label><input type="text" id="job"></div>
+      </div>
+      <label for="dept">القسم</label>
+      <input type="text" id="dept">
+    </div>
+    <label for="date" id="dateLbl">التاريخ</label>
+    <input type="text" id="date" dir="ltr">
+    <div class="row">
+      <div><label for="sAR">الجهة المرسلة (عربي)</label><input type="text" id="sAR"></div>
+      <div><label for="sEN">Sender (EN)</label><input type="text" id="sEN" dir="ltr"></div>
+    </div>
+  </section>
+
+
+  <div style="display:grid;gap:14px">
+    <section class="card">
+      <h2><span class="n">3</span> البطاقة</h2>
+      <canvas id="cv"></canvas>
+      <div class="btns">
+        <button class="btn" id="dl">⬇ تحميل البطاقة</button>
+        <button class="btn alt" id="share">↗ مشاركة</button>
+        <button class="btn alt" id="print">🖨 طباعة A4</button>
+      </div>
+      <div class="hint">على الجوال: إذا ما نزلت الصورة، اضغط «مشاركة» ثم «حفظ الصورة».</div>
+    </section>
+
+    <section class="card">
+      <h2><span class="n">4</span> الإيميل الجاهز</h2>
+      <label for="subj">العنوان</label>
+      <input type="text" id="subj" class="subj">
+      <label for="body">نص الإيميل</label>
+      <textarea id="body" style="min-height:320px"></textarea>
+      <div class="btns">
+        <button class="btn" id="copy">📋 نسخ الإيميل</button>
+        <a class="btn alt" id="mail" href="#">✉ فتح في البريد</a>
+      </div>
+      <div class="hint">أرفق البطاقة مع الإيميل ليكون شكله احترافي.</div>
+    </section>
+  </div>
+</main>
+<div style="max-width:1100px;margin:0 auto 30px;padding:0 12px">
+  <section class="card" id="idSec">
+    <h2><span class="n">5</span> بطاقة الموظف — Employee ID Card</h2>
+    <p class="hint" style="margin-top:-4px">تستخدم شعار الشركة واسمها من الأعلى. المقاس الرسمي للبطاقة 85.6 × 54 مم (مثل البطاقة البنكية).</p>
+    <div style="display:grid;gap:14px;grid-template-columns:1fr" class="idgrid">
+      <div>
+        <label>صورة الموظف</label>
+        <label class="upload" for="photo" style="margin:0">
+          <img id="photoPrev" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%239dc3e6' d='M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z'/%3E%3C/svg%3E">
+          <span>اضغط لرفع صورة شخصية بخلفية سادة</span>
+        </label>
+        <input type="file" id="photo" accept="image/*" hidden>
+        <div class="row">
+          <div><label for="iNameA">الاسم بالعربي</label><input type="text" id="iNameA"></div>
+          <div><label for="iNameE">Name (EN)</label><input type="text" id="iNameE" dir="ltr"></div>
+        </div>
+        <div class="row">
+          <div><label for="iJobA">المسمى بالعربي</label><input type="text" id="iJobA"></div>
+          <div><label for="iJobE">Job Title (EN)</label><input type="text" id="iJobE" dir="ltr"></div>
+        </div>
+        <div class="row">
+          <div><label for="iNo">الرقم الوظيفي</label><input type="text" id="iNo" dir="ltr"></div>
+          <div><label for="iDept">القسم</label><input type="text" id="iDept"></div>
+        </div>
+        <div class="row">
+          <div><label for="iIss">تاريخ الإصدار</label><input type="text" id="iIss" dir="ltr"></div>
+          <div><label for="iExp">تاريخ الانتهاء</label><input type="text" id="iExp" dir="ltr"></div>
+        </div>
+        <div class="row">
+          <div><label for="iBlood">فصيلة الدم (اختياري)</label><input type="text" id="iBlood" dir="ltr"></div>
+          <div><label for="iEmg">رقم الطوارئ (اختياري)</label><input type="text" id="iEmg" dir="ltr" placeholder="05xxxxxxxx"></div>
+        </div>
+        <label for="iContact">تواصل الشركة (هاتف / موقع)</label>
+        <input type="text" id="iContact" dir="ltr">
+        <label>لون البطاقة</label>
+        <div class="cats" id="idPal"></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="hint" style="text-align:center;margin:0 0 4px">الوجه الأمامي</div><canvas id="idF"></canvas></div>
+          <div><div class="hint" style="text-align:center;margin:0 0 4px">الوجه الخلفي</div><canvas id="idB"></canvas></div>
+        </div>
+        <div class="btns">
+          <button class="btn" id="idDl">⬇ تحميل الوجهين</button>
+          <button class="btn alt" id="idPrint">🖨 طباعة بالمقاس الحقيقي</button>
+        </div>
+        <div class="hint">الطباعة تطلع الوجهين على ورقة A4 بالمقاس الحقيقي للقص، أو أرسلي الصورتين لمطبعة بطاقات PVC.</div>
+      </div>
+    </div>
+  </section>
+</div>
+<style>@media(min-width:900px){.idgrid{grid-template-columns:400px 1fr!important}}</style>
+
+<footer>© <b>منقذك — Your HR Lifesaver | إيمان خالد</b> — جميع الحقوق محفوظة. يُمنع نسخ الأداة أو إعادة نشرها دون إذن.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS={emp:"الترحيب والتقدير",nat:"المناسبات الوطنية",rel:"المناسبات الدينية",soc:"المناسبات الاجتماعية"};
+// c: [primary, accent, light]; p: band pattern; per: addressed to a person (shows employee box)
+const O=[
+ {id:"welcome",cat:"emp",name:"ترحيب بموظف جديد",c:["#5C3A1E","#D9952E","#F3E5CC"],p:"hex",per:1,k:"WELCOME",dl:"تاريخ المباشرة / Start Date",
+  tE:"Welcome to {short}",tA:"مرحبًا بكم في {coAR}",
+  bE:"We are pleased to welcome you to {coEN}. We are confident that your expertise and commitment will be a valuable addition to our team, and we wish you every success in your new role.",
+  bA:"يسرّنا الترحيب بكم في {coAR}، وثقتنا بأن خبراتكم والتزامكم سيكونان إضافة قيّمة لفريق العمل، متمنين لكم التوفيق والنجاح في مهامكم الجديدة.",
+  sA:"مرحبًا بانضمامكم إلى {coAR}",sE:"Welcome to {coEN}"},
+ {id:"probation",cat:"emp",name:"اجتياز فترة التجربة",c:["#0B5E43","#7CB342","#E5F3EA"],p:"hex",per:1,k:"CONGRATS",dl:"تاريخ التثبيت / Confirmation Date",
+  tE:"Probation Successfully Completed",tA:"تهنئة باجتياز فترة التجربة",
+  bE:"We are pleased to inform you that you have successfully completed your probation period. Your dedication and performance reflect the values of {coEN}, and we look forward to your continued success.",
+  bA:"يسرّنا إبلاغكم باجتياز فترة التجربة بنجاح وتثبيتكم ضمن فريق {coAR}، تقديرًا لما أظهرتموه من التزام وكفاءة، متطلعين إلى مزيد من النجاح والعطاء.",
+  sA:"تهنئة باجتياز فترة التجربة",sE:"Probation Successfully Completed"},
+ {id:"thanks",cat:"emp",name:"شكر وتقدير",c:["#7A1E48","#D4A04C","#F6E6EE"],p:"diamond",per:1,k:"THANK YOU",dl:"التاريخ / Date",
+  tE:"Certificate of Appreciation",tA:"شكر وتقدير",
+  bE:"In recognition of your outstanding efforts and dedication, {coEN} is pleased to extend its sincere thanks and appreciation. Your commitment sets an example for all, and we look forward to your continued excellence.",
+  bA:"تقديرًا لجهودكم المتميزة وإخلاصكم في العمل، يسرّ {coAR} أن تتقدم لكم بخالص الشكر والتقدير، فقد كان التزامكم مثالًا يُحتذى، متطلعين إلى مزيد من التميز والعطاء.",
+  sA:"شكر وتقدير",sE:"Certificate of Appreciation"},
+ {id:"eom",cat:"emp",name:"موظف الشهر",c:["#6E5007","#D4A017","#FBF1D6"],p:"stars",per:1,k:"EMPLOYEE OF THE MONTH",dl:"الشهر / Month",
+  tE:"Employee of the Month",tA:"موظف الشهر",
+  bE:"{coEN} is proud to recognize you as Employee of the Month, in appreciation of your exceptional performance, commitment and positive spirit within the team.",
+  bA:"يسرّ {coAR} اختياركم موظف الشهر، تقديرًا لأدائكم الاستثنائي والتزامكم وروحكم الإيجابية مع فريق العمل، متمنين لكم دوام التميز.",
+  sA:"موظف الشهر",sE:"Employee of the Month"},
+ {id:"anniv",cat:"emp",name:"ذكرى الانضمام",c:["#1F4E79","#2E9BD6","#DDEBF7"],p:"hex",per:1,k:"ANNIVERSARY",dl:"تاريخ الانضمام / Joining Date",
+  tE:"Happy Work Anniversary",tA:"تهنئة بذكرى الانضمام",
+  bE:"On your work anniversary, {coEN} thanks you for your dedication and valuable contributions. Your presence is part of our success, and we wish you many more years of achievement.",
+  bA:"بمناسبة ذكرى انضمامكم إلى {coAR}، نتقدم لكم بالشكر على إخلاصكم وإسهاماتكم القيّمة، فوجودكم جزء من نجاحنا، متمنين لكم سنوات قادمة حافلة بالإنجاز.",
+  sA:"تهنئة بذكرى الانضمام",sE:"Happy Work Anniversary"},
+ {id:"promo",cat:"emp",name:"ترقية",c:["#0F4C81","#C9A227","#E1ECF6"],p:"diamond",per:1,k:"PROMOTION",dl:"تاريخ الترقية / Effective Date",jobL:"المسمى الجديد / New Title",
+  tE:"Congratulations on Your Promotion",tA:"تهنئة بالترقية",
+  bE:"{coEN} is pleased to congratulate you on your well-deserved promotion, in recognition of your competence and distinguished performance. We wish you every success in your new responsibilities.",
+  bA:"يسرّ {coAR} أن تهنئكم بمناسبة ترقيتكم المستحقة، تقديرًا لكفاءتكم وأدائكم المتميز، متمنين لكم التوفيق والنجاح في مسؤولياتكم الجديدة.",
+  sA:"تهنئة بالترقية",sE:"Congratulations on Your Promotion"},
+ {id:"farewell",cat:"emp",name:"شكر ووداع",c:["#37474F","#90A4AE","#ECEFF1"],p:"diamond",per:1,k:"THANK YOU",dl:"آخر يوم عمل / Last Working Day",
+  tE:"Thank You & Farewell",tA:"شكر ووداع",
+  bE:"As you conclude your journey with {coEN}, we thank you for your valuable efforts and the positive impact you have left. We wish you every success in your next chapter.",
+  bA:"مع ختام مسيرتكم في {coAR}، نتقدم لكم بخالص الشكر على جهودكم القيّمة والأثر الطيب الذي تركتموه، متمنين لكم التوفيق والنجاح في محطتكم القادمة.",
+  sA:"شكر ووداع",sE:"Thank You & Farewell"},
+ {id:"national",cat:"nat",name:"اليوم الوطني",c:["#0B5D3B","#C9A227","#E8F3EC"],p:"najdi",per:0,k:"SAUDI NATIONAL DAY",dl:"التاريخ / Date",
+  tE:"Happy Saudi National Day",tA:"اليوم الوطني السعودي",
+  bE:"On the occasion of Saudi National Day, {coEN} extends its warmest congratulations to all employees. We take pride in our nation's unity and achievements, and wish our beloved Kingdom continued glory and prosperity.",
+  bA:"بمناسبة اليوم الوطني للمملكة العربية السعودية، يسرّ {coAR} أن تتقدم لجميع منسوبيها بأصدق التهاني والتبريكات، معتزين بوحدة وطننا ومنجزاته، سائلين الله أن يديم على مملكتنا الغالية عزّها وأمنها ورخاءها.",
+  sA:"تهنئة بمناسبة اليوم الوطني السعودي",sE:"Happy Saudi National Day"},
+ {id:"founding",cat:"nat",name:"يوم التأسيس",c:["#6B3E26","#C8963E","#F5EADB"],p:"najdi",per:0,k:"FOUNDING DAY",dl:"التاريخ / Date",
+  tE:"Happy Founding Day",tA:"يوم التأسيس",
+  bE:"On the occasion of Founding Day, {coEN} congratulates all employees as we celebrate the deep-rooted history of the Saudi state and the proud heritage that continues to inspire our future.",
+  bA:"بمناسبة يوم التأسيس، تتقدم {coAR} لجميع منسوبيها بخالص التهاني، احتفاءً بالجذور الراسخة للدولة السعودية وإرثها العريق الذي نستمد منه العزم نحو مستقبل مشرق.",
+  sA:"تهنئة بمناسبة يوم التأسيس",sE:"Happy Founding Day"},
+ {id:"flag",cat:"nat",name:"يوم العلم",c:["#0F6B45","#8FBF9F","#E6F2EA"],p:"stars",per:0,k:"FLAG DAY",dl:"التاريخ / Date",
+  tE:"Saudi Flag Day",tA:"يوم العلم",
+  bE:"On Saudi Flag Day, {coEN} joins the nation in honoring our flag as a symbol of unity, pride and loyalty, wishing our Kingdom lasting glory.",
+  bA:"بمناسبة يوم العلم، تشارك {coAR} الوطن الاحتفاء برايته الخفّاقة رمز التوحيد والعزة والولاء، سائلين الله أن تبقى عالية شامخة.",
+  sA:"بمناسبة يوم العلم السعودي",sE:"Saudi Flag Day"},
+ {id:"ramadan",cat:"rel",name:"رمضان",c:["#1B1F4B","#C9A24A","#ECEBF5"],p:"stars",per:0,k:"RAMADAN KAREEM",dl:"التاريخ / Date",
+  tE:"Ramadan Kareem",tA:"رمضان كريم",
+  bE:"On the advent of the holy month of Ramadan, {coEN} extends its sincere greetings to all employees and their families, wishing everyone a blessed month filled with peace and goodness.",
+  bA:"بمناسبة حلول شهر رمضان المبارك، تتقدم {coAR} لجميع منسوبيها وأسرهم بأطيب التهاني، سائلين الله أن يبلّغنا وإياكم صيامه وقيامه، وأن يجعله شهر خير وبركة على الجميع.",
+  sA:"تهنئة بحلول شهر رمضان المبارك",sE:"Ramadan Kareem"},
+ {id:"fitr",cat:"rel",name:"عيد الفطر",c:["#0E5E6F","#E0A93B","#E3F1F3"],p:"stars",per:0,k:"EID MUBARAK",dl:"التاريخ / Date",
+  tE:"Eid Al-Fitr Mubarak",tA:"عيد فطر مبارك",
+  bE:"On the occasion of Eid Al-Fitr, {coEN} extends its heartfelt congratulations to all employees and their families, wishing everyone a joyful Eid and continued blessings.",
+  bA:"بمناسبة عيد الفطر المبارك، تتقدم {coAR} لجميع منسوبيها وأسرهم بأصدق التهاني، سائلين الله أن يعيده علينا وعليكم باليمن والبركات، وأن يتقبّل منا ومنكم صالح الأعمال.",
+  sA:"تهنئة بعيد الفطر المبارك",sE:"Eid Al-Fitr Mubarak"},
+ {id:"adha",cat:"rel",name:"عيد الأضحى",c:["#5A2A6E","#D4A35A","#F1E8F4"],p:"stars",per:0,k:"EID MUBARAK",dl:"التاريخ / Date",
+  tE:"Eid Al-Adha Mubarak",tA:"عيد أضحى مبارك",
+  bE:"On the occasion of Eid Al-Adha, {coEN} extends its sincere congratulations to all employees and their families, wishing everyone a blessed Eid filled with joy and goodness.",
+  bA:"بمناسبة عيد الأضحى المبارك، تتقدم {coAR} لجميع منسوبيها وأسرهم بأصدق التهاني، سائلين الله أن يعيده علينا وعليكم بالخير واليمن والبركات.",
+  sA:"تهنئة بعيد الأضحى المبارك",sE:"Eid Al-Adha Mubarak"},
+ {id:"hijri",cat:"rel",name:"العام الهجري",c:["#234E52","#B8975F","#E6EFEF"],p:"diamond",per:0,k:"HIJRI NEW YEAR",dl:"التاريخ / Date",
+  tE:"Happy Hijri New Year",tA:"عام هجري سعيد",
+  bE:"On the occasion of the Hijri New Year, {coEN} extends its best wishes to all employees, hoping the new year brings blessings, success and prosperity to all.",
+  bA:"بمناسبة حلول العام الهجري الجديد، تتقدم {coAR} لجميع منسوبيها بأطيب التهاني، سائلين الله أن يجعله عام خير وبركة وتوفيق للجميع.",
+  sA:"تهنئة بالعام الهجري الجديد",sE:"Happy Hijri New Year"},
+ {id:"wedding",cat:"soc",name:"تهنئة زواج",c:["#6D4C63","#C9A0B4","#F5ECF1"],p:"diamond",per:1,k:"CONGRATS",dl:"التاريخ / Date",
+  tE:"Congratulations on Your Wedding",tA:"تهنئة بالزواج",
+  bE:"On behalf of {coEN}, we extend our warmest congratulations on your marriage, wishing you a lifetime of happiness, harmony and blessings.",
+  bA:"بالأصالة عن {coAR}، نتقدم لكم بأحرّ التهاني بمناسبة زواجكم، سائلين الله أن يبارك لكما وعليكما، وأن يجمع بينكما في خير.",
+  sA:"تهنئة بمناسبة الزواج",sE:"Congratulations on Your Wedding"},
+ {id:"baby",cat:"soc",name:"تهنئة مولود",c:["#2B5966","#7FC4D6","#E6F3F6"],p:"hex",per:1,k:"CONGRATS",dl:"التاريخ / Date",
+  tE:"Congratulations on Your New Baby",tA:"تهنئة بالمولود",
+  bE:"On behalf of {coEN}, we extend our heartfelt congratulations on the arrival of your new baby, wishing your family joy, health and blessings.",
+  bA:"بالأصالة عن {coAR}، نتقدم لكم بأطيب التهاني بمناسبة قدوم المولود، بورك لكم في الموهوب، وشكرتم الواهب، وبلغ أشده، ورُزقتم برّه.",
+  sA:"تهنئة بمناسبة المولود",sE:"Congratulations on Your New Baby"},
+ {id:"grad",cat:"soc",name:"تخرج / إتمام تدريب",c:["#283593","#F2B705","#E8EAF6"],p:"diamond",per:1,k:"ACHIEVEMENT",dl:"تاريخ الإتمام / Completion Date",
+  tE:"Congratulations on Your Achievement",tA:"تهنئة بالإنجاز",
+  bE:"{coEN} congratulates you on successfully completing your program, and commends your commitment to continuous learning and professional development.",
+  bA:"تهنئكم {coAR} بمناسبة إتمام برنامجكم بنجاح، مقدّرين حرصكم على التعلم المستمر والتطوير المهني، متمنين لكم مزيدًا من التقدم.",
+  sA:"تهنئة بمناسبة الإنجاز",sE:"Congratulations on Your Achievement"},
+ {id:"recovery",cat:"soc",name:"الحمد لله على السلامة",c:["#2A7F62","#7FD1AE","#E4F5EE"],p:"hex",per:1,k:"WELCOME BACK",dl:"تاريخ العودة / Return Date",
+  tE:"Welcome Back",tA:"الحمد لله على السلامة",
+  bE:"{coEN} is delighted to welcome you back to work, wishing you lasting health and wellbeing.",
+  bA:"يسرّ {coAR} عودتكم إلى العمل بالصحة والعافية، حمدًا لله على سلامتكم، متمنين لكم دوام الصحة والعافية.",
+  sA:"الحمد لله على السلامة",sE:"Welcome Back"}
+];
+
+const $=id=>document.getElementById(id);
+const cv=$("cv");let ctx=cv.getContext("2d");
+let cat="emp",cur=O[0],logo=null;
+const W=1754,H=1240; // A4 landscape @150dpi
+const FA="'Tajawal',Tahoma,Arial,sans-serif",FE="Arial,'Helvetica Neue',sans-serif";
+
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}
+function renderCats(){
+  $("cats").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="cat ${k===cat?'on':''}" data-c="${k}">${v}</button>`).join("");
+  $("cats").querySelectorAll("button").forEach(b=>b.onclick=()=>{cat=b.dataset.c;renderCats();renderOcc()});
+}
+function renderOcc(){
+  $("occ").innerHTML=O.filter(o=>o.cat===cat).map(o=>`<button class="o ${o.id===cur.id?'on':''}" data-id="${o.id}"><i style="background:${o.c[0]}"></i>${o.name}</button>`).join("");
+  $("occ").querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=O.find(o=>o.id===b.dataset.id);renderOcc();update()});
+}
+const val=(id,d)=>($(id).value.trim()||d);
+function F(t){
+  const coAR=val("coAR","الشركة"),coEN=val("coEN","the Company");
+  return t.replace(/\{coAR\}/g,coAR).replace(/\{coEN\}/g,coEN).replace(/\{short\}/g,val("coShort",coEN)).replace(/\{name\}/g,val("person",""));
+}
+
+/* ---------- shapes ---------- */
+function hex(x,y,r){ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3;ctx.lineTo(x+r*Math.cos(a),y+r*Math.sin(a))}ctx.closePath()}
+function star8(x,y,r){ctx.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8,q=i%2?r*.5:r;ctx.lineTo(x+q*Math.cos(a),y+q*Math.sin(a))}ctx.closePath()}
+function diamond(x,y,r){ctx.beginPath();ctx.moveTo(x,y-r);ctx.lineTo(x+r,y);ctx.lineTo(x,y+r);ctx.lineTo(x-r,y);ctx.closePath()}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+
+function band(x,y,w,h){
+  const [P,A]=cur.c;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  ctx.fillStyle=mix(P,A,.45);ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle=A;ctx.fillStyle=A;ctx.lineWidth=2.5;ctx.globalAlpha=.55;
+  if(cur.p==="hex"){const r=26,dx=r*Math.sqrt(3),dy=r*1.5;for(let j=0,yy=y;yy<y+h+r;yy+=dy,j++)for(let xx=x+(j%2?dx/2:0);xx<x+w+r;xx+=dx){hex(xx,yy,r-2);ctx.stroke()}}
+  else if(cur.p==="stars"){for(let j=0,yy=y+30;yy<y+h+40;yy+=62,j++)for(let xx=x+(j%2?31:0);xx<x+w+40;xx+=62){star8(xx,yy,22);ctx.stroke()}}
+  else if(cur.p==="diamond"){for(let j=0,yy=y;yy<y+h+40;yy+=40,j++)for(let xx=x+(j%2?20:0);xx<x+w+40;xx+=40){diamond(xx,yy,17);ctx.stroke()}}
+  else if(cur.p==="najdi"){for(let yy=y;yy<y+h+60;yy+=56){for(let xx=x;xx<x+w+40;xx+=40){ctx.beginPath();ctx.moveTo(xx,yy);ctx.lineTo(xx+20,yy+28);ctx.lineTo(xx+40,yy);ctx.closePath();ctx.globalAlpha=.6;ctx.fill();ctx.globalAlpha=.4;diamond(xx+20,yy+42,8);ctx.fill()}}}
+  ctx.restore();
+  // keyword plate
+  const k=cur.k,stack=!k.includes(" ")&&k.length<=9;
+  ctx.save();ctx.fillStyle=P;ctx.strokeStyle=A;ctx.lineWidth=3;
+  if(stack){const lh=62,ph=k.length*lh+40,py=y+h/2-ph/2;ctx.fillRect(x+w/2-38,py,76,ph);ctx.strokeRect(x+w/2-38,py,76,ph);
+    ctx.fillStyle="#fff";ctx.font=`700 44px ${FE}`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.direction="ltr";
+    [...k].forEach((ch,i)=>ctx.fillText(ch,x+w/2,py+40+i*lh))}
+  else{ctx.font=`700 40px ${FE}`;const tw=ctx.measureText(k).width+80;const ph=Math.min(tw,h-60);ctx.fillRect(x+w/2-38,y+h/2-ph/2,76,ph);ctx.strokeRect(x+w/2-38,y+h/2-ph/2,76,ph);
+    ctx.translate(x+w/2,y+h/2);ctx.rotate(-Math.PI/2);ctx.fillStyle="#fff";ctx.textAlign="center";ctx.textBaseline="middle";ctx.direction="ltr";ctx.fillText(k,0,2)}
+  ctx.restore();
+}
+function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));const A=p(a),B=p(b);return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(",")})`}
+
+function wrap(text,maxW){const ws=text.split(/\s+/),L=[];let l="";for(const w of ws){const t=l?l+" "+w:w;if(ctx.measureText(t).width>maxW&&l){L.push(l);l=w}else l=t}if(l)L.push(l);return L}
+
+function cluster(cx,cy){
+  const [P,A,Lt]=cur.c,r=44,dx=r*Math.sqrt(3);
+  const cells=[[0,-2,"o"],[-.5,-1,"t"],[.5,-1,"l"],[1.5,-1,"a"],[-1,0,"l"],[0,0,"a"],[1,0,"p"]];
+  cells.forEach(([i,j,t])=>{hex(cx+i*dx,cy+j*r*1.5,r-3);
+    if(t==="o"){ctx.strokeStyle=mix(P,"#ffffff",.6);ctx.lineWidth=3;ctx.fillStyle="#fff";ctx.fill();ctx.stroke()}
+    else{ctx.fillStyle=t==="a"?A:t==="p"?P:t==="t"?mix(A,"#ffffff",.55):mix(Lt,P,.08);ctx.fill()}});
+}
+
+function patternIn(pathFn){
+  const [P,A]=cur.c;ctx.save();pathFn();ctx.clip();
+  ctx.fillStyle=mix(P,A,.35);ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=A;ctx.fillStyle=A;ctx.lineWidth=2.5;ctx.globalAlpha=.5;
+  if(cur.p==="hex"){const r=26,dx=r*Math.sqrt(3),dy=r*1.5;for(let j=0,yy=0;yy<H+r;yy+=dy,j++)for(let xx=(j%2?dx/2:0);xx<W+r;xx+=dx){hex(xx,yy,r-2);ctx.stroke()}}
+  else if(cur.p==="stars"){for(let j=0,yy=30;yy<H+40;yy+=62,j++)for(let xx=(j%2?31:0);xx<W+40;xx+=62){star8(xx,yy,22);ctx.stroke()}}
+  else if(cur.p==="diamond"){for(let j=0,yy=0;yy<H+40;yy+=40,j++)for(let xx=(j%2?20:0);xx<W+40;xx+=40){diamond(xx,yy,17);ctx.stroke()}}
+  else{for(let yy=0;yy<H+60;yy+=56){for(let xx=0;xx<W+40;xx+=40){ctx.beginPath();ctx.moveTo(xx,yy);ctx.lineTo(xx+20,yy+28);ctx.lineTo(xx+40,yy);ctx.closePath();ctx.globalAlpha=.55;ctx.fill();ctx.globalAlpha=.35;diamond(xx+20,yy+42,8);ctx.fill()}}}
+  ctx.restore();
+}
+const LR=t=>"‪"+t+"‬";
+
+function draw(){
+  ctx=cv.getContext("2d");cv.width=W;cv.height=H;const [P,A,Lt]=cur.c;
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  // corner ornaments
+  const C=330;
+  patternIn(()=>{ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(C,0);ctx.lineTo(0,C);ctx.closePath()});
+  patternIn(()=>{ctx.beginPath();ctx.moveTo(W,H);ctx.lineTo(W-C,H);ctx.lineTo(W,H-C);ctx.closePath()});
+  ctx.strokeStyle=A;ctx.lineWidth=6;
+  ctx.beginPath();ctx.moveTo(C+18,0);ctx.lineTo(0,C+18);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W-C-18,H);ctx.lineTo(W,H-C-18);ctx.stroke();
+  // frame
+  ctx.strokeStyle=P;ctx.lineWidth=3;ctx.strokeRect(46,46,W-92,H-92);
+  ctx.strokeStyle=A;ctx.lineWidth=1.5;ctx.strokeRect(60,60,W-120,H-120);
+
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  // logo
+  const lw=420,lh=150,ly=95;
+  if(logo){const k=Math.min(lw/logo.width,lh/logo.height),dw=logo.width*k,dh=logo.height*k;ctx.drawImage(logo,W/2-dw/2,ly+(lh-dh)/2,dw,dh)}
+  else{ctx.save();ctx.setLineDash([12,10]);ctx.strokeStyle="#bbb";ctx.lineWidth=3;rr(W/2-lw/2,ly,lw,lh,18);ctx.stroke();ctx.restore();
+    ctx.fillStyle="#999";ctx.font=`500 34px ${FA}`;ctx.direction="rtl";ctx.fillText("شعار الشركة",W/2,ly+lh/2)}
+  // keyword with side rules
+  const kw=cur.k.split("").join(" ");ctx.direction="ltr";ctx.font=`700 26px ${FE}`;ctx.fillStyle=A;
+  const kwW=ctx.measureText(kw).width;ctx.fillText(LR(kw),W/2,292);
+  ctx.fillRect(W/2-kwW/2-150,290,120,3);ctx.fillRect(W/2+kwW/2+30,290,120,3);
+  diamond(W/2-kwW/2-24,291.5,7);ctx.fill();diamond(W/2+kwW/2+24,291.5,7);ctx.fill();
+
+  // two columns
+  const tE=F(cur.tE),tA=F(cur.tA),bE=F(cur.bE),bA=F(cur.bA);
+  const colW=650,xA=W*0.735,xE=W*0.265,top=360;
+  ctx.textBaseline="alphabetic";
+  // Arabic (right)
+  ctx.direction="rtl";ctx.font=`800 56px ${FA}`;let LtA=wrap(tA,colW);let y=top+30;
+  ctx.fillStyle=P;LtA.forEach(l=>{ctx.fillText(l,xA,y);y+=70});
+  ctx.fillStyle=A;ctx.fillRect(xA-90,y-36,180,5);y+=30;
+  ctx.fillStyle="#333";ctx.font=`400 34px ${FA}`;wrap(bA,colW).forEach(l=>{ctx.fillText(l,xA,y);y+=56});
+  const yA=y;
+  // English (left)
+  ctx.direction="ltr";ctx.font=`700 52px ${FE}`;y=top+30;
+  ctx.fillStyle=P;wrap(tE,colW).forEach(l=>{ctx.fillText(LR(l),xE,y);y+=64});
+  ctx.fillStyle=A;ctx.fillRect(xE-90,y-30,180,5);y+=36;
+  ctx.fillStyle="#444";ctx.font=`400 30px ${FE}`;wrap(bE,colW).forEach(l=>{ctx.fillText(LR(l),xE,y);y+=47});
+  const colBottom=Math.max(yA,y);
+  // center divider
+  ctx.fillStyle=Lt;ctx.fillRect(W/2-1.5,top-10,3,colBottom-top-20);
+  ctx.fillStyle=A;diamond(W/2,top-18,9);ctx.fill();diamond(W/2,colBottom-22,9);ctx.fill();
+
+  // details strip
+  const cells=cur.per?[["الاسم","Name",val("person","")],[cur.jobL?cur.jobL.split(" / ")[0]:"المسمى الوظيفي",cur.jobL?cur.jobL.split(" / ")[1]:"Job Title",val("job","")],["القسم","Department",val("dept","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]]
+                    :[["اسم الشركة","",val("coAR","")],["Company Name","",val("coEN","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]];
+  const sy=Math.max(colBottom+20,860),sx=170,sw=W-340,cw=sw/cells.length,sh=120;
+  ctx.fillStyle=Lt;rr(sx,sy,sw,sh,16);ctx.fill();
+  ctx.fillStyle=P;ctx.fillRect(sx+20,sy+sh-6,sw-40,4);
+  ctx.textBaseline="middle";
+  cells.forEach(([ar,en,v],i)=>{
+    const cx=sx+sw-cw*(i+.5); // RTL order: first cell on the right
+    if(i)ctx.fillStyle=mix(Lt,P,.25),ctx.fillRect(sx+sw-cw*i-1,sy+22,2,sh-44);
+    ctx.fillStyle=A;ctx.direction="rtl";ctx.font=`700 24px ${FA}`;ctx.fillText(en?`${ar}  |  ${en}`:ar,cx,sy+36);
+    const isA=/[؀-ۿ]/.test(v);ctx.fillStyle="#2b2b2b";ctx.direction=isA?"rtl":"ltr";
+    let fs=34;do{ctx.font=`700 ${fs}px ${isA?FA:FE}`;fs-=2}while(ctx.measureText(v).width>cw-40&&fs>20);
+    ctx.fillText(isA?v:LR(v),cx,sy+82)});
+
+  // signature
+  const gy=Math.min(H-110,sy+sh+70);
+  ctx.fillStyle="#666";ctx.fillRect(W/2-220,gy-34,440,2);
+  ctx.fillStyle=P;ctx.direction="rtl";ctx.font=`700 30px ${FA}`;ctx.fillText(val("sAR","إدارة الموارد البشرية"),W/2,gy);
+  ctx.fillStyle="#555";ctx.direction="ltr";ctx.font=`400 24px ${FE}`;ctx.fillText(LR(val("sEN","Human Resources Management")),W/2,gy+36);
+
+  // watermark
+  ctx.font=`400 18px ${FA}`;ctx.fillStyle="rgba(0,0,0,.28)";ctx.textAlign="left";ctx.direction="rtl";ctx.fillText("صُمّمت عبر منقذك — Your HR Lifesaver",80,H-24);
+}
+
+function email(){
+  const coAR=val("coAR","الشركة"),coEN=val("coEN",""),sAR=val("sAR","إدارة الموارد البشرية"),sEN=val("sEN","Human Resources Management");
+  const toA=cur.per?`الأستاذ/ة ${val("person","")} المحترم/ة،`:`السادة منسوبي ${coAR} المحترمين،`;
+  const toE=cur.per?`Dear ${val("person","")},`:(coEN?`Dear ${coEN} Team,`:"Dear Team,");
+  const det=cur.per?[val("job",""),val("dept","")].filter(Boolean).join(" — "):"";
+  $("subj").value=`${F(cur.sA)} | ${F(cur.sE)}`;
+  $("body").value=`${toA}
+السلام عليكم ورحمة الله وبركاته،
+
+${F(cur.bA)}
+
+وتفضلوا بقبول فائق الاحترام والتقدير،
+${sAR}
+${$("coAR").value.trim()}
+
+────────────
+
+${toE}
+
+${F(cur.bE)}
+
+Best regards,
+${sEN}
+${coEN}`;
+  setMail();
+}
+function setMail(){$("mail").href=`mailto:?subject=${encodeURIComponent($("subj").value)}&body=${encodeURIComponent($("body").value)}`}
+function update(){
+  $("empFields").style.display=cur.per?"":"none";
+  $("dateLbl").textContent=cur.dl;
+  $("job").previousElementSibling.textContent=cur.jobL?cur.jobL.split(" / ")[0]:"المسمى الوظيفي";
+  draw();email();
+}
+
+/* ---------- events ---------- */
+["coAR","coEN","coShort","person","job","dept","date","sAR","sEN"].forEach(id=>$(id).addEventListener("input",update));
+["subj","body"].forEach(id=>$(id).addEventListener("input",setMail));
+$("logo").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{const im=new Image();im.onload=()=>{logo=im;$("logoPrev").src=ev.target.result;draw()};im.src=ev.target.result};rd.readAsDataURL(f)});
+function fname(){return `${cur.name}-${val("person",val("coAR","منقذك"))}.png`.replace(/\s+/g,"-")}
+$("dl").onclick=()=>cv.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=fname();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);toast("تم تجهيز البطاقة ✔")},"image/png");
+$("share").onclick=()=>cv.toBlob(async b=>{const f=new File([b],fname(),{type:"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:F(cur.tA)})}catch(e){}}
+  else{const w=window.open();if(w)w.document.write(`<img src="${cv.toDataURL()}" style="width:100%">`);else toast("استخدم زر التحميل")}},"image/png");
+$("print").onclick=()=>{const w=window.open();if(!w){toast("اسمح بالنوافذ المنبثقة");return}
+  w.document.write(`<html><head><title>${F(cur.tA)}</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0}img{width:100%;height:100vh;object-fit:contain;display:block}</style></head><body><img src="${cv.toDataURL()}" onload="setTimeout(()=>print(),300)"></body></html>`);w.document.close()};
+$("copy").onclick=async()=>{const t=`${$("subj").value}\n\n${$("body").value}`;try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()}toast("تم نسخ الإيميل ✔")};
+
+renderCats();renderOcc();update();
+/* =================== EMPLOYEE ID CARD =================== */
+const IDP=[["بني ذهبي",["#5C3A1E","#D9952E","#F3E5CC"]],["أزرق",["#1F4E79","#2E9BD6","#DDEBF7"]],["أخضر",["#0B5D3B","#C9A227","#E8F3EC"]],["عنابي",["#7A1E48","#D4A04C","#F6E6EE"]],["كحلي",["#1B1F4B","#C9A24A","#ECEBF5"]],["رمادي",["#37474F","#90A4AE","#ECEFF1"]]];
+let idc=IDP[0][1],photo=null;const IW=638,IH=1013;
+const idF=$("idF"),idB=$("idB");
+function renderPal(){$("idPal").innerHTML=IDP.map(([n,c],i)=>`<button class="cat ${c===idc?'on':''}" data-i="${i}" style="${c===idc?`background:${c[0]};border-color:${c[0]}`:`color:${c[0]};border-color:${c[0]}`}">${n}</button>`).join("");
+  $("idPal").querySelectorAll("button").forEach(b=>b.onclick=()=>{idc=IDP[b.dataset.i][1];renderPal();drawID()})}
+function fitText(t,maxW,weight,size,fam,min){let s=size;do{ctx.font=`${weight} ${s}px ${fam}`;s-=2}while(ctx.measureText(t).width>maxW&&s>min);}
+function isAr(t){return/[؀-ۿ]/.test(t)}
+function txt(t,x,y,weight,size,color,maxW,min){const a=isAr(t);if(!a)t="\u202A"+t+"\u202C";ctx.direction=a?"rtl":"ltr";ctx.fillStyle=color;fitText(t,maxW||IW-80,weight,size,a?FA:FE,min||16);ctx.fillText(t,x,y)}
+function logoAt(cx,cy,mw,mh){if(logo){const k=Math.min(mw/logo.width,mh/logo.height),w=logo.width*k,h=logo.height*k;ctx.drawImage(logo,cx-w/2,cy-h/2,w,h)}
+  else{ctx.save();ctx.setLineDash([10,8]);ctx.strokeStyle="#bbb";ctx.lineWidth=2;rr(cx-mw/2,cy-mh/2,mw,mh,14);ctx.stroke();ctx.restore();ctx.textAlign="center";ctx.textBaseline="middle";txt("شعار الشركة",cx,cy,"500",28,"#999")}}
+function hexPat(x,y,w,h,col,alpha){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.strokeStyle=col;ctx.globalAlpha=alpha;ctx.lineWidth=2;const r=30,dx=r*Math.sqrt(3);for(let j=0,yy=y;yy<y+h+r;yy+=r*1.5,j++)for(let xx=x+(j%2?dx/2:0);xx<x+w+r;xx+=dx){hex(xx,yy,r-3);ctx.stroke()}ctx.restore()}
+
+function drawFront(){
+  const [P,A,L]=idc;ctx=idF.getContext("2d");idF.width=IW;idF.height=IH;
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,IW,IH);
+  logoAt(IW/2,110,400,130);
+  // colored body with angled top
+  ctx.fillStyle=P;ctx.beginPath();ctx.moveTo(0,300);ctx.lineTo(IW,230);ctx.lineTo(IW,IH);ctx.lineTo(0,IH);ctx.closePath();ctx.fill();
+  ctx.save();ctx.beginPath();ctx.moveTo(0,300);ctx.lineTo(IW,230);ctx.lineTo(IW,IH);ctx.lineTo(0,IH);ctx.closePath();ctx.clip();hexPat(0,230,IW,IH,A,.18);ctx.restore();
+  ctx.strokeStyle=A;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(0,292);ctx.lineTo(IW,222);ctx.stroke();
+  // photo
+  const pw=250,ph=300,px=IW/2-pw/2,py=270;
+  ctx.save();ctx.shadowColor="rgba(0,0,0,.3)";ctx.shadowBlur=20;ctx.fillStyle="#fff";rr(px-10,py-10,pw+20,ph+20,24);ctx.fill();ctx.restore();
+  ctx.save();rr(px,py,pw,ph,18);ctx.clip();
+  if(photo){const k=Math.max(pw/photo.width,ph/photo.height),w=photo.width*k,h=photo.height*k;ctx.drawImage(photo,px+(pw-w)/2,py+(ph-h)/2.6,w,h)}
+  else{ctx.fillStyle=L;ctx.fillRect(px,py,pw,ph);ctx.fillStyle=mix(P,"#ffffff",.55);ctx.beginPath();ctx.arc(IW/2,py+115,62,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(IW/2,py+ph+30,110,120,0,Math.PI,0);ctx.fill()}
+  ctx.restore();ctx.strokeStyle=A;ctx.lineWidth=4;rr(px,py,pw,ph,18);ctx.stroke();
+  // names
+  ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  txt(val("iNameA",""),IW/2,660,"800",52,"#fff",IW-70,28);
+  txt(val("iNameE",""),IW/2,710,"700",34,mix(L,"#ffffff",.4),IW-70,20);
+  ctx.fillStyle=A;ctx.fillRect(IW/2-80,735,160,5);
+  txt(val("iJobA",""),IW/2,790,"700",36,A,IW-70,22);
+  txt(val("iJobE",""),IW/2,830,"400",28,"#fff",IW-70,18);
+  // info strip
+  ctx.fillStyle="rgba(255,255,255,.95)";rr(40,862,IW-80,92,16);ctx.fill();
+  ctx.fillStyle=P;ctx.fillRect(IW/2-1,876,2,64);
+  ctx.textAlign="center";
+  txt("الرقم الوظيفي  |  ID No",IW*0.75-20,895,"700",20,mix(P,"#000",.1),250,14);
+  txt(val("iNo",""),IW*0.75-20,935,"800",32,P,250,18);
+  txt("القسم  |  Dept",IW*0.25+20,895,"700",20,mix(P,"#000",.1),250,14);
+  txt(val("iDept",""),IW*0.25+20,935,"700",30,P,250,16);
+  // bottom label
+  ctx.fillStyle=A;ctx.fillRect(0,IH-46,IW,46);
+  txt("EMPLOYEE ID  |  بطاقة موظف",IW/2,IH-14,"700",24,"#fff",IW-40,14);
+}
+
+function drawBack(){
+  const [P,A,L]=idc;ctx=idB.getContext("2d");idB.width=IW;idB.height=IH;
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,IW,IH);
+  ctx.fillStyle=P;ctx.fillRect(0,0,IW,150);hexPat(0,0,IW,150,A,.22);ctx.fillStyle=A;ctx.fillRect(0,150,IW,8);
+  ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  txt(val("coAR",""),IW/2,70,"800",38,"#fff",IW-60,22);
+  txt(val("coEN",""),IW/2,118,"500",26,mix(L,"#ffffff",.3),IW-60,16);
+  // details rows
+  const rows=[["تاريخ الإصدار","Issue Date",val("iIss","")],["تاريخ الانتهاء","Expiry Date",val("iExp","")]];
+  if($("iBlood").value.trim())rows.push(["فصيلة الدم","Blood Type",$("iBlood").value.trim()]);
+  if($("iEmg").value.trim())rows.push(["رقم الطوارئ","Emergency",$("iEmg").value.trim()]);
+  let y=205;
+  rows.forEach(([a,e,v])=>{ctx.fillStyle=L;rr(40,y,IW-80,70,12);ctx.fill();
+    ctx.textAlign="right";txt(`${a} / ${e}`,IW-60,y+45,"700",22,P,300,14);
+    ctx.textAlign="left";txt(v,60,y+46,"700",28,"#2b2b2b",220,16);y+=84});
+  // terms
+  ctx.textAlign="center";y+=30;
+  ctx.direction="rtl";ctx.fillStyle="#333";ctx.font=`500 25px ${FA}`;
+  wrap(`هذه البطاقة ملك ${$("coAR").value.trim()?"ل"+$("coAR").value.trim():"للشركة"}، ويجب حملها وإبرازها عند الطلب. لا يجوز استخدامها من قبل غير صاحبها، وفي حال العثور عليها يرجى إعادتها إلى إدارة الموارد البشرية.`,IW-90).forEach(l=>{ctx.fillText(l,IW/2,y);y+=38});
+  y+=14;ctx.direction="ltr";ctx.fillStyle="#555";ctx.font=`400 21px ${FE}`;
+  wrap(`This card is the property of ${val("coEN","the company")} and must be carried and shown upon request. If found, please return it to the Human Resources Department.`,IW-90).forEach(l=>{ctx.fillText("\u202A"+l+"\u202C",IW/2,y);y+=30});
+  // signature
+  const sy=Math.max(y+60,IH-230);
+  ctx.strokeStyle="#777";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(IW/2-160,sy);ctx.lineTo(IW/2+160,sy);ctx.stroke();
+  txt(val("sAR","إدارة الموارد البشرية"),IW/2,sy+38,"700",24,P,IW-80,14);
+  txt(val("sEN","Human Resources Management"),IW/2,sy+70,"400",20,"#555",IW-80,12);
+  // footer
+  ctx.fillStyle=P;ctx.fillRect(0,IH-80,IW,80);ctx.fillStyle=A;ctx.fillRect(0,IH-86,IW,6);
+  txt(val("iContact"," "),IW/2,IH-30,"500",24,"#fff",IW-60,14);
+}
+function drawID(){const keep=ctx;drawFront();drawBack();ctx=keep}
+
+["iNameA","iNameE","iJobA","iJobE","iNo","iDept","iIss","iExp","iBlood","iEmg","iContact","coAR","coEN","sAR","sEN"].forEach(id=>$(id).addEventListener("input",drawID));
+$("logo").addEventListener("change",()=>setTimeout(drawID,300));
+$("photo").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{const im=new Image();im.onload=()=>{photo=im;$("photoPrev").src=ev.target.result;drawID()};im.src=ev.target.result};rd.readAsDataURL(f)});
+// prefill ID name/job from card fields if empty
+["person","job","dept"].forEach((id,i)=>$(id).addEventListener("input",()=>{const t=["iNameA","iJobA","iDept"][i];if(!$(t).dataset.touched){$(t).value=$(id).value;drawID()}}));
+["iNameA","iJobA","iDept"].forEach(id=>$(id).addEventListener("input",()=>$(id).dataset.touched=1));
+function dlCanvas(c,n){return new Promise(r=>c.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);r()},"image/png"))}
+$("idDl").onclick=async()=>{const n=val("iNameE",val("iNameA","employee")).replace(/\s+/g,"-");await dlCanvas(idF,`ID-${n}-front.png`);setTimeout(()=>dlCanvas(idB,`ID-${n}-back.png`),600);toast("تم تجهيز الوجهين ✔")};
+$("idPrint").onclick=()=>{const w=window.open();if(!w){toast("اسمح بالنوافذ المنبثقة");return}
+  w.document.write(`<html><head><title>Employee ID</title><style>@page{size:A4 portrait;margin:15mm}body{margin:0;font-family:Arial}.r{display:flex;gap:10mm;justify-content:center;margin-top:10mm}img{width:54mm;height:85.6mm;border:0.2mm dashed #999}</style></head><body><div class="r"><img src="${idF.toDataURL()}"><img src="${idB.toDataURL()}"></div><p style="text-align:center;font-size:9pt;color:#777">اطبع بمقياس 100% (Actual size) ثم قص على الخط المنقط</p><script>window.onload=()=>setTimeout(()=>print(),400)<\/script></body></html>`);w.document.close()};
+renderPal();drawID();
+if(document.fonts){document.fonts.ready.then(drawID)}
+
+if(document.fonts){document.fonts.load("700 40px Tajawal").then(()=>document.fonts.ready).then(update).catch(()=>{})}
+</script>
+
+</body>
+</html>
