@@ -106,6 +106,11 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
     <input type="text" id="coShort" dir="ltr">
     <div id="empFields">
       <div class="row">
+        <div><label for="gender">الجنس</label><select id="gender"><option value="m">ذكر — موظف</option><option value="f">أنثى — موظفة</option></select></div>
+        <div><label for="ttl">اللقب</label><select id="ttl"><option value="ust">الأستاذ / الأستاذة</option><option value="eng">المهندس / المهندسة</option><option value="dr">الدكتور / الدكتورة</option><option value="sayed">السيد / السيدة</option><option value="none">بدون لقب</option><option value="other">لقب آخر…</option></select></div>
+      </div>
+      <div id="ttlOtherW" style="display:none"><div class="row"><div><label for="ttlA">اللقب بالعربي</label><input type="text" id="ttlA"></div><div><label for="ttlE">Title (EN)</label><input type="text" id="ttlE" dir="ltr"></div></div></div>
+      <div class="row">
         <div><label for="person">اسم الموظف</label><input type="text" id="person"></div>
         <div><label for="job">المسمى الوظيفي</label><input type="text" id="job"></div>
       </div>
@@ -137,13 +142,14 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
       <h2><span class="n">4</span> الإيميل الجاهز</h2>
       <label for="subj">العنوان</label>
       <input type="text" id="subj" class="subj">
-      <label for="body">نص الإيميل</label>
-      <textarea id="body" style="min-height:320px"></textarea>
+      <label>نص الإيميل <span style="font-weight:400;color:var(--muted)">— تقدر تعدّل عليه مباشرة</span></label>
+      <div id="bodyView" contenteditable="true" style="background:#fff;color:#1d2733;border-radius:14px;padding:18px;border:1.5px solid #D3CBE4;max-height:520px;overflow:auto"></div>
       <div class="btns">
-        <button class="btn" id="copy">📋 نسخ الإيميل</button>
+        <button class="btn" id="copy">📋 نسخ الإيميل مع البطاقة</button>
+        <button class="btn alt" id="copyTxt">نسخ الإيميل بدون صورة</button>
         <a class="btn alt" id="mail" href="#">✉ فتح في البريد</a>
       </div>
-      <div class="hint">أرفق البطاقة مع الإيميل ليكون شكله احترافي.</div>
+      <div class="hint">انسخ والصق في Outlook أو Gmail — يطلع الإيميل بنفس الترتيب والخط العريض، والبطاقة فوقه. إذا ما طلعت الصورة، استخدم «تحميل البطاقة» وأرفقها.</div>
     </section>
   </div>
 </main>
@@ -299,6 +305,9 @@ const O=[
   sA:"الحمد لله على السلامة",sE:"Welcome Back"}
 ];
 
+const ART={"ترحيب بموظف جديد": "card-01.webp", "اجتياز فترة التجربة": "card-02.webp", "شكر وتقدير": "card-03.webp", "موظف الشهر": "card-04.webp", "ذكرى الانضمام": "card-05.webp", "ترقية": "card-06.webp", "شكر ووداع": "card-07.webp", "اليوم الوطني": "card-08.webp", "يوم التأسيس": "card-09.webp", "يوم العلم": "card-10.webp", "رمضان": "card-11.webp", "عيد الفطر": "card-12.webp", "عيد الأضحى": "card-13.webp", "العام الهجري": "card-14.webp", "تهنئة زواج": "card-15.webp", "تهنئة مولود": "card-16.webp", "تخرج / إتمام تدريب": "card-17.webp", "الحمد لله على السلامة": "card-18.webp"};
+const SLOG={"ترحيب بموظف جديد": ["أهلًا بك في فريقنا 🤍", "Welcome aboard!"], "اجتياز فترة التجربة": ["خطوة ثابتة نحو النجاح", "Officially one of us!"], "شكر وتقدير": ["عطاؤك يصنع الفرق", "Your effort makes the difference"], "موظف الشهر": ["تميّزك يستحق الاحتفاء", "Excellence deserves celebration"], "ذكرى الانضمام": ["شكرًا لأنك معنا", "Thank you for being with us"], "ترقية": ["خطوة جديدة تليق بك", "A well-deserved step forward"], "شكر ووداع": ["نودّعك بكل الحب والامتنان", "Farewell, with gratitude"], "اليوم الوطني": ["دام عزّك يا وطن 🇸🇦", "Proud of our nation"], "يوم التأسيس": ["يوم بدينا", "The day we began"], "يوم العلم": ["رايتنا عزّنا", "Our flag, our pride"], "رمضان": ["تقبّل الله منا ومنكم", "A blessed month for all"], "عيد الفطر": ["عساكم من عوّاده", "Eid Mubarak to you and your family"], "عيد الأضحى": ["أضحى مبارك، وعساكم من عوّاده", "Wishing you a blessed Eid"], "العام الهجري": ["عام جديد مليء بالخير", "A new year full of blessings"], "تهنئة زواج": ["بارك الله لكما وبارك عليكما", "Wishing you a lifetime of happiness"], "تهنئة مولود": ["بورك لكم في الموهوب", "Welcome to the little one"], "تخرج / إتمام تدريب": ["إنجاز يستحق الفخر", "An achievement to be proud of"], "الحمد لله على السلامة": ["طهور إن شاء الله", "Welcome back, stay well"]};
+const CFG={"ترحيب بموظف جديد": {"panel": "FFFFFF", "P": "8A4B14", "A": "D9643A", "strip": "FDEBD8", "body": "4A3626"}, "اجتياز فترة التجربة": {"panel": "FFFFFF", "P": "1E6B45", "A": "3E9B5E", "strip": "E6F4EA", "body": "2E3E33"}, "شكر وتقدير": {"panel": "FFFBF5", "P": "7A1E48", "A": "B5852F", "strip": "F6E6EE", "body": "4A2A35"}, "موظف الشهر": {"panel": "FFFDF6", "P": "6E5007", "A": "B8860B", "strip": "FBF1D6", "body": "3D3522"}, "ذكرى الانضمام": {"panel": "FFFFFF", "P": "1F4E79", "A": "D99A1E", "strip": "E3EEF9", "body": "23384F"}, "ترقية": {"panel": "FFFFFF", "P": "0F4C81", "A": "B08A1E", "strip": "E1ECF6", "body": "23384F"}, "شكر ووداع": {"panel": "FFFFFF", "P": "37474F", "A": "607D8B", "strip": "ECEFF1", "body": "37474F"}, "اليوم الوطني": {"panel": "FFFFFF", "P": "0B5D3B", "A": "B8962E", "strip": "E7F3EC", "body": "2E3B33"}, "يوم التأسيس": {"panel": "FBF4E6", "P": "6B3E26", "A": "A6342A", "strip": "F1E2C6", "body": "4A3326"}, "يوم العلم": {"panel": "FFFFFF", "P": "0F6B45", "A": "0F6B45", "strip": "E6F2EA", "body": "2E3B33"}, "رمضان": {"panel": "FFF9EC", "P": "1B1F4B", "A": "B8892E", "strip": "F3EAD3", "body": "2B2E4F"}, "عيد الفطر": {"panel": "FFFFFF", "P": "0E5E6F", "A": "C98B1E", "strip": "E2F2F3", "body": "23474D"}, "عيد الأضحى": {"panel": "FFF8F1", "P": "6E2A50", "A": "B5853A", "strip": "F5E7EE", "body": "4A2A3C"}, "العام الهجري": {"panel": "FFFFFF", "P": "234E52", "A": "A9864A", "strip": "E6EFEF", "body": "2E4447"}, "تهنئة زواج": {"panel": "FFFBFB", "P": "8E4A5F", "A": "C27C8E", "strip": "F8E8EC", "body": "5A3A44"}, "تهنئة مولود": {"panel": "FFFFFF", "P": "3C6E8F", "A": "E58AA6", "strip": "EEF6FB", "body": "3E4F5C"}, "تخرج / إتمام تدريب": {"panel": "FFFFFF", "P": "283593", "A": "C79A00", "strip": "E8EAF6", "body": "2C3250"}, "الحمد لله على السلامة": {"panel": "FFFFFF", "P": "1F6E52", "A": "2A9D72", "strip": "E4F5EE", "body": "2E4A40"}};
 const $=id=>document.getElementById(id);
 const cv=$("cv");let ctx=cv.getContext("2d");
 let cat="emp",cur=O[0],logo=null;
@@ -312,7 +321,7 @@ function renderCats(){
 }
 function renderOcc(){
   $("occ").innerHTML=O.filter(o=>o.cat===cat).map(o=>`<button class="o ${o.id===cur.id?'on':''}" data-id="${o.id}"><i style="background:${o.c[0]}"></i>${o.name}</button>`).join("");
-  $("occ").querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=O.find(o=>o.id===b.dataset.id);renderOcc();update()});
+  $("occ").querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=O.find(o=>o.id===b.dataset.id);emailEdited=false;renderOcc();update()});
 }
 const val=(id,d)=>($(id).value.trim()||d);
 function F(t){
@@ -370,104 +379,117 @@ function patternIn(pathFn){
 }
 const LR=t=>"‪"+t+"‬";
 
+const STRIP=[330,860,1424,980];
+const ART_IMG={};
+function artFor(o){if(!ART_IMG[o.name]){const im=new Image();im.onload=()=>{if(cur===o)draw()};im.src=ART[o.name];ART_IMG[o.name]=im}return ART_IMG[o.name]}
+function fitLines(text,maxW,maxH,font0,lh0,minF,dir,weight){
+  let f=font0;
+  while(true){ctx.font=`${weight} ${f}px ${dir==="rtl"?FA:FE}`;const L=wrap(text,maxW);const lh=f*lh0;if(L.length*lh<=maxH||f<=minF)return {L,f,lh};f-=2}
+}
 function draw(){
-  ctx=cv.getContext("2d");cv.width=W;cv.height=H;const [P,A,Lt]=cur.c;
-  ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
-  // corner ornaments
-  const C=330;
-  patternIn(()=>{ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(C,0);ctx.lineTo(0,C);ctx.closePath()});
-  patternIn(()=>{ctx.beginPath();ctx.moveTo(W,H);ctx.lineTo(W-C,H);ctx.lineTo(W,H-C);ctx.closePath()});
-  ctx.strokeStyle=A;ctx.lineWidth=6;
-  ctx.beginPath();ctx.moveTo(C+18,0);ctx.lineTo(0,C+18);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W-C-18,H);ctx.lineTo(W,H-C-18);ctx.stroke();
-  // frame
-  ctx.strokeStyle=P;ctx.lineWidth=3;ctx.strokeRect(46,46,W-92,H-92);
-  ctx.strokeStyle=A;ctx.lineWidth=1.5;ctx.strokeRect(60,60,W-120,H-120);
-
+  ctx=cv.getContext("2d");cv.width=W;cv.height=H;
+  const C=CFG[cur.name]||{panel:"FFFFFF",P:cur.c[0].slice(1),A:cur.c[1].slice(1),strip:cur.c[2].slice(1),body:"333333"};
+  const P="#"+C.P,A="#"+C.A,Lt="#"+C.strip,BODY="#"+C.body;
+  ctx.fillStyle="#"+C.panel;ctx.fillRect(0,0,W,H);
+  const art=artFor(cur);if(art.complete&&art.naturalWidth)ctx.drawImage(art,0,0,W,H);
   ctx.textAlign="center";ctx.textBaseline="middle";
   // logo
   const lw=420,lh=150,ly=95;
   if(logo){const k=Math.min(lw/logo.width,lh/logo.height),dw=logo.width*k,dh=logo.height*k;ctx.drawImage(logo,W/2-dw/2,ly+(lh-dh)/2,dw,dh)}
   else{ctx.save();ctx.setLineDash([12,10]);ctx.strokeStyle="#bbb";ctx.lineWidth=3;rr(W/2-lw/2,ly,lw,lh,18);ctx.stroke();ctx.restore();
     ctx.fillStyle="#999";ctx.font=`500 34px ${FA}`;ctx.direction="rtl";ctx.fillText("شعار الشركة",W/2,ly+lh/2)}
-  // keyword with side rules
-  const kw=cur.k.split("").join(" ");ctx.direction="ltr";ctx.font=`700 26px ${FE}`;ctx.fillStyle=A;
-  const kwW=ctx.measureText(kw).width;ctx.fillText(LR(kw),W/2,292);
-  ctx.fillRect(W/2-kwW/2-150,290,120,3);ctx.fillRect(W/2+kwW/2+30,290,120,3);
+  // keyword
+  const kw=cur.k.split("").join(" ");ctx.direction="ltr";ctx.font=`800 28px ${FE}`;ctx.fillStyle=A;
+  const kwW=Math.min(ctx.measureText(kw).width,620);ctx.fillText(LR(kw),W/2,292);
+  ctx.fillRect(W/2-kwW/2-150,290,110,3);ctx.fillRect(W/2+kwW/2+40,290,110,3);
   diamond(W/2-kwW/2-24,291.5,7);ctx.fill();diamond(W/2+kwW/2+24,291.5,7);ctx.fill();
-
-  // two columns
+  // columns
   const tE=F(cur.tE),tA=F(cur.tA),bE=F(cur.bE),bA=F(cur.bA);
-  const colW=650,xA=W*0.735,xE=W*0.265,top=360;
-  ctx.textBaseline="alphabetic";
-  // Arabic (right)
-  ctx.direction="rtl";ctx.font=`800 56px ${FA}`;let LtA=wrap(tA,colW);let y=top+30;
-  ctx.fillStyle=P;LtA.forEach(l=>{ctx.fillText(l,xA,y);y+=70});
-  ctx.fillStyle=A;ctx.fillRect(xA-90,y-36,180,5);y+=30;
-  ctx.fillStyle="#333";ctx.font=`400 34px ${FA}`;wrap(bA,colW).forEach(l=>{ctx.fillText(l,xA,y);y+=56});
-  const yA=y;
-  // English (left)
-  ctx.direction="ltr";ctx.font=`700 52px ${FE}`;y=top+30;
-  ctx.fillStyle=P;wrap(tE,colW).forEach(l=>{ctx.fillText(LR(l),xE,y);y+=64});
-  ctx.fillStyle=A;ctx.fillRect(xE-90,y-30,180,5);y+=36;
-  ctx.fillStyle="#444";ctx.font=`400 30px ${FE}`;wrap(bE,colW).forEach(l=>{ctx.fillText(LR(l),xE,y);y+=47});
-  const colBottom=Math.max(yA,y);
-  // center divider
-  ctx.fillStyle=Lt;ctx.fillRect(W/2-1.5,top-10,3,colBottom-top-20);
-  ctx.fillStyle=A;diamond(W/2,top-18,9);ctx.fill();diamond(W/2,colBottom-22,9);ctx.fill();
-
-  // details strip
-  const cells=cur.per?[["الاسم","Name",val("person","")],[cur.jobL?cur.jobL.split(" / ")[0]:"المسمى الوظيفي",cur.jobL?cur.jobL.split(" / ")[1]:"Job Title",val("job","")],["القسم","Department",val("dept","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]]
-                    :[["اسم الشركة","",val("coAR","")],["Company Name","",val("coEN","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]];
-  const sy=Math.max(colBottom+20,860),sx=170,sw=W-340,cw=sw/cells.length,sh=120;
-  ctx.fillStyle=Lt;rr(sx,sy,sw,sh,16);ctx.fill();
-  ctx.fillStyle=P;ctx.fillRect(sx+20,sy+sh-6,sw-40,4);
+  const colW=640,xA=W*0.735,xE=W*0.265;
   ctx.textBaseline="middle";
+  const SG=SLOG[cur.name]||["",""];
+  ctx.direction="rtl";ctx.fillStyle=P;let t=fitLines(tA,colW,100,64,1.15,40,"rtl",800);
+  ctx.font=`800 ${t.f}px ${FA}`;let y=384-(t.L.length-1)*t.lh/2;t.L.forEach(l=>{ctx.fillText(l,xA,y);y+=t.lh});
+  ctx.direction="ltr";t=fitLines(tE,colW,100,54,1.15,32,"ltr",800);
+  ctx.font=`800 ${t.f}px ${FE}`;y=384-(t.L.length-1)*t.lh/2;t.L.forEach(l=>{ctx.fillText(LR(l),xE,y);y+=t.lh});
+  ctx.fillStyle=A;ctx.fillRect(xA-80,430,160,4);ctx.fillRect(xE-80,430,160,4);
+  // slogan (short distinctive line)
+  ctx.fillStyle=A;ctx.direction="rtl";let sf=40;do{ctx.font=`800 ${sf}px ${FA}`;sf-=2}while(ctx.measureText(SG[0]).width>colW&&sf>24);ctx.fillText(SG[0],xA,474);
+  ctx.direction="ltr";sf=34;do{ctx.font=`italic 700 ${sf}px ${FE}`;sf-=2}while(ctx.measureText(SG[1]).width>colW&&sf>20);ctx.fillText(LR(SG[1]),xE,474);
+  ctx.fillStyle=BODY;ctx.direction="rtl";t=fitLines(bA,colW-20,300,34,1.7,22,"rtl",500);
+  ctx.font=`500 ${t.f}px ${FA}`;y=512+t.lh/2;t.L.forEach(l=>{ctx.fillText(l,xA,y);y+=t.lh});
+  ctx.direction="ltr";t=fitLines(bE,colW-20,300,29,1.65,18,"ltr",400);
+  ctx.font=`400 ${t.f}px ${FE}`;y=512+t.lh/2;t.L.forEach(l=>{ctx.fillText(LR(l),xE,y);y+=t.lh});
+  // divider
+  ctx.fillStyle=Lt;ctx.fillRect(W/2-1.5,350,3,470);ctx.fillStyle=A;diamond(W/2,342,9);ctx.fill();diamond(W/2,828,9);ctx.fill();
+  // strip
+  const cells=cur.per?[["الاسم","Name",fullNameAR()],[cur.jobL?cur.jobL.split(" / ")[0]:"المسمى الوظيفي",cur.jobL?cur.jobL.split(" / ")[1]:"Job Title",val("job","")],["القسم","Department",val("dept","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]]
+                    :[["اسم الشركة","Company",val("coAR","")],["Company Name","",val("coEN","")],[cur.dl.split(" / ")[0],cur.dl.split(" / ")[1],val("date","")]];
+  const sx=STRIP[0],sy=STRIP[1],sw=STRIP[2]-STRIP[0],sh=STRIP[3]-STRIP[1],cw=sw/cells.length;
+  ctx.fillStyle=Lt;rr(sx,sy,sw,sh,16);ctx.fill();ctx.fillStyle=P;ctx.fillRect(sx+20,sy+sh-6,sw-40,4);
   cells.forEach(([ar,en,v],i)=>{
-    const cx=sx+sw-cw*(i+.5); // RTL order: first cell on the right
-    if(i)ctx.fillStyle=mix(Lt,P,.25),ctx.fillRect(sx+sw-cw*i-1,sy+22,2,sh-44);
-    ctx.fillStyle=A;ctx.direction="rtl";ctx.font=`700 24px ${FA}`;ctx.fillText(en?`${ar}  |  ${en}`:ar,cx,sy+36);
-    const isA=/[؀-ۿ]/.test(v);ctx.fillStyle="#2b2b2b";ctx.direction=isA?"rtl":"ltr";
-    let fs=34;do{ctx.font=`700 ${fs}px ${isA?FA:FE}`;fs-=2}while(ctx.measureText(v).width>cw-40&&fs>20);
-    ctx.fillText(isA?v:LR(v),cx,sy+82)});
-
+    const cx=sx+sw-cw*(i+.5);
+    if(i){ctx.fillStyle=mix(Lt,P,.25);ctx.fillRect(sx+sw-cw*i-1,sy+22,2,sh-44)}
+    ctx.fillStyle=A;ctx.direction="rtl";let lf=22;do{ctx.font=`700 ${lf}px ${FA}`;lf--}while(ctx.measureText(en?`${ar}  |  ${en}`:ar).width>cw-24&&lf>14);
+    ctx.fillText(en?`${ar}  |  ${en}`:ar,cx,sy+34);
+    const vv=v||"—";const isA=/[؀-ۿ]/.test(vv);ctx.fillStyle=P;ctx.direction=isA?"rtl":"ltr";
+    let fs=36;do{ctx.font=`800 ${fs}px ${isA?FA:FE}`;fs-=2}while(ctx.measureText(vv).width>cw-30&&fs>18);
+    ctx.fillText(isA?vv:LR(vv),cx,sy+80)});
   // signature
-  const gy=Math.min(H-110,sy+sh+70);
-  ctx.fillStyle="#666";ctx.fillRect(W/2-220,gy-34,440,2);
-  ctx.fillStyle=P;ctx.direction="rtl";ctx.font=`700 30px ${FA}`;ctx.fillText(val("sAR","إدارة الموارد البشرية"),W/2,gy);
-  ctx.fillStyle="#555";ctx.direction="ltr";ctx.font=`400 24px ${FE}`;ctx.fillText(LR(val("sEN","Human Resources Management")),W/2,gy+36);
-
-  // watermark
-  ctx.font=`400 18px ${FA}`;ctx.fillStyle="rgba(0,0,0,.28)";ctx.textAlign="left";ctx.direction="rtl";ctx.fillText("صُمّمت عبر منقذك — Your HR Lifesaver",80,H-24);
+  ctx.fillStyle="#777";ctx.fillRect(W/2-220,1016,440,2);
+  ctx.fillStyle=P;ctx.direction="rtl";ctx.font=`800 32px ${FA}`;ctx.fillText(val("sAR","إدارة الموارد البشرية"),W/2,1048);
+  ctx.fillStyle="#555";ctx.direction="ltr";ctx.font=`500 24px ${FE}`;ctx.fillText(LR(val("sEN","Human Resources Management")),W/2,1084);
+  ctx.font=`400 17px ${FA}`;ctx.fillStyle="rgba(0,0,0,.3)";ctx.direction="rtl";ctx.fillText("صُمّمت عبر منقذك — Your HR Lifesaver",W/2,1130);
 }
 
+/* ---------- formatted email ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function emailHTML(withImg){
+  const C=CFG[cur.name]||{P:"1F4E79",A:"A87A1E",strip:"EEF5FC"};const P="#"+C.P,A="#"+C.A,Lt="#"+C.strip;
+  const coAR=val("coAR",""),coEN=val("coEN",""),sAR=val("sAR","إدارة الموارد البشرية"),sEN=val("sEN","Human Resources Management");
+  const nm=val("person","");
+  const tA=titleAR(),tE=titleEN(),f=isF();
+  const toA=cur.per?`${tA?esc(tA)+" ":""}<b>${esc(nm||"........")}</b> ${f?"المحترمة":"المحترم"}،`:`السادة منسوبي <b>${esc(coAR||"الشركة")}</b> المحترمين،`;
+  const toE=cur.per?`Dear ${tE?esc(tE)+" ":""}<b>${esc(nm||"........")}</b>,`:`Dear <b>${esc(coEN||"Team")}</b>${coEN?" Team":""},`;
+  const img=withImg?`<p style="margin:0 0 18px"><img src="${cv.toDataURL("image/jpeg",.9)}" width="640" style="width:100%;max-width:640px;border-radius:10px;display:block" alt="${esc(F(cur.tA))}"></p>`:"";
+  const det=cur.per&&(val("job","")||val("dept",""))?`<table dir="rtl" style="border-collapse:collapse;margin:6px 0 14px;font-size:14px">${[["الاسم",fullNameAR()],["المسمى الوظيفي",val("job","")],["القسم",val("dept","")],[cur.dl.split(" / ")[0],val("date","")]].filter(r=>r[1]).map(r=>`<tr><td style="padding:6px 12px;background:${Lt};color:${A};font-weight:700">${esc(r[0])}</td><td style="padding:6px 12px;border-bottom:1px solid ${Lt};font-weight:700;color:${P}">${esc(r[1])}</td></tr>`).join("")}</table>`:"";
+  return `<div style="font-family:Tahoma,Arial,sans-serif;font-size:15px;line-height:1.9;color:#1d2733;max-width:680px">
+${img}
+<div dir="rtl" style="text-align:right">
+<p style="margin:0 0 10px">${toA}</p>
+<p style="margin:0 0 14px">السلام عليكم ورحمة الله وبركاته،</p>
+<h2 style="margin:0 0 4px;font-size:24px;color:${P}">${esc(F(cur.tA))}</h2>
+<p style="margin:0 0 12px;font-size:18px;font-weight:700;color:${A}">${esc((SLOG[cur.name]||[""])[0])}</p>
+<p style="margin:0 0 14px">${esc(F(cur.bA))}</p>
+${det}
+<p style="margin:0">وتفضلوا بقبول فائق الاحترام والتقدير،</p>
+<p style="margin:0"><b style="color:${P}">${esc(sAR)}</b></p>
+${coAR?`<p style="margin:0">${esc(coAR)}</p>`:""}
+</div>
+<hr style="border:none;border-top:2px solid ${A};margin:22px 0">
+<div dir="ltr" style="text-align:left">
+<p style="margin:0 0 10px">${toE}</p>
+<h2 style="margin:0 0 4px;font-size:22px;color:${P}">${esc(F(cur.tE))}</h2>
+<p style="margin:0 0 12px;font-size:17px;font-weight:700;font-style:italic;color:${A}">${esc((SLOG[cur.name]||["",""])[1])}</p>
+<p style="margin:0 0 14px">${esc(F(cur.bE))}</p>
+<p style="margin:0">Best regards,</p>
+<p style="margin:0"><b style="color:${P}">${esc(sEN)}</b></p>
+${coEN?`<p style="margin:0">${esc(coEN)}</p>`:""}
+</div></div>`;
+}
+
+const TITLES={ust:["الأستاذ","الأستاذة","Mr.","Ms."],eng:["المهندس","المهندسة","Eng.","Eng."],dr:["الدكتور","الدكتورة","Dr.","Dr."],sayed:["السيد","السيدة","Mr.","Mrs."],none:["","","",""]};
+function isF(){return $("gender").value==="f"}
+function titleAR(){const t=$("ttl").value;if(t==="other")return $("ttlA").value.trim();return (TITLES[t]||TITLES.ust)[isF()?1:0]}
+function titleEN(){const t=$("ttl").value;if(t==="other")return $("ttlE").value.trim();return (TITLES[t]||TITLES.ust)[isF()?3:2]}
+function fullNameAR(){const n=val("person","");return n?[titleAR(),n].filter(Boolean).join(" "):""}
+let emailEdited=false;
 function email(){
-  const coAR=val("coAR","الشركة"),coEN=val("coEN",""),sAR=val("sAR","إدارة الموارد البشرية"),sEN=val("sEN","Human Resources Management");
-  const toA=cur.per?`الأستاذ/ة ${val("person","")} المحترم/ة،`:`السادة منسوبي ${coAR} المحترمين،`;
-  const toE=cur.per?`Dear ${val("person","")},`:(coEN?`Dear ${coEN} Team,`:"Dear Team,");
-  const det=cur.per?[val("job",""),val("dept","")].filter(Boolean).join(" — "):"";
   $("subj").value=`${F(cur.sA)} | ${F(cur.sE)}`;
-  $("body").value=`${toA}
-السلام عليكم ورحمة الله وبركاته،
-
-${F(cur.bA)}
-
-وتفضلوا بقبول فائق الاحترام والتقدير،
-${sAR}
-${$("coAR").value.trim()}
-
-────────────
-
-${toE}
-
-${F(cur.bE)}
-
-Best regards,
-${sEN}
-${coEN}`;
+  if(!emailEdited)$("bodyView").innerHTML=emailHTML(false);
   setMail();
 }
-function setMail(){$("mail").href=`mailto:?subject=${encodeURIComponent($("subj").value)}&body=${encodeURIComponent($("body").value)}`}
+function setMail(){$("mail").href=`mailto:?subject=${encodeURIComponent($("subj").value)}&body=${encodeURIComponent($("bodyView").innerText)}`}
 function update(){
   $("empFields").style.display=cur.per?"":"none";
   $("dateLbl").textContent=cur.dl;
@@ -476,8 +498,9 @@ function update(){
 }
 
 /* ---------- events ---------- */
-["coAR","coEN","coShort","person","job","dept","date","sAR","sEN"].forEach(id=>$(id).addEventListener("input",update));
-["subj","body"].forEach(id=>$(id).addEventListener("input",setMail));
+["coAR","coEN","coShort","person","job","dept","date","sAR","sEN"].forEach(id=>$(id).addEventListener("input",()=>{emailEdited=false;update()}));
+["gender","ttl"].forEach(id=>$(id).addEventListener("change",()=>{$("ttlOtherW").style.display=$("ttl").value==="other"?"":"none";emailEdited=false;update()}));["ttlA","ttlE"].forEach(id=>$(id).addEventListener("input",()=>{emailEdited=false;update()}));
+$("subj").addEventListener("input",setMail);$("bodyView").addEventListener("input",()=>{emailEdited=true;setMail()});
 $("logo").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>{const im=new Image();im.onload=()=>{logo=im;$("logoPrev").src=ev.target.result;draw()};im.src=ev.target.result};rd.readAsDataURL(f)});
 function fname(){return `${cur.name}-${val("person",val("coAR","منقذك"))}.png`.replace(/\s+/g,"-")}
 $("dl").onclick=()=>cv.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=fname();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);toast("تم تجهيز البطاقة ✔")},"image/png");
@@ -486,7 +509,18 @@ $("share").onclick=()=>cv.toBlob(async b=>{const f=new File([b],fname(),{type:"i
   else{const w=window.open();if(w)w.document.write(`<img src="${cv.toDataURL()}" style="width:100%">`);else toast("استخدم زر التحميل")}},"image/png");
 $("print").onclick=()=>{const w=window.open();if(!w){toast("اسمح بالنوافذ المنبثقة");return}
   w.document.write(`<html><head><title>${F(cur.tA)}</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0}img{width:100%;height:100vh;object-fit:contain;display:block}</style></head><body><img src="${cv.toDataURL()}" onload="setTimeout(()=>print(),300)"></body></html>`);w.document.close()};
-$("copy").onclick=async()=>{const t=`${$("subj").value}\n\n${$("body").value}`;try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()}toast("تم نسخ الإيميل ✔")};
+async function copyRich(withImg){
+  let html=emailHTML(withImg);
+  if(emailEdited&&!withImg)html=$("bodyView").innerHTML;
+  else if(emailEdited&&withImg)html=`<p><img src="${cv.toDataURL("image/jpeg",.9)}" width="640" style="width:100%;max-width:640px;border-radius:10px"></p>`+$("bodyView").innerHTML;
+  const tmp=document.createElement("div");tmp.innerHTML=html;const plain=$("subj").value+"\n\n"+tmp.innerText;
+  try{await navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([plain],{type:"text/plain"})})]);toast("تم النسخ ✔ الصقه في الإيميل");return}catch(e){}
+  const box=document.createElement("div");box.contentEditable="true";box.style.cssText="position:fixed;left:-9999px;top:0";box.innerHTML=html;document.body.appendChild(box);
+  const r=document.createRange();r.selectNodeContents(box);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  try{document.execCommand("copy");toast("تم النسخ ✔ الصقه في الإيميل")}catch(e){toast("ما قدرنا ننسخ — حدد النص وانسخه")}
+  sel.removeAllRanges();box.remove();
+}
+$("copy").onclick=()=>copyRich(true);$("copyTxt").onclick=()=>copyRich(false);
 
 renderCats();renderOcc();update();
 /* =================== EMPLOYEE ID CARD =================== */
@@ -592,7 +626,7 @@ var R={};for(var k in D)R[D[k]]=k;
 var TK=Object.keys(T).sort(function(a,b){return b.length-a.length});
 var AR=/[؀-ۿ]/;
 var DYN='.how,.status,.v,.rows';
-var SKIP='script,style,noscript,.mq-lang,#paper,#doc,#viewer,[data-en],textarea';
+var SKIP='script,style,noscript,.mq-lang,#paper,#doc,#viewer,[data-en],textarea,#bodyView';
 function isPairSub(n){var p=n.parentNode;return p&&/^(EM|SMALL|I)$/.test(p.tagName)&&p.parentNode&&p.parentNode.matches&&p.parentNode.matches('label,h1,h2,.k')}
 function swapPairs(){
   document.querySelectorAll('label,h1,h2,.k').forEach(function(el){
