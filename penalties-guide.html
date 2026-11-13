@@ -9,14 +9,14 @@
 <style>
   /* ألوان منقذك — نفس الصفحة الرئيسية */
   :root{
-    /* ألوان منقذك: عنابي */
-    --bg:#F3F3F7; --card:#FDFDFE; --field:#EEF0F6; --field-line:#CDD1E0;
-    --active:#3B4159; --line:#E1E3EC; --gold:#3B4159; --on-gold:#ffffff;
-    --main:#3B4159; --ink:#262A3B; --muted:#6A6F84;
-    --ok:#1f6b52; --ok-bg:#e4f2ec;
-    --warn:#8a5a0b; --warn-bg:#f8eedb;
-    --bad:#a8291f; --bad-bg:#f9e4e2;
-    --paper-main:#3B4159;
+    /* ألوان منقذك: خزامى */
+    --bg:#F5F3F9; --card:#FFFFFF; --field:#F1EEF7; --field-line:#D3CBE4;
+    --active:#8A6BBE; --line:#E4DFEE; --gold:#8A6BBE; --on-gold:#ffffff;
+    --main:#8A6BBE; --ink:#2A2338; --muted:#6F6782;
+    --ok:#1F6B52; --ok-bg:#E4F2EC;
+    --warn:#8A5A0B; --warn-bg:#F8EEDB;
+    --bad:#A8291F; --bad-bg:#F9E4E2;
+    --paper-main:#5E4596;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
@@ -35,7 +35,7 @@
   .pagetitle h2{margin:0;font-size:26px}
   .pagetitle span{color:var(--muted);font-size:14px}
   .sub{color:var(--muted);margin:4px 0 0;font-size:14.5px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 1px 3px rgba(31,39,66,.05)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin:14px 0;box-shadow:none}
   .step{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:12px;font-size:16px}
   .num{background:var(--main);color:#fff;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
   .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:12px;background:var(--field);border:1px solid var(--line);border-radius:40px;padding:5px}
@@ -45,23 +45,23 @@
   input::placeholder{color:var(--muted);opacity:.75}
   input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
   label{display:block;font-size:14px;color:var(--muted);margin:12px 0 5px}
-  .list{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:10px;background:#fff}
+  .list{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:16px;margin-top:10px;background:var(--field)}
   .item{padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14.5px;display:flex;gap:8px}
   .item:last-child{border-bottom:0}
   .item:hover{background:var(--field)}
   .item.on{background:var(--field);box-shadow:inset -3px 0 0 var(--gold)}
   .item small{color:var(--gold);flex:none;min-width:34px}
   .occ{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-  .occ button{font:inherit;font-weight:600;padding:11px 4px;border:1px solid var(--field-line);border-radius:30px;background:#fff;color:var(--ink);cursor:pointer;font-size:14px}
+  .occ button{font:inherit;font-weight:600;padding:11px 4px;border:1px solid var(--field-line);border-radius:30px;background:var(--field);color:var(--ink);cursor:pointer;font-size:14px}
   .occ button.on{background:var(--main);color:#fff;border-color:var(--main)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
   @media(max-width:520px){.grid2{grid-template-columns:1fr}}
   table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
   th,td{border:1px solid var(--line);padding:8px;text-align:center}
-  th{background:var(--field);color:var(--main);font-weight:600}
+  th{background:var(--field);color:#6B4FA0;font-weight:600}
   td.now{background:var(--main);color:#fff;font-weight:700}
   .result{border-radius:16px;padding:14px;background:var(--field);border:1px solid var(--field-line)}
-  .big{font-size:22px;font-weight:700;color:var(--main)}
+  .big{font-size:22px;font-weight:700;color:#6B4FA0}
   .amt{font-size:16px;margin-top:4px}
   .flag{border-radius:12px;padding:10px 12px;margin-top:8px;font-size:14px}
   .flag.ok{background:var(--ok-bg);color:var(--ok)}
@@ -70,17 +70,17 @@
   .btn{display:inline-block;font:inherit;font-weight:700;background:var(--main);color:#fff;border:0;border-radius:30px;padding:12px 20px;cursor:pointer;margin-top:12px}
   ul.rules{margin:6px 0 0;padding-inline-start:18px;font-size:14px}
   ul.rules li{margin-bottom:7px}
-  ul.rules b{color:var(--main)}
+  ul.rules b{color:#6B4FA0}
   .hint{font-size:13px;color:var(--muted)}
   footer{text-align:center;font-size:12.5px;color:var(--muted);padding:18px 14px 30px}
   .hidden{display:none}
   ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
   ol.steps li{counter-increment:s;position:relative;padding:9px 42px 9px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
   ol.steps li:last-child{border-bottom:0}
-  ol.steps li::before{content:counter(s);position:absolute;right:0;top:9px;width:28px;height:28px;border-radius:10px;background:var(--field);color:var(--main);font-weight:700;display:grid;place-items:center}
-  ol.steps b{color:var(--main)}
+  ol.steps li::before{content:counter(s);position:absolute;right:0;top:9px;width:28px;height:28px;border-radius:10px;background:var(--field);color:#6B4FA0;font-weight:700;display:grid;place-items:center}
+  ol.steps b{color:#6B4FA0}
   .docs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-  .docs button{font:inherit;font-weight:700;font-size:14px;padding:12px 8px;border-radius:30px;border:1px solid var(--main);background:#fff;color:var(--main);cursor:pointer}
+  .docs button{font:inherit;font-weight:700;font-size:14px;padding:12px 8px;border-radius:30px;border:1px solid var(--main);background:var(--field);color:var(--ink);cursor:pointer}
   .docs button.main{background:var(--main);color:#fff;border-color:var(--main)}
   /* معاينة النموذج — ورق أبيض */
   #viewer{position:fixed;inset:0;background:rgba(31,39,66,.6);z-index:50;overflow:auto;padding:14px}
@@ -115,15 +115,26 @@
 </style>
 <style id="mq-hero-css">
 .mq-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:fit-content;margin:0 auto;padding:4px 0}
-.mq-n{font-weight:800;font-size:32px;line-height:1.2;color:var(--mq,#3B4159);margin:0}
-.mq-e{direction:ltr;font-size:13px;letter-spacing:2.5px;color:#6A6F84;margin-top:2px;font-weight:500}
+.mq-n{font-weight:800;font-size:32px;line-height:1.2;color:#8A6BBE;margin:0}
+.mq-e{direction:ltr;font-size:13px;letter-spacing:2.5px;color:#6F6782;margin-top:2px;font-weight:500}
+</style>
+<style id="mq-lang-css">
+.mq-lang{display:flex;width:fit-content;margin:0 0 10px auto;gap:2px;background:var(--surface,var(--card,var(--panel,#fff)));border:1px solid var(--line,#E4DFEE);border-radius:30px;padding:3px;position:relative;z-index:2}
+.mq-lang button{font:inherit;font-size:13px;font-weight:700;border:0;background:transparent;color:var(--muted,#6F6782);padding:6px 12px;border-radius:30px;cursor:pointer}
+.mq-lang button.on{background:#8A6BBE;color:#fff}
+html[lang=en] .mq-lang{margin:0 auto 10px 0}
+html[lang=en] body{direction:ltr}
+html[lang=en] .mq-n{font-size:28px}
+html[lang=en] label em,html[lang=en] h1 small,html[lang=en] h2 small,html[lang=en] .k i{text-align:left;direction:rtl}
+html[lang=en] h1 small,html[lang=en] h2 small{margin-inline-start:8px}
+html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <div class="mq-hero" role="banner"><h1 class="mq-n">منقذك</h1><div class="mq-e">Your HR Lifesaver</div></div>
+    <div class="mq-lang" role="group" aria-label="Language"><button type="button" data-l="ar" class="on">عربي</button><button type="button" data-l="en">EN</button></div><div class="mq-hero" role="banner"><h1 class="mq-n">منقذك</h1><div class="mq-e">Your HR Lifesaver</div></div>
     <a class="home" href="index.html" style="display:inline-block;margin-top:12px">← الرئيسية</a>
     <div class="pagetitle"><h2>دليل الجزاءات ⚖️</h2><span>Penalties Guide</span></div>
     <p class="sub">اختر المخالفة ومرة التكرار، ويطلع لك الجزاء النظامي وقيمته والإجراءات والنماذج.</p>
@@ -233,21 +244,21 @@
   <section class="card">
     <div class="step"><span class="num">!</span>قواعد لازم تعرفها قبل أي جزاء</div>
     <ul class="rules">
-      <li>ما يُوقَّع جزاء أكبر من غرامة أجر يوم إلا بعد <b>إبلاغ الموظف كتابيًا</b> بالمخالفة، وسماع أقواله، وتحقيق دفاعه في محضر يُحفظ في ملفه.</li>
-      <li>ما يُساءَل الموظف عن مخالفة مضى على علم المنشأة بها <b>أكثر من 30 يوم</b> بدون ما تبدأ أي إجراء تحقيق.</li>
-      <li>ما يُوقَّع الجزاء إذا مضى على ثبوت المخالفة <b>أكثر من 30 يوم</b>.</li>
-      <li>المخالفة الواحدة لها <b>جزاء واحد</b> فقط، والغرامة عنها ما تتجاوز أجر <b>5 أيام</b>، ومجموع الغرامات المخصومة في الشهر ما يتجاوز أجر <b>5 أيام</b>.</li>
-      <li>الإيقاف عن العمل بدون أجر ما يتجاوز <b>5 أيام في الشهر</b>.</li>
-      <li>ما يُشدَّد الجزاء إذا مضى <b>180 يوم</b> من تاريخ إبلاغ الموظف بالجزاء السابق عن نفس المخالفة.</li>
-      <li>إذا تكررت المخالفة بعد المرة الرابعة، يُطبَّق الجزاء الأشد المقرر لها.</li>
-      <li>صاحب الصلاحية يقدر يستبدل الجزاء بجزاء <b>أخف</b>، لكن ما يقدر يشدّده.</li>
-      <li>لازم يُبلَّغ الموظف كتابيًا بالجزاء ونوعه ومقداره والجزاء اللي بيتعرض له إذا كرّر المخالفة. وله التظلم كتابيًا خلال <b>30 يوم</b> (عدا العطل الرسمية)، والمنشأة ترد عليه خلال <b>15 يوم</b> (عدا العطل الرسمية). وإذا رُفض أو ما انرد عليه، له يعترض أمام المحاكم العمالية خلال <b>30 يوم</b>.</li>
-      <li>كل موظف له <b>صحيفة جزاءات</b> في ملفه، والغرامات تُقيَّد في سجل خاص.</li>
+      <li data-en="A penalty greater than a fine of one day's wage may only be imposed after <b>notifying the employee in writing</b> of the violation, hearing their statement, and examining their defense in minutes kept in their file.">ما يُوقَّع جزاء أكبر من غرامة أجر يوم إلا بعد <b>إبلاغ الموظف كتابيًا</b> بالمخالفة، وسماع أقواله، وتحقيق دفاعه في محضر يُحفظ في ملفه.</li>
+      <li data-en="An employee may not be held accountable for a violation the company learned of <b>more than 30 days</b> earlier without starting any investigation.">ما يُساءَل الموظف عن مخالفة مضى على علم المنشأة بها <b>أكثر من 30 يوم</b> بدون ما تبدأ أي إجراء تحقيق.</li>
+      <li data-en="A penalty may not be imposed if <b>more than 30 days</b> have passed since the violation was proven.">ما يُوقَّع الجزاء إذا مضى على ثبوت المخالفة <b>أكثر من 30 يوم</b>.</li>
+      <li data-en="Each violation carries <b>one penalty</b> only; the fine for it may not exceed <b>5 days'</b> wage, and total fines deducted in a month may not exceed <b>5 days'</b> wage.">المخالفة الواحدة لها <b>جزاء واحد</b> فقط، والغرامة عنها ما تتجاوز أجر <b>5 أيام</b>، ومجموع الغرامات المخصومة في الشهر ما يتجاوز أجر <b>5 أيام</b>.</li>
+      <li data-en="Suspension from work without pay may not exceed <b>5 days per month</b>.">الإيقاف عن العمل بدون أجر ما يتجاوز <b>5 أيام في الشهر</b>.</li>
+      <li data-en="A penalty may not be escalated if <b>180 days</b> have passed since the employee was notified of the previous penalty for the same violation.">ما يُشدَّد الجزاء إذا مضى <b>180 يوم</b> من تاريخ إبلاغ الموظف بالجزاء السابق عن نفس المخالفة.</li>
+      <li data-en="If the violation is repeated after the fourth time, the most severe penalty prescribed for it applies.">إذا تكررت المخالفة بعد المرة الرابعة، يُطبَّق الجزاء الأشد المقرر لها.</li>
+      <li data-en="The authorized person may replace the penalty with a <b>lighter</b> one, but may not make it heavier.">صاحب الصلاحية يقدر يستبدل الجزاء بجزاء <b>أخف</b>، لكن ما يقدر يشدّده.</li>
+      <li data-en="The employee must be notified in writing of the penalty, its type and amount, and the penalty for repeating the violation. They may file a written grievance within <b>30 days</b> (excluding official holidays), and the company must respond within <b>15 days</b> (excluding official holidays). If rejected or unanswered, they may object before the labor courts within <b>30 days</b>.">لازم يُبلَّغ الموظف كتابيًا بالجزاء ونوعه ومقداره والجزاء اللي بيتعرض له إذا كرّر المخالفة. وله التظلم كتابيًا خلال <b>30 يوم</b> (عدا العطل الرسمية)، والمنشأة ترد عليه خلال <b>15 يوم</b> (عدا العطل الرسمية). وإذا رُفض أو ما انرد عليه، له يعترض أمام المحاكم العمالية خلال <b>30 يوم</b>.</li>
+      <li data-en="Every employee has a <b>penalty sheet</b> in their file, and fines are recorded in a dedicated register.">كل موظف له <b>صحيفة جزاءات</b> في ملفه، والغرامات تُقيَّد في سجل خاص.</li>
     </ul>
   </section>
 
   <section class="card">
-    <p class="hint" style="margin:0">
+    <p class="hint" style="margin:0" data-en="<b>Source:</b> Implementing Regulations of the Labor Law and annexes — Annex (1) “Unified Model Work Regulation”, violations and penalties tables and Articles (58–71), Ministry of Human Resources and Social Development, 2025 edition.<br>If your company has its own regulation approved by the Ministry, its approved table is the reference. This tool is for assistance and guidance; the final decision rests with the authorized person.">
       <b>المصدر:</b> اللائحة التنفيذية لنظام العمل وملحقاتها — الملحق رقم (1) «النموذج الموحد للائحة تنظيم العمل»، جداول المخالفات والجزاءات والمواد (58–71)، وزارة الموارد البشرية والتنمية الاجتماعية، إصدار 2025.<br>
       إذا كان لمنشأتك لائحة خاصة معتمدة من الوزارة، فجدولها المعتمد هو المرجع. هذه الأداة للمساعدة والاسترشاد، والقرار النهائي لصاحب الصلاحية.
     </p>
@@ -331,17 +342,34 @@ const DATA=[
 ];
 
 const DAYS={D1:"يوم",D2:"يومان",D3:"ثلاثة أيام",D4:"أربعة أيام",D5:"خمسة أيام"};
+const DAYS_EN={D1:"1 day",D2:"2 days",D3:"3 days",D4:"4 days",D5:"5 days"};
+const NAMES_EN=[["Late arrival up to 15 minutes without permission or acceptable excuse, not delaying other workers", "Late arrival up to 15 minutes without permission or acceptable excuse, delaying other workers", "Late arrival of 15–30 minutes without permission or acceptable excuse, not delaying other workers", "Late arrival of 15–30 minutes without permission or acceptable excuse, delaying other workers", "Late arrival of 30–60 minutes without permission or acceptable excuse, not delaying other workers", "Late arrival of 30–60 minutes without permission or acceptable excuse, delaying other workers", "Late arrival of more than one hour without permission or acceptable excuse, whether or not it delays other workers", "Leaving work early without permission or acceptable excuse, by no more than 15 minutes", "Leaving work early without permission or acceptable excuse, by more than 15 minutes", "Staying at or returning to the workplace after working hours without prior permission", "Absence of one day without written permission or acceptable excuse, within one contract year", "Continuous absence of 2 to 6 days without written permission or acceptable excuse, within one contract year", "Continuous absence of 7 to 10 days without written permission or acceptable excuse, within one contract year", "Continuous absence of 11 to 14 days without written permission or acceptable excuse, within one contract year", "Leaving work without a legitimate reason for more than 15 consecutive days, within one contract year", "Intermittent absence without a legitimate reason totaling more than 30 days within one contract year"], ["Being, without justification, away from the assigned workplace during working hours", "Receiving visitors for non-work matters at the workplace without management permission", "Using company machines, equipment or tools for personal purposes without permission", "Interfering without right in work outside one's duties or not assigned to them", "Exiting or entering from other than the designated place", "Neglecting to clean or maintain machines, or failing to report faults in them", "Not returning repair and maintenance tools and supplies to their places after work", "Tearing or damaging the company's notices or announcements", "Negligence with custody items in one's possession (cars, machines, devices, equipment, tools…)", "Eating at the workplace, outside the designated area, or outside break times", "Sleeping during work", "Sleeping in situations that require constant alertness", "Loitering or being away from one's workplace during working hours", "Manipulating attendance and departure records", "Disobeying ordinary work orders or not following work instructions posted in a visible place", "Inciting others to violate written work orders and instructions", "Smoking in prohibited areas announced to protect workers and the establishment", "Negligence at work that may harm the health or safety of workers, or materials, tools and equipment"], ["Fighting with colleagues or others, or causing disturbances at the workplace", "Malingering, or falsely claiming an injury at or because of work", "Refusing a medical examination requested by the company doctor, or refusing medical instructions during treatment", "Violating health instructions posted at the workplace", "Writing on or posting notices on the company's walls", "Refusing administrative inspection on leaving", "Not handing over money collected for the company on time without acceptable justification", "Refusing to wear prescribed protective and safety clothing and equipment", "Deliberately being alone with the opposite sex at the workplace", "Suggestive words or acts offending modesty toward others", "Verbally or by gesture, or via electronic means, insulting or belittling colleagues", "Physically assaulting colleagues or others, or in an indecent manner", "Physically or verbally assaulting, or via electronic means, the employer, responsible manager or a superior during or because of work", "Filing a malicious report or complaint", "Not complying with the investigation committee's summons to attend", "Not adhering to the company's approved uniform"]], CATS_EN=["Work hours", "Organization", "Conduct"];
+const PEN_EN={};
+PEN_EN[PROMO]="Postponement of promotion or withholding of increment, once";
+PEN_EN[FIRE]="Dismissal with end-of-service award";
+PEN_EN[FIRE80]="Dismissal without award, notice or compensation under Article (80)";
+PEN_EN["الفصل من العمل مع المكافأة، إذا لم يتجاوز مجموع الغياب 30 يومًا"]="Dismissal with award, if total absence does not exceed 30 days";
+PEN_EN[PROMO+"، مع توجيه إنذار بالفصل طبقًا للمادة (80) من نظام العمل"]="Postponement of promotion or withholding of increment once, with a dismissal warning under Article (80) of the Labor Law";
+PEN_EN["الفصل من العمل طبقًا للمادة (80) من نظام العمل"]="Dismissal under Article (80) of the Labor Law";
+PEN_EN["الفصل دون مكافأة أو تعويض، على أن يسبقه إنذار كتابي بعد الغياب مدة عشرة أيام، في نطاق المادة (80) من النظام"]="Dismissal without award or compensation, preceded by a written warning after 10 days of absence, under Article (80)";
+PEN_EN["الفصل دون مكافأة أو تعويض، على أن يسبقه إنذار كتابي بعد الغياب مدة عشرين يومًا، في نطاق المادة (80) من النظام"]="Dismissal without award or compensation, preceded by a written warning after 20 days of absence, under Article (80)";
+PEN_EN["—"]="—";
+const NOTE_EN={"بالإضافة إلى حسم أجر دقائق التأخر":"Plus deduction of the wage for the late minutes","بالإضافة إلى حسم أجر ساعات التأخر":"Plus deduction of the wage for the late hours","بالإضافة إلى حسم أجر مدة ترك العمل":"Plus deduction of the wage for the time away","بالإضافة إلى حسم أجر مدة الغياب":"Plus deduction of the wage for the absence period"};
+const EN=()=>document.documentElement.lang==="en";
+const t=(a,e)=>EN()?e:a;
+const vname=(ci,ri)=>EN()?NAMES_EN[ci][ri]:DATA[ci].rows[ri][0];
+const cname=ci=>EN()?CATS_EN[ci]:DATA[ci].cat;
 function label(p){
-  if(p===W) return "إنذار كتابي";
-  if(typeof p==="number") return "حسم "+p+"% من الأجر اليومي";
-  if(DAYS[p]) return "حسم أجر "+DAYS[p];
-  return p;
+  if(p===W) return t("إنذار كتابي","Written warning");
+  if(typeof p==="number") return t("حسم "+p+"% من الأجر اليومي","Deduct "+p+"% of daily wage");
+  if(DAYS[p]) return t("حسم أجر "+DAYS[p],"Deduct "+DAYS_EN[p]+" wage");
+  return EN()&&PEN_EN[p]?PEN_EN[p]:p;
 }
 function short(p){
-  if(p===W) return "إنذار كتابي";
+  if(p===W) return t("إنذار كتابي","Written warning");
   if(typeof p==="number") return p+"%";
-  if(DAYS[p]) return DAYS[p];
-  return p;
+  if(DAYS[p]) return t(DAYS[p],DAYS_EN[p]);
+  return EN()&&PEN_EN[p]?PEN_EN[p]:p;
 }
 /* قيمة الغرامة بالأيام، أو null إذا الجزاء غير مالي */
 function days(p){
@@ -354,18 +382,18 @@ const $=id=>document.getElementById(id);
 let cat=0, sel=null, occ=0;
 
 function drawTabs(){
-  $("tabs").innerHTML=DATA.map((d,i)=>`<button class="tab ${i===cat?'on':''}" data-i="${i}">${d.cat}</button>`).join("");
+  $("tabs").innerHTML=DATA.map((d,i)=>`<button class="tab ${i===cat?'on':''}" data-i="${i}">${cname(i)}</button>`).join("");
   document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{cat=+b.dataset.i;$("q").value="";drawTabs();drawList();});
 }
 function drawList(){
-  const q=$("q").value.trim();
+  const q=$("q").value.trim().toLowerCase();
   let items=[];
   DATA.forEach((d,ci)=>d.rows.forEach((r,ri)=>{
-    if(q ? r[0].includes(q) : ci===cat) items.push({ci,ri,r});
+    if(q ? (r[0].includes(q)||NAMES_EN[ci][ri].toLowerCase().includes(q)) : ci===cat) items.push({ci,ri});
   }));
   $("list").innerHTML = items.length ? items.map(x=>
-    `<div class="item ${sel&&sel.ci===x.ci&&sel.ri===x.ri?'on':''}" data-c="${x.ci}" data-r="${x.ri}"><small>${x.ci+1}/${x.ri+1}</small><span>${x.r[0]}</span></div>`
-  ).join("") : `<div class="item hint">ما لقيت مخالفة بهالكلمة.</div>`;
+    `<div class="item ${sel&&sel.ci===x.ci&&sel.ri===x.ri?'on':''}" data-c="${x.ci}" data-r="${x.ri}"><small>${x.ci+1}/${x.ri+1}</small><span>${vname(x.ci,x.ri)}</span></div>`
+  ).join("") : `<div class="item hint">${t("ما لقيت مخالفة بهالكلمة.","No violation matches that word.")}</div>`;
   document.querySelectorAll(".item[data-c]").forEach(el=>el.onclick=()=>{
     sel={ci:+el.dataset.c,ri:+el.dataset.r}; drawList(); calc();
     $("out").scrollIntoView({behavior:"smooth",block:"start"});
@@ -379,9 +407,10 @@ document.querySelectorAll("#occ button").forEach(b=>b.onclick=()=>{
 ["wage","used","known","proven","lastPen"].forEach(id=>$(id).addEventListener("input",calc));
 $("q").addEventListener("input",drawList);
 
-const fmt=n=>n.toLocaleString("ar-SA",{maximumFractionDigits:2});
+const fmt=n=>n.toLocaleString(EN()?"en-US":"ar-SA",{maximumFractionDigits:2});
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
-function dstr(d){return d.toLocaleDateString("ar-SA-u-ca-gregory",{year:"numeric",month:"long",day:"numeric"});}
+function dstr(d){return d.toLocaleDateString(EN()?"en-GB":"ar-SA-u-ca-gregory",{year:"numeric",month:"long",day:"numeric"});}
+function dstrA(d){return d.toLocaleDateString("ar-SA-u-ca-gregory",{year:"numeric",month:"long",day:"numeric"});}
 function today(){const t=new Date();t.setHours(0,0,0,0);return t;}
 function flag(cls,txt){return `<div class="flag ${cls}">${txt}</div>`;}
 
@@ -390,78 +419,77 @@ function calc(){
   $("empty").classList.add("hidden"); $("res").classList.remove("hidden");
   const row=DATA[sel.ci].rows[sel.ri];
   const pens=row[1], note=row[2]||"";
+  const noteT=EN()&&note?NOTE_EN[note]:note;
   let o=occ, f="";
 
-  // 180 يوم: إذا مضت، ما يجوز التشديد
   const lp=$("lastPen").value;
   if(lp && o>0){
     const passed=Math.floor((today()-new Date(lp))/864e5);
     if(passed>180){
       o=0;
-      f+=flag("warn",`مضى ${passed} يوم على آخر جزاء (أكثر من 180 يوم)، فما يجوز تشديد الجزاء. يُطبَّق جزاء <b>أول مرة</b>.`);
+      f+=flag("warn",t(`مضى ${passed} يوم على آخر جزاء (أكثر من 180 يوم)، فما يجوز تشديد الجزاء. يُطبَّق جزاء <b>أول مرة</b>.`,`${passed} days have passed since the last penalty (over 180 days), so it may not be escalated. The <b>1st time</b> penalty applies.`));
     } else if(passed>=0){
-      f+=flag("ok",`مضى ${passed} يوم على آخر جزاء، فالتكرار يُحتسب.`);
+      f+=flag("ok",t(`مضى ${passed} يوم على آخر جزاء، فالتكرار يُحتسب.`,`${passed} days since the last penalty, so the repetition counts.`));
     }
   }
 
   const p=pens[o];
-  $("rViol").textContent=DATA[sel.ci].cat+" — بند "+(sel.ri+1)+": "+row[0];
+  $("rViol").textContent=cname(sel.ci)+t(" — بند "," — item ")+(sel.ri+1)+": "+vname(sel.ci,sel.ri);
   $("rPen").textContent=label(p);
-  $("rNote").innerHTML=note?flag("warn",note):"";
+  $("rNote").innerHTML=noteT?flag("warn",noteT):"";
   $("rRow").innerHTML=pens.map((x,i)=>`<td class="${i===o?'now':''}">${short(x)}</td>`).join("");
 
-  // المبلغ
   const wage=parseFloat($("wage").value)||0, daily=wage/30, d=days(p);
   let amtTxt="";
-  if(d===null) amtTxt="جزاء غير مالي.";
-  else if(d===0) amtTxt="بدون خصم مالي.";
-  else if(wage>0) amtTxt=`قيمة الخصم: <b>${fmt(d*daily)} ريال</b> (الأجر اليومي ${fmt(daily)} ريال)`;
-  else amtTxt=`= ${fmt(d)} من أجر يوم. أدخل الراتب لحساب المبلغ.`;
+  if(d===null) amtTxt=t("جزاء غير مالي.","Non-monetary penalty.");
+  else if(d===0) amtTxt=t("بدون خصم مالي.","No deduction.");
+  else if(wage>0) amtTxt=t(`قيمة الخصم: <b>${fmt(d*daily)} ريال</b> (الأجر اليومي ${fmt(daily)} ريال)`,`Deduction: <b>SAR ${fmt(d*daily)}</b> (daily wage SAR ${fmt(daily)})`);
+  else amtTxt=t(`= ${fmt(d)} من أجر يوم. أدخل الراتب لحساب المبلغ.`,`= ${fmt(d)} of a day's wage. Enter the salary to calculate the amount.`);
   $("rAmt").innerHTML=amtTxt;
 
-  // التحقيق
   if(d!==null && d<=1)
-    f+=flag("ok","الجزاء ما يتجاوز غرامة أجر يوم، فالتحقيق الكتابي غير لازم. ويُستحسن توثيق أقوال الموظف.");
+    f+=flag("ok",t("الجزاء ما يتجاوز غرامة أجر يوم، فالتحقيق الكتابي غير لازم. ويُستحسن توثيق أقوال الموظف.","The penalty does not exceed one day's wage, so a written investigation isn't required. Documenting the employee's statement is still recommended."));
   else
-    f+=flag("bad","لازم قبل الجزاء: إبلاغ الموظف كتابيًا بالمخالفة، وسماع أقواله، وتحقيق دفاعه في محضر يُحفظ في ملفه.");
+    f+=flag("bad",t("لازم قبل الجزاء: إبلاغ الموظف كتابيًا بالمخالفة، وسماع أقواله، وتحقيق دفاعه في محضر يُحفظ في ملفه.","Required before the penalty: notify the employee in writing, hear their statement and defense, and record it in minutes kept in their file."));
 
   if(d===null && /فصل|الفصل/.test(p))
-    f+=flag("bad","الفصل قرار حساس: راجع شروط المادة (80) من نظام العمل وإجراءاتها قبل التنفيذ.");
+    f+=flag("bad",t("الفصل قرار حساس: راجع شروط المادة (80) من نظام العمل وإجراءاتها قبل التنفيذ.","Dismissal is a sensitive decision: review the conditions and procedure of Article (80) of the Labor Law before acting."));
 
-  // سقف الخصم الشهري
   const used=parseFloat($("used").value)||0;
   if(d>0){
     if(used+d>5){
       const left=Math.max(0,5-used);
-      f+=flag("bad",`تنبيه: مجموع الغرامات هذا الشهر بيصير ${fmt(used+d)} يوم، والحد الأقصى أجر 5 أيام. المتبقي المسموح خصمه هذا الشهر: ${fmt(left)} يوم${wage>0?` (${fmt(left*daily)} ريال)`:""}.`);
+      f+=flag("bad",t(`تنبيه: مجموع الغرامات هذا الشهر بيصير ${fmt(used+d)} يوم، والحد الأقصى أجر 5 أيام. المتبقي المسموح خصمه هذا الشهر: ${fmt(left)} يوم${wage>0?` (${fmt(left*daily)} ريال)`:""}.`,`Warning: total fines this month would be ${fmt(used+d)} days; the maximum is 5 days' wage. Remaining allowed this month: ${fmt(left)} days${wage>0?` (SAR ${fmt(left*daily)})`:""}.`));
     } else if(used>0){
-      f+=flag("ok",`مجموع الغرامات هذا الشهر بعد الجزاء: ${fmt(used+d)} يوم من أصل 5.`);
+      f+=flag("ok",t(`مجموع الغرامات هذا الشهر بعد الجزاء: ${fmt(used+d)} يوم من أصل 5.`,`Total fines this month after this penalty: ${fmt(used+d)} of 5 days.`));
     }
   }
 
-  // المدد
   const kn=$("known").value, pr=$("proven").value;
   if(kn){
     const dl=addDays(kn,30), left=Math.ceil((dl-today())/864e5);
     f+=flag(left<0?"bad":left<=7?"warn":"ok", left<0
-      ? `مضى أكثر من 30 يوم على علم المنشأة بالمخالفة (${dstr(dl)}). إذا ما بدأتوا أي إجراء تحقيق، ما يجوز مساءلة الموظف.`
-      : `آخر موعد لبدء التحقيق: ${dstr(dl)} (باقي ${left} يوم).`);
+      ? t(`مضى أكثر من 30 يوم على علم المنشأة بالمخالفة (${dstr(dl)}). إذا ما بدأتوا أي إجراء تحقيق، ما يجوز مساءلة الموظف.`,`More than 30 days have passed since the company learned of the violation (${dstr(dl)}). If no investigation was started, the employee can't be held accountable.`)
+      : t(`آخر موعد لبدء التحقيق: ${dstr(dl)} (باقي ${left} يوم).`,`Deadline to start the investigation: ${dstr(dl)} (${left} days left).`));
   }
   if(pr){
     const dl=addDays(pr,30), left=Math.ceil((dl-today())/864e5);
     f+=flag(left<0?"bad":left<=7?"warn":"ok", left<0
-      ? `مضى أكثر من 30 يوم على ثبوت المخالفة (${dstr(dl)}). ما يجوز توقيع الجزاء.`
-      : `آخر موعد لتوقيع الجزاء: ${dstr(dl)} (باقي ${left} يوم).`);
+      ? t(`مضى أكثر من 30 يوم على ثبوت المخالفة (${dstr(dl)}). ما يجوز توقيع الجزاء.`,`More than 30 days have passed since the violation was proven (${dstr(dl)}). The penalty can no longer be imposed.`)
+      : t(`آخر موعد لتوقيع الجزاء: ${dstr(dl)} (باقي ${left} يوم).`,`Deadline to impose the penalty: ${dstr(dl)} (${left} days left).`));
   }
 
-  // الجزاء القادم
   if(o<3 && pens[o+1] && pens[o+1]!=="—")
-    f+=flag("warn",`إذا كرّرها (خلال 180 يوم): ${label(pens[o+1])}. ولازم يُذكر هذا في خطاب الجزاء.`);
+    f+=flag("warn",t(`إذا كرّرها (خلال 180 يوم): ${label(pens[o+1])}. ولازم يُذكر هذا في خطاب الجزاء.`,`If repeated (within 180 days): ${label(pens[o+1])}. This must be stated in the penalty letter.`));
 
   $("flags").innerHTML=f;
   window._st={row,o,p,d,note,next:(o<3&&pens[o+1]&&pens[o+1]!=="—")?pens[o+1]:null,wage,daily};
   drawProc();
-  window._sum=`المخالفة: ${row[0]}\nالتكرار: ${["أول","ثاني","ثالث","رابع"][o]} مرة\nالجزاء: ${label(p)}${note?"\n"+note:""}${d>0&&wage>0?`\nقيمة الخصم: ${fmt(d*daily)} ريال`:""}${o<3&&pens[o+1]&&pens[o+1]!=="—"?`\nالجزاء عند التكرار: ${label(pens[o+1])}`:""}\nالمرجع: جدول المخالفات والجزاءات — ${DATA[sel.ci].cat}، بند ${sel.ri+1}، النموذج الموحد للائحة تنظيم العمل.`;
+  // ملخص النسخ بالعربي دايمًا لأنه يروح للخطاب
+  const L0=p=>{const e=EN;return p===W?"إنذار كتابي":typeof p==="number"?"حسم "+p+"% من الأجر اليومي":DAYS[p]?"حسم أجر "+DAYS[p]:p;};
+  window._sum=EN()
+   ? `Violation: ${NAMES_EN[sel.ci][sel.ri]}\nOccurrence: ${["1st","2nd","3rd","4th"][o]}\nPenalty: ${label(p)}${noteT?"\n"+noteT:""}${d>0&&wage>0?`\nDeduction: SAR ${fmt(d*daily)}`:""}${o<3&&pens[o+1]&&pens[o+1]!=="—"?`\nIf repeated: ${label(pens[o+1])}`:""}\nReference: Violations & Penalties Table — ${CATS_EN[sel.ci]}, item ${sel.ri+1}, Unified Model Work Regulation.`
+   : `المخالفة: ${row[0]}\nالتكرار: ${["أول","ثاني","ثالث","رابع"][o]} مرة\nالجزاء: ${L0(p)}${note?"\n"+note:""}${d>0&&wage>0?`\nقيمة الخصم: ${fmt(d*daily)} ريال`:""}${o<3&&pens[o+1]&&pens[o+1]!=="—"?`\nالجزاء عند التكرار: ${L0(pens[o+1])}`:""}\nالمرجع: جدول المخالفات والجزاءات — ${DATA[sel.ci].cat}، بند ${sel.ri+1}، النموذج الموحد للائحة تنظيم العمل.`;
 }
 /* ===== الإجراءات ===== */
 const isAbsFire=()=>sel&&sel.ci===0&&sel.ri>=13; // بنود الغياب 14-16
@@ -471,38 +499,39 @@ function drawProc(){
   const light = s.d!==null && s.d<=1;
   const fire = s.d===null && /فصل|الفصل/.test(s.p);
   let st=[];
-  st.push("<b>وثّق المخالفة</b> فور علمك بها: التاريخ والوقت والشهود وأي إثبات (سجل البصمة، بريد، صور). ومن تاريخ علم المنشأة يبدأ عدّاد الـ30 يوم.");
-  if(isAbsFire()) st.push(`<b>وجّه إنذار كتابي بالفصل</b> بعد الغياب ${sel.ri===15?"مدة عشرين يومًا (متقطعة)":"مدة عشرة أيام"}، وهذا شرط قبل الفصل في نطاق المادة (80). <b>النموذج: إنذار بالفصل</b>.`);
+  st.push(t("<b>وثّق المخالفة</b> فور علمك بها: التاريخ والوقت والشهود وأي إثبات (سجل البصمة، بريد، صور). ومن تاريخ علم المنشأة يبدأ عدّاد الـ30 يوم.","<b>Document the violation</b> as soon as you learn of it: date, time, witnesses and any evidence (attendance log, email, photos). The 30-day clock starts from the date the company learns of it."));
+  if(isAbsFire()) st.push(t(`<b>وجّه إنذار كتابي بالفصل</b> بعد الغياب ${sel.ri===15?"مدة عشرين يومًا (متقطعة)":"مدة عشرة أيام"}، وهذا شرط قبل الفصل في نطاق المادة (80). <b>النموذج: إنذار بالفصل</b>.`,`<b>Issue a written dismissal warning</b> after ${sel.ri===15?"20 days of (intermittent) absence":"10 days of absence"} — a condition before dismissal under Article (80). <b>Form: Dismissal warning</b>.`));
   if(light){
-    st.push("<b>اسمع أقوال الموظف</b>. الجزاء هنا ما يتجاوز غرامة أجر يوم، فالتحقيق الكتابي غير لازم، لكن الأفضل توثيق رده. <b>النموذج: محضر تحقيق (اختياري)</b>.");
+    st.push(t("<b>اسمع أقوال الموظف</b>. الجزاء هنا ما يتجاوز غرامة أجر يوم، فالتحقيق الكتابي غير لازم، لكن الأفضل توثيق رده. <b>النموذج: محضر تحقيق (اختياري)</b>.","<b>Hear the employee's statement</b>. The penalty doesn't exceed one day's wage, so a written investigation isn't required, but documenting the response is best. <b>Form: Investigation record (optional)</b>."));
   } else {
-    st.push("<b>أبلغ الموظف كتابيًا</b> بالمخالفة المنسوبة له وموعد التحقيق، خلال 30 يوم من علم المنشأة بها. <b>النموذج: استدعاء للتحقيق</b>.");
-    st.push("<b>حقق معه</b>: اسمع أقواله، وحقق دفاعه ومستنداته، ودوّن كل شيء في محضر يوقّع عليه الموظف والمحقق، ويُحفظ في ملفه. <b>النموذج: محضر تحقيق</b>.");
+    st.push(t("<b>أبلغ الموظف كتابيًا</b> بالمخالفة المنسوبة له وموعد التحقيق، خلال 30 يوم من علم المنشأة بها. <b>النموذج: استدعاء للتحقيق</b>.","<b>Notify the employee in writing</b> of the alleged violation and the investigation date, within 30 days of the company learning of it. <b>Form: Investigation summons</b>."));
+    st.push(t("<b>حقق معه</b>: اسمع أقواله، وحقق دفاعه ومستنداته، ودوّن كل شيء في محضر يوقّع عليه الموظف والمحقق، ويُحفظ في ملفه. <b>النموذج: محضر تحقيق</b>.","<b>Investigate</b>: hear the statement, examine the defense and documents, and record everything in minutes signed by the employee and investigator, kept in the file. <b>Form: Investigation record</b>."));
   }
-  st.push(`<b>أصدر القرار</b> خلال 30 يوم من ثبوت المخالفة: ${label(s.p)}. ويُعتمد من صاحب الصلاحية، وله يخففه بس ما يشدده. <b>النموذج: ${s.p===W?"إنذار كتابي":"قرار جزاء"}</b>.`);
-  if(fire) st.push("<b>قبل الفصل</b>: راجع شروط المادة (80) وتأكد إن كل الإجراءات السابقة موثقة، ويُفضّل مراجعة مختص قانوني.");
-  st.push("<b>أبلغ الموظف كتابيًا بالقرار</b>: نوع الجزاء ومقداره والجزاء اللي بيتعرض له إذا كرر المخالفة، وخذ توقيعه بالاستلام. إذا رفض أو كان غايب، أرسله بالبريد المسجل على عنوانه في ملف خدمته أو على بريده الإلكتروني الشخصي الثابت في عقد العمل أو المعتمد لدى المنشأة.");
-  st.push("<b>قيّد الجزاء</b> في صحيفة جزاءات الموظف بملفه"+(s.d>0?"، وقيّد الغرامة في سجل الغرامات الخاص، وتأكد إن مجموع غرامات الشهر ما يتجاوز أجر 5 أيام":"")+".");
-  st.push("<b>التظلم</b>: للموظف يتظلم كتابيًا خلال 30 يوم (عدا العطل الرسمية) من إبلاغه، ولازم يُبلَّغ بالنتيجة خلال 15 يوم (عدا العطل الرسمية) من تقديمه. وإذا رُفض تظلمه أو ما انرد عليه، له يعترض أمام المحاكم العمالية خلال 30 يوم.");
+  st.push(t(`<b>أصدر القرار</b> خلال 30 يوم من ثبوت المخالفة: ${label(s.p)}. ويُعتمد من صاحب الصلاحية، وله يخففه بس ما يشدده. <b>النموذج: ${s.p===W?"إنذار كتابي":"قرار جزاء"}</b>.`,`<b>Issue the decision</b> within 30 days of the violation being proven: ${label(s.p)}. It's approved by the authorized person, who may reduce it but not increase it. <b>Form: ${s.p===W?"Written warning":"Penalty decision"}</b>.`));
+  if(fire) st.push(t("<b>قبل الفصل</b>: راجع شروط المادة (80) وتأكد إن كل الإجراءات السابقة موثقة، ويُفضّل مراجعة مختص قانوني.","<b>Before dismissal</b>: review the conditions of Article (80), make sure all previous steps are documented, and preferably consult a legal specialist."));
+  st.push(t("<b>أبلغ الموظف كتابيًا بالقرار</b>: نوع الجزاء ومقداره والجزاء اللي بيتعرض له إذا كرر المخالفة، وخذ توقيعه بالاستلام. إذا رفض أو كان غايب، أرسله بالبريد المسجل على عنوانه في ملف خدمته أو على بريده الإلكتروني الشخصي الثابت في عقد العمل أو المعتمد لدى المنشأة.","<b>Notify the employee of the decision in writing</b>: the penalty type, amount, and the penalty for repeating the violation, and get their signature of receipt. If they refuse or are absent, send it by registered mail to the address in their service file, or to the personal email stated in the contract or approved by the company."));
+  st.push(t("<b>قيّد الجزاء</b> في صحيفة جزاءات الموظف بملفه"+(s.d>0?"، وقيّد الغرامة في سجل الغرامات الخاص، وتأكد إن مجموع غرامات الشهر ما يتجاوز أجر 5 أيام":"")+".","<b>Record the penalty</b> in the employee's penalty sheet in their file"+(s.d>0?", record the fine in the dedicated fines register, and make sure the month's total fines don't exceed 5 days' wage":"")+"."));
+  st.push(t("<b>التظلم</b>: للموظف يتظلم كتابيًا خلال 30 يوم (عدا العطل الرسمية) من إبلاغه، ولازم يُبلَّغ بالنتيجة خلال 15 يوم (عدا العطل الرسمية) من تقديمه. وإذا رُفض تظلمه أو ما انرد عليه، له يعترض أمام المحاكم العمالية خلال 30 يوم.","<b>Grievance</b>: the employee may file a written grievance within 30 days (excluding official holidays) of notification, and must be informed of the outcome within 15 days (excluding official holidays). If rejected or unanswered, they may object before the labor courts within 30 days."));
   $("steps").innerHTML=st.map(x=>`<li>${x}</li>`).join("");
 
   let b=[];
-  if(isAbsFire()) b.push(["fire","إنذار بالفصل",1]);
-  b.push(["call","استدعاء للتحقيق",!light&&!isAbsFire()]);
-  b.push(["minutes","محضر تحقيق",0]);
-  if(s.p===W) b.push(["warn","إنذار كتابي",light]);
-  else b.push(["decision","قرار جزاء",light]);
+  if(isAbsFire()) b.push(["fire",t("إنذار بالفصل","Dismissal warning"),1]);
+  b.push(["call",t("استدعاء للتحقيق","Investigation summons"),!light&&!isAbsFire()]);
+  b.push(["minutes",t("محضر تحقيق","Investigation record"),0]);
+  if(s.p===W) b.push(["warn",t("إنذار كتابي","Written warning"),light]);
+  else b.push(["decision",t("قرار جزاء","Penalty decision"),light]);
   $("docBtns").innerHTML=b.map(x=>`<button class="${x[2]?'main':''}" data-doc="${x[0]}">${x[1]}</button>`).join("");
   document.querySelectorAll("[data-doc]").forEach(el=>el.onclick=()=>openDoc(el.dataset.doc));
 }
+window.addEventListener("mqlang",()=>{drawTabs();drawList();if(sel)calc();});
 
 /* ===== النماذج ===== */
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const v=(id,blank="................................")=>{const x=$(id).value.trim();return x?esc(x):blank;};
-function dval(id){const x=$(id).value;return x?dstr(new Date(x)):"......../......../........";}
+function dval(id){const x=$(id).value;return x?dstrA(new Date(x)):"......../......../........";}
 function invval(){const x=$("fInv").value;if(!x)return "يوم ............ الموافق ......../......../........ الساعة ..........";const d=new Date(x);return d.toLocaleDateString("ar-SA-u-ca-gregory",{weekday:"long",year:"numeric",month:"long",day:"numeric"})+" الساعة "+d.toLocaleTimeString("ar-SA",{hour:"numeric",minute:"2-digit"});}
 function head(title){
-  return `<div class="top"><span><b>${v("fCo","اسم المنشأة: ....................")}</b></span><span>الرقم: ............ &nbsp; التاريخ: ${dstr(new Date())}</span></div><h2>${title}</h2>`;
+  return `<div class="top"><span><b>${v("fCo","اسم المنشأة: ....................")}</b></span><span>الرقم: ............ &nbsp; التاريخ: ${dstrA(new Date())}</span></div><h2>${title}</h2>`;
 }
 function empTable(){
   return `<table><tr><th>اسم الموظف</th><td>${v("fName")}</td></tr><tr><th>الرقم الوظيفي</th><td>${v("fId")}</td></tr><tr><th>المسمى الوظيفي</th><td>${v("fJob")}</td></tr><tr><th>الإدارة / القسم</th><td>${v("fDept")}</td></tr><tr><th>الجنسية</th><td>${v("fNat")}</td></tr></table>`;
@@ -579,6 +608,67 @@ $("copy").onclick=()=>{
   navigator.clipboard.writeText(window._sum).then(()=>{$("copied").textContent=" ✓ تم النسخ";setTimeout(()=>$("copied").textContent="",2000);});
 };
 drawTabs(); drawList();
+</script>
+<script id="mq-lang-js">
+(function(){
+var D={"منقذك": "Your HR Lifesaver", "Your HR Lifesaver": "منقذك", "منقذ السيرة 🛟": "CV Saver 🛟", "حد نطاقات 📈": "Nitaqat Threshold 📈", "هيكلة الراتب والتكلفة 💰": "Salary & Cost 💰", "بطاقات منقذك 🎉": "Lifesaver Cards 🎉", "الخطابات والنماذج ✉": "Letters & Forms ✉", "دليل الجزاءات ⚖️": "Penalties Guide ⚖️", "رصيد الإجازات 🌴": "Leave Balance 🌴", "لوحة المؤشرات والأداء 📊": "KPIs & Performance 📊", "المخالصة ونهاية الخدمة 🤝": "Settlement & EOSB 🤝", "لوحة المؤشرات 📊": "HR Dashboard 📊", "أداء الموظف 🎯": "Employee Performance 🎯", "النماذج 📋": "Forms 📋", "الحاسبات ←": "Calculators →", "الخطابات ✉": "Letters ✉", "مؤشرات المنشأة 📊": "Company KPIs 📊", "← الرئيسية": "← Home", "الرئيسية ←": "Home →", "اكتب أرقامك في الخانات الملوّنة، والنتيجة تطلع على طول": "Type your numbers in the colored fields — results appear instantly", "من تاريخ المباشرة": "From joining date", "من رصيد حالي (لآخر يوم عمل)": "From current balance (to last working day)", "اختر": "Select", "رقم آخر": "Other number", "نظام العمل: 21 يوم في السنة، و30 يوم بعد إكمال 5 سنوات. اختر اللي ينطبق عليك.": "Labor Law: 21 days a year, and 30 days after completing 5 years. Choose what applies to you.", "الرصيد المتبقي": "Remaining balance", "المستحق": "Accrued", "المتبقي": "Remaining", "تصفير": "Reset", "نسخ النتيجة": "Copy result", "المخالصة الكاملة": "Full settlement", "المكافأة فقط": "EOSB only", "انتهاء مدة العقد أو عدم تجديده": "Contract expiry or non-renewal", "اتفاق الطرفين": "Mutual agreement", "إنهاء من صاحب العمل لسبب مشروع": "Termination by employer for a valid reason", "إنهاء من صاحب العمل لغير سبب مشروع": "Termination by employer without a valid reason", "بلوغ سن التقاعد": "Reaching retirement age", "إغلاق المنشأة نهائيًا": "Permanent closure of the establishment", "وفاة الموظف": "Death of the employee", "عجز الموظف كليًا عن العمل": "Total disability of the employee", "إنهاء بسبب المرض بعد استنفاد الإجازة المرضية": "Termination due to illness after sick leave is exhausted", "استقالة الموظف": "Employee resignation", "ترك العمل لإخلال صاحب العمل": "Leaving due to employer breach", "ترك العمل لقوة قاهرة": "Leaving due to force majeure", "الموظفة خلال 6 أشهر من الزواج": "Female employee within 6 months of marriage", "الموظفة خلال 3 أشهر من الولادة": "Female employee within 3 months of giving birth", "خلال فترة التجربة": "During probation", "فصل لارتكاب مخالفة جسيمة": "Dismissal for a serious violation", "الغياب بدون عذر: أكثر من 30 يوم في السنة العقدية أو أكثر من 15 يوم متتالية، بعد إنذار كتابي": "Unexcused absence: over 30 days in the contract year or over 15 consecutive days, after a written warning", "غير محدد المدة": "Indefinite term", "محدد المدة": "Fixed term", "عدد الأيام ÷ 360": "Days ÷ 360", "سنة + شهر ÷ 12 + يوم ÷ 360": "Years + months ÷ 12 + days ÷ 360", "المكافأة على الأجر الفعلي: الأساسي مع البدلات الثابتة.": "The award is based on the actual wage: basic plus fixed allowances.", "المكافأة المستحقة (ريال)": "End-of-service award (SAR)", "أول 5 سنوات": "First 5 years", "بعد 5 سنوات": "After 5 years", "استحقاق كامل": "Full entitlement", "الطريقة الأولى: على الراتب الإجمالي": "Method 1: on gross salary", "الطريقة الثانية: السكن والطعام لآخر يوم في العقد، والمكافأة بدون الطعام": "Method 2: housing & food to contract end; award without food", "سعودي": "Saudi", "غير سعودي": "Non-Saudi", "0 (غير سعودي)": "0 (Non-Saudi)", "الإجمالي كامل": "Full gross", "الإجمالي بدون بدل الطعام": "Gross without food allowance", "الأساسي + السكن": "Basic + housing", "الأساسي فقط": "Basic only", "حسب الطريقة (الأولى: الأيام ÷ 360 · الثانية 365)": "By method (1st: days ÷ 360 · 2nd: 365)", "صافي المستحق (ريال)": "Net due (SAR)", "الإجمالي": "Gross", "مدة الخدمة": "Service period", "الرواتب": "Salaries", "الإجازات": "Leave", "الإضافي": "Overtime", "الغياب": "Absence", "المكافأة": "Award", "الخطابات": "Letters", "خطابات الموارد البشرية الجاهزة": "Ready HR letters", "فتح ←": "Open →", "النماذج": "Forms", "نماذج الموارد البشرية للتعبئة والطباعة": "HR forms to fill and print", "لوحة المؤشرات": "HR Dashboard", "مؤشرات الموارد البشرية الشهرية": "Monthly HR KPIs", "أداء الموظف": "Employee Performance", "تقييم ومتابعة أداء الموظفين": "Evaluate and track employee performance", "هيكلة الراتب": "Salary Structure", "تكلفة الموظف": "Employee Cost", "قبل خصم التأمينات (إجمالي)": "Before GOSI (gross)", "بعد خصم التأمينات (صافي)": "After GOSI (net)", "9.75% للمسجلين في التأمينات قبل 3 يوليو 2024، و10.75% فأعلى للمسجلين بعده. التأمينات على الأساسي + السكن.": "9.75% for those registered in GOSI before 3 July 2024, and 10.75%+ for those registered after. GOSI applies to basic + housing.", "الراتب الإجمالي": "Gross salary", "الأساسي": "Basic", "التأمينات": "GOSI", "الأساسي = الحد ÷ (1 + نسبة السكن)، فيصير الأساسي + السكن = الحد بالضبط. تقدر تغيّر الحد من الجدول.": "Basic = threshold ÷ (1 + housing %), so basic + housing equals the threshold exactly. You can change the threshold in the table.", "حد نطاقات (أساسي + سكن)": "Nitaqat threshold (basic + housing)", "يبدأ من": "Starts", "25 أبريل 2027": "25 April 2027", "25 أبريل 2028": "25 April 2028", "الراتب الأساسي": "Basic salary", "بدل السكن": "Housing allowance", "بدل النقل": "Transport allowance", "خصم التأمينات على الموظف": "Employee GOSI deduction", "صافي الراتب": "Net salary", "تأمينات صاحب العمل": "Employer GOSI", "التكلفة الشهرية على الشركة": "Monthly cost to company", "الجديد (من 3 يوليو 2024)": "New (from 3 July 2024)", "القديم": "Old", "التكلفة الشهرية الفعلية": "Actual monthly cost", "مخصص نهاية الخدمة": "EOSB provision", "التكلفة أعلى من الراتب بـ": "Cost exceeds salary by", "© 2026 إيمان | EMAN HR — جميع الحقوق محفوظة، ويُمنع النسخ أو إعادة النشر دون ذكر المصدر": "© 2026 Eman | EMAN HR — All rights reserved. Copying or republishing without credit is prohibited.", "منقذك · Your HR Lifesaver": "Your HR Lifesaver · منقذك", "الحاسبات للتقدير، وقد تختلف بعض البنود حسب سياسة المنشأة وعقد العمل.": "Calculators are estimates; some items may differ by company policy and employment contract.", "PH:مثال 5000": "e.g. 5000", "تعريف بالراتب": "Salary certificate", "شهادة خبرة": "Experience certificate", "موافقة على إجازة": "Leave approval", "لفت نظر": "Notice of caution", "استدعاء للتحقيق": "Investigation summons", "إنذار أول": "First warning", "إنذار نهائي": "Final warning", "جزاء خصم": "Deduction penalty", "استقالة": "Resignation", "قبول استقالة": "Resignation acceptance", "إنهاء خدمة": "Termination of service", "إخلاء طرف": "Clearance", "عبّ الخانات، والخطاب يتجهز على طول. بعدها اطبعه أو احفظه PDF، أو انسخ النص.": "Fill in the fields and the letter is ready instantly. Then print it, save as PDF, or copy the text.", "حذف الشعار": "Remove logo", "ذكر": "Male", "أنثى": "Female", "هوية وطنية": "National ID", "إقامة": "Iqama", "إظهار الراتب": "Show salary", "إظهار \"خطاب من منقذك\" أسفل الخطاب": "Show \"Letter by Monqethak\" at the bottom", "طباعة / حفظ PDF": "Print / Save PDF", "نسخ النص": "Copy text", "الخطابات استرشادية، وراجعها مع لائحة تنظيم العمل في منشأتك قبل الاستخدام.": "Letters are guidance only — review them against your company's work regulation before use.", "الإجازات والحضور": "Leave & Attendance", "طلب إجازة": "Leave request", "مباشرة عمل بعد إجازة": "Return to work after leave", "طلب استئذان": "Short leave request", "طلب عمل إضافي": "Overtime request", "تعديل حضور / نسيان بصمة": "Attendance correction / missed punch", "كشف الحضور والانصراف الشهري": "Monthly attendance sheet", "طلب عمل عن بُعد": "Remote work request", "طلب تغيير وردية / أوقات دوام": "Shift / working hours change", "طلب مهمة عمل / انتداب": "Business trip request", "تسليم واستلام أعمال": "Work handover", "المالية": "Finance", "طلب سلفة": "Salary advance request", "طلب صرف مصروفات": "Expense claim", "طلب صرف بدل سكن مقدم": "Advance housing allowance request", "العُهد": "Custody", "استلام عهدة": "Custody receipt", "تسليم عهدة": "Custody return", "التوظيف": "Recruitment", "طلب احتياج وظيفي": "Manpower requisition", "تقييم مقابلة وظيفية": "Interview evaluation", "بيانات موظف جديد": "New employee data", "قائمة تهيئة موظف جديد": "Onboarding checklist", "طلب توظيف": "Job application", "بطاقة الوصف الوظيفي": "Job description card", "التحقق من المراجع": "Reference check", "السياسات والإقرارات": "Policies & Acknowledgments", "إقرار استلام لائحة تنظيم العمل": "Work regulation receipt acknowledgment", "تعهد المحافظة على سرية المعلومات": "Confidentiality undertaking", "تحديث بيانات موظف": "Employee data update", "الأداء والتطوير": "Performance & Development", "تقييم فترة التجربة": "Probation evaluation", "تقييم الأداء": "Performance appraisal", "طلب تدريب": "Training request", "طلب نقل": "Transfer request", "ترقية / تعديل راتب": "Promotion / salary adjustment", "تحديد الاحتياجات التدريبية": "Training needs analysis", "تقييم برنامج تدريبي": "Training program evaluation", "التأمين والسلامة": "Insurance & Safety", "إضافة / حذف تأمين طبي": "Medical insurance add / remove", "بلاغ إصابة عمل": "Work injury report", "الانضباط": "Discipline", "محضر تحقيق إداري": "Administrative investigation record", "رصد مخالفة": "Violation report", "قرار جزاء": "Penalty decision", "الطلبات والتواصل": "Requests & Communication", "طلب خطاب": "Letter request", "شكوى / تظلم": "Complaint / grievance", "اقتراح": "Suggestion", "طلب خدمة حكومية": "Government service request", "نهاية الخدمة": "End of Service", "مقابلة نهاية الخدمة": "Exit interview", "طلب استقالة": "Resignation request", "إظهار \"نموذج من منقذك\" أسفل النموذج": "Show \"Form by Monqethak\" at the bottom", "تصفير النموذج": "Reset form", "اكتب مباشرة على النموذج، أو اطبعه فاضي وعبّه باليد.": "Type directly on the form, or print it blank and fill it by hand.", "النماذج استرشادية، وعدّلها حسب لائحة تنظيم العمل وسياسة منشأتك.": "Forms are guidance only — adjust them to your work regulation and company policy.", "الأشهر المحفوظة (اضغط لفتح الشهر):": "Saved months (tap to open):", "القوى العاملة": "Workforce", "الحركة الوظيفية": "Movements", "الحضور والانضباط": "Attendance & Discipline", "التكاليف": "Costs", "التوظيف والتطوير": "Recruitment & Development", "حفظ الشهر": "Save month", "تصفير الشهر": "Reset month", "حذف الشهر المحفوظ": "Delete saved month", "مسح كل البيانات المحفوظة": "Clear all saved data", "تنزيل نسخة احتياطية": "Download backup", "استرجاع نسخة": "Restore backup", "الأشهر المحفوظة تبقى في هذا الجهاز وهذا المتصفح فقط. نزّل نسخة احتياطية كل فترة عشان ما تضيع.": "Saved months stay on this device and browser only. Download a backup regularly so nothing is lost.", "بدون قالب (فارغ)": "No template (blank)", "موظف موارد بشرية": "HR employee", "مبيعات": "Sales", "إداري / سكرتارية": "Administrative / Secretarial", "مشرف تشغيل / عمال": "Operations supervisor / Labor", "100% (لا يتجاوز المستهدف)": "100% (capped at target)", "الأوزان والتقديرات استرشادية، وعدّلها حسب سياسة الأداء في منشأتك.": "Weights and ratings are guidance — adjust them to your company's performance policy.", "بطاقات منقذك": "Lifesaver Cards", "بطاقة رسمية بالعربي والإنجليزي بشعار شركتك، مع إيميل رسمي جاهز.": "An official bilingual card with your company logo, plus a ready formal email.", "اختر المناسبة": "Choose the occasion", "الترحيب والتقدير": "Welcome & Recognition", "المناسبات الوطنية": "National occasions", "المناسبات الدينية": "Religious occasions", "المناسبات الاجتماعية": "Social occasions", "ترحيب بموظف جديد": "Welcome new employee", "اجتياز فترة التجربة": "Passing probation", "شكر وتقدير": "Thanks & appreciation", "موظف الشهر": "Employee of the month", "ذكرى الانضمام": "Work anniversary", "ترقية": "Promotion", "شكر ووداع": "Thanks & farewell", "بيانات شركتك": "Your company details", "شعار الشركة": "Company logo", "اضغط لرفع الشعار (PNG بخلفية شفافة أفضل)": "Tap to upload the logo (transparent PNG works best)", "اسم الشركة بالعربي": "Company name (Arabic)", "اختصار الشركة (اختياري) — يظهر في العنوان": "Company abbreviation (optional) — shown in the title", "اسم الموظف": "Employee name", "المسمى الوظيفي": "Job title", "القسم": "Department", "تاريخ المباشرة / Start Date": "Start date / تاريخ المباشرة", "الجهة المرسلة (عربي)": "Sender (Arabic)", "البطاقة": "The card", "⬇ تحميل البطاقة": "⬇ Download card", "↗ مشاركة": "↗ Share", "🖨 طباعة A4": "🖨 Print A4", "على الجوال: إذا ما نزلت الصورة، اضغط «مشاركة» ثم «حفظ الصورة».": "On mobile: if the image doesn't download, tap “Share” then “Save Image”.", "الإيميل الجاهز": "Ready email", "العنوان": "Subject", "نص الإيميل": "Email body", "📋 نسخ الإيميل": "📋 Copy email", "✉ فتح في البريد": "✉ Open in mail", "أرفق البطاقة مع الإيميل ليكون شكله احترافي.": "Attach the card to the email for a professional look.", "بطاقة الموظف — Employee ID Card": "Employee ID Card — بطاقة الموظف", "تستخدم شعار الشركة واسمها من الأعلى. المقاس الرسمي للبطاقة 85.6 × 54 مم (مثل البطاقة البنكية).": "Uses the company logo and name from above. Official card size is 85.6 × 54 mm (same as a bank card).", "صورة الموظف": "Employee photo", "اضغط لرفع صورة شخصية بخلفية سادة": "Tap to upload a photo with a plain background", "الاسم بالعربي": "Name (Arabic)", "المسمى بالعربي": "Job title (Arabic)", "الرقم الوظيفي": "Employee number", "تاريخ الإصدار": "Issue date", "تاريخ الانتهاء": "Expiry date", "فصيلة الدم (اختياري)": "Blood type (optional)", "رقم الطوارئ (اختياري)": "Emergency number (optional)", "تواصل الشركة (هاتف / موقع)": "Company contact (phone / website)", "لون البطاقة": "Card color", "بني ذهبي": "Golden brown", "أزرق": "Blue", "أخضر": "Green", "عنابي": "Burgundy", "كحلي": "Navy", "رمادي": "Gray", "الوجه الأمامي": "Front side", "الوجه الخلفي": "Back side", "⬇ تحميل الوجهين": "⬇ Download both sides", "🖨 طباعة بالمقاس الحقيقي": "🖨 Print at actual size", "الطباعة تطلع الوجهين على ورقة A4 بالمقاس الحقيقي للقص، أو أرسلي الصورتين لمطبعة بطاقات PVC.": "Printing places both sides on an A4 sheet at actual size for cutting, or send the two images to a PVC card printer.", "منقذك — Your HR Lifesaver | إيمان خالد": "Your HR Lifesaver — منقذك | Eman Khaled", "— جميع الحقوق محفوظة. يُمنع نسخ الأداة أو إعادة نشرها دون إذن.": "— All rights reserved. Copying or republishing this tool without permission is prohibited.", "حاسبات وأدوات الموارد البشرية": "HR calculators & tools", "فاحص السيرة الذاتية ATS": "ATS Resume Checker", "اعرف هل سيرتك تعدّي أنظمة الفرز الآلي — درجة شاملة، كلمات مفتاحية ناقصة، وإصلاحات مرتبة بالأولوية.": "Find out if your CV passes automated screening — an overall score, missing keywords, and fixes ranked by priority.", "📄 رفع ملف": "📄 Upload file", "✍️ لصق النص": "✍️ Paste text", "اضغط لاختيار سيرتك": "Tap to choose your CV", "أو اسحبها هنا": "or drag it here", "PDF أو DOCX — بالعربي أو الإنجليزي": "PDF or DOCX — Arabic or English", "/ 30,000 حرف": "/ 30,000 characters", "الوصف الوظيفي": "Job description", "(اختياري — ننصح فيه)": "(optional — recommended)", "بإضافة الوصف الوظيفي تحصل على درجة تطابق الكلمات المفتاحية — الهدف 80 أو أعلى.": "Add the job description to get a keyword match score — aim for 80 or higher.", "🔍 افحص سيرتي الآن": "🔍 Check my CV now", "🔒 الفحص يتم داخل جهازك بالكامل — سيرتك لا تُرفع ولا تُحفظ في أي مكان.": "🔒 The check runs entirely on your device — your CV is never uploaded or stored.", "من 100": "out of 100", "🛠️ أهم الإصلاحات بالترتيب": "🛠️ Top fixes in order", "🎯 الكلمات المفتاحية": "🎯 Keywords", "موجودة": "Found", "تطابق جزئي": "Partial match", "ناقصة": "Missing", "★ = أهمية عالية": "★ = high importance", "📋 فحوصات التنسيق ATS": "📋 ATS formatting checks", "💥 قوة النقاط (Bullets)": "💥 Bullet strength", "✨ حوّل سيرتك لقالب ATS": "✨ Convert your CV to an ATS template", "✨ حسّن سيرتي تلقائياً": "✨ Improve my CV automatically", "✨ سيرتك بعد التحسين — جاهزة بقالب ATS": "✨ Your improved CV — ready in an ATS template", "🔎 راجع سيرتك قبل التحميل — حسّنا الصياغة بأسلوب السيرة الرسمي تلقائياً بدون تغيير معلوماتك.": "🔎 Review your CV before downloading — we polished the wording in a formal CV style without changing your information.", "⬇️ تحميل السيرة Word": "⬇️ Download CV (Word)", "📄 تحميل السيرة PDF": "📄 Download CV (PDF)", "📋 نسخ السيرة كنص": "📋 Copy CV as text", "✏️ تعديل يدوي (اختياري)": "✏️ Manual edit (optional)", "لغة العناوين": "Heading language", "العربية": "Arabic", "عربي + English": "Arabic + English", "الاسم": "Name", "البريد الإلكتروني": "Email", "الجوال": "Mobile", "المدينة": "City", "🔄 حدّث الدرجة بعد تعديلي": "🔄 Update score after my edits", "📋 نسخ التقرير": "📋 Copy report", "↩️ فحص سيرة أخرى": "↩️ Check another CV", "إيمان خالد": "Eman Khaled", "— منقذك | EMAN HR. جميع الحقوق محفوظة.": "— Your HR Lifesaver | EMAN HR. All rights reserved.", "أدوات HR أخرى:": "Other HR tools:", "PH:الصق نص سيرتك الذاتية هنا...": "Paste your CV text here...", "PH:الصق إعلان الوظيفة أو المتطلبات عشان نقيس تطابق الكلمات المفتاحية...": "Paste the job posting or requirements so we can measure keyword match...", "اختر المخالفة ومرة التكرار، ويطلع لك الجزاء النظامي وقيمته والإجراءات والنماذج.": "Choose the violation and how many times it occurred — get the statutory penalty, its value, the procedure and ready forms.", "اختر المخالفة": "Choose the violation", "مواعيد العمل": "Working hours", "تنظيم العمل": "Work organization", "سلوك العامل": "Employee conduct", "كم مرة تكررت المخالفة؟": "How many times has it occurred?", "أول مرة": "1st time", "ثاني مرة": "2nd time", "ثالث مرة": "3rd time", "رابع مرة": "4th time", "تاريخ إبلاغ الموظف بآخر جزاء عن نفس المخالفة (اختياري)": "Date the employee was notified of the last penalty for the same violation (optional)", "إذا مضى عليه أكثر من 180 يوم، ما يجوز تشديد الجزاء.": "If more than 180 days have passed, the penalty may not be escalated.", "بيانات الحساب (اختياري)": "Calculation details (optional)", "الأجر الشهري المعتمد للحسم (ريال)": "Monthly wage used for deductions (SAR)", "غرامات خُصمت عليه هذا الشهر (بالأيام)": "Fines already deducted this month (in days)", "تاريخ علم المنشأة بالمخالفة": "Date the company learned of the violation", "تاريخ ثبوت المخالفة (نهاية التحقيق)": "Date the violation was proven (end of investigation)", "الأجر اليومي = الأجر الشهري ÷ 30 (طريقة الحساب المعتادة، واتبع سياسة منشأتك إذا كانت تحسبه بطريقة ثانية).": "Daily wage = monthly wage ÷ 30 (the usual method — follow your company policy if it calculates differently).", "النتيجة": "Result", "اختر مخالفة من القائمة.": "Choose a violation from the list.", "انسخ ملخص الجزاء": "Copy penalty summary", "الإجراءات خطوة بخطوة": "Step-by-step procedure", "النماذج الجاهزة": "Ready forms", "عبّي البيانات مرة وحدة، وتنعبّى في كل النماذج تلقائيًا. اللي تتركه فاضي يطلع فراغ تكتبه باليد.": "Enter the details once and they fill every form automatically. Anything left empty prints as a blank to fill by hand.", "اسم المنشأة": "Company name", "الإدارة / القسم": "Department / Section", "الجنسية": "Nationality", "تاريخ المخالفة": "Violation date", "موعد التحقيق": "Investigation date & time", "مكان التحقيق": "Investigation place", "الشهر اللي ينخصم فيه (للغرامات)": "Deduction month (for fines)", "اسم المسؤول المُصدِر": "Issuing manager name", "وظيفة المسؤول": "Manager's title", "تفاصيل الواقعة (بحياد، بدون أحكام)": "Incident details (neutral, no judgments)", "قواعد لازم تعرفها قبل أي جزاء": "Rules to know before any penalty", "المصدر:": "Source:", "© منقذك · EMAN HR — جميع الحقوق محفوظة": "© Your HR Lifesaver · EMAN HR — All rights reserved", "PH:ابحث: تأخر، غياب، نوم، تدخين…": "Search: late, absence, sleeping, smoking…", "PH:مثال: 6000": "e.g. 6000", "PH:مثال: مكتب الموارد البشرية": "e.g. HR office", "PH:مثال: ديسمبر 2026": "e.g. December 2026", "PH:مثال: مدير الموارد البشرية": "e.g. HR Manager", "PH:مثال: تأخر عن الحضور 40 دقيقة يوم الأحد دون إذن مسبق": "e.g. Arrived 40 minutes late on Sunday without prior permission", "تم النسخ": "Copied", "✓ الإدخال صحيح": "✓ Input is valid", "المكافأة كاملة": "Full award", "تاريخ النهاية (الاحتساب أو آخر يوم عمل)": "End date (calculation or last working day)", "الأيام المستخدمة": "Used days", "إجازات بعد تاريخ الرصيد": "Leave after balance date", "الرصيد في آخر يوم عمل": "Balance on last working day", "الطريقة الأولى: الراتب الأخير على الإجمالي ÷ أيام الشهر × أيام الدوام، والمكافأة على الإجمالي. الطريقة الثانية: الأساسي والبدلات الأخرى على أيام الدوام، والسكن والطعام لين آخر يوم في العقد، والمكافأة على الإجمالي بدون الطعام. الإجازات والإضافي والغياب نفسها في الطريقتين.": "Method 1: last salary on gross ÷ days in month × days worked, and the award on gross. Method 2: basic and other allowances on days worked, housing and food until the last day of the contract, and the award on gross without food. Leave, overtime and absence are the same in both methods.", "تأمينات صاحب العمل على الأساسي + السكن بحد أعلى 45,000: السعودي النظام القديم 11.75%، والجديد 12.75% وتتحدث تلقائيًا كل يوليو (13.25% من يوليو 2027، و13.75% من يوليو 2028)، وغير السعودي 2%. الرسوم والتأمين الطبي تختلف حسب المنشأة.": "Employer GOSI on basic + housing, capped at 45,000: Saudi old system 11.75%, new 12.75%, updating automatically each July (13.25% from July 2027 and 13.75% from July 2028); non-Saudi 2%. Fees and medical insurance vary by company.", "اختر قالب أو اكتب مؤشراتك مباشرة على النموذج. نسبة التحقيق = الفعلي ÷ المستهدف (وإذا كان \"الأقل أفضل\" = المستهدف ÷ الفعلي). والدرجة = نسبة التحقيق × الوزن.": "Choose a template or type your KPIs directly on the form. Achievement = actual ÷ target (if “lower is better”: target ÷ actual). Score = achievement × weight.", "Penalties Guide": "دليل الجزاءات"}, T={}, USE_T=false;
+var R={};for(var k in D)R[D[k]]=k;
+var TK=Object.keys(T).sort(function(a,b){return b.length-a.length});
+var AR=/[؀-ۿ]/;
+var DYN='.how,.status,.v,.rows';
+var SKIP='script,style,noscript,.mq-lang,#paper,#doc,#viewer,[data-en],textarea';
+function isPairSub(n){var p=n.parentNode;return p&&/^(EM|SMALL|I)$/.test(p.tagName)&&p.parentNode&&p.parentNode.matches&&p.parentNode.matches('label,h1,h2,.k')}
+function swapPairs(){
+  document.querySelectorAll('label,h1,h2,.k').forEach(function(el){
+    if(el.closest(SKIP))return;
+    var sub=el.querySelector(':scope>em,:scope>small,:scope>i'); if(!sub||!sub.textContent.trim())return;
+    var main=null;
+    for(var i=0;i<el.childNodes.length;i++){var n=el.childNodes[i]; if(n===sub)continue;
+      if(n.nodeType===3&&n.textContent.trim()){main=n;break}
+      if(n.nodeType===1&&/^(SPAN|B)$/.test(n.tagName)&&n.textContent.trim()&&!n.querySelector('input,select')){main=n;break}}
+    if(!main)return;
+    var a=main.textContent,b=sub.textContent; main.textContent=b; sub.textContent=a;
+  });
+}
+function setT(n,r){var p=n.parentNode; if(p&&p.tagName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',n.textContent); n.textContent=r;}
+function look(map,s){ if(map[s]!==undefined)return map[s]; var t=s.trim(); if(t&&map[t]!==undefined)return s.replace(t,map[t]); return null; }
+function tok(s){ if(!AR.test(s))return null; var o=s; for(var i=0;i<TK.length;i++){ if(o.indexOf(TK[i])>-1) o=o.split(TK[i]).join(T[TK[i]]); } return o===s?null:o; }
+function walk(map,root){
+  var w=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT,null),n,list=[];
+  while(n=w.nextNode()){ if(!n.parentNode||n.parentNode.closest(SKIP)||isPairSub(n))continue; list.push(n); }
+  list.forEach(function(n){ var r=look(map,n.textContent); if(r===null&&map===D&&USE_T&&n.parentNode.closest(DYN))r=tok(n.textContent); if(r!==null)setT(n,r); });
+  (root||document).querySelectorAll('[placeholder]').forEach(function(e){ if(e.parentNode.closest(SKIP))return; var r=map['PH:'+e.placeholder]; if(r!==undefined){e.dataset.ph=e.placeholder; e.placeholder=r.replace(/^PH:/,'');} else if(map===R&&e.dataset.ph){e.placeholder=e.dataset.ph;} });
+}
+function swapRich(l){
+  document.querySelectorAll('[data-en]').forEach(function(e){ if(l==='en'){ if(!e.dataset.ar)e.dataset.ar=e.innerHTML; e.innerHTML=e.dataset.en; } else if(e.dataset.ar){ e.innerHTML=e.dataset.ar; } });
+}
+var cur='ar', obs=null, busy=false;
+function observe(on){
+  if(obs){obs.disconnect();obs=null}
+  if(!on)return;
+  obs=new MutationObserver(function(ms){ if(busy)return; busy=true;
+    ms.forEach(function(m){
+      if(m.type==='characterData'){ var n=m.target; if(n.parentNode&&!n.parentNode.closest(SKIP)&&!isPairSub(n)){ var r=look(D,n.textContent); if(r===null&&USE_T&&n.parentNode.closest(DYN))r=tok(n.textContent); if(r!==null)setT(n,r); } }
+      m.addedNodes&&m.addedNodes.forEach(function(a){ if(a.nodeType===3){ if(a.parentNode&&!a.parentNode.closest(SKIP)){ var r=look(D,a.textContent); if(r===null&&USE_T&&a.parentNode.closest(DYN))r=tok(a.textContent); if(r!==null)setT(a,r); } } else if(a.nodeType===1&&!a.closest(SKIP)) walk(D,a); });
+    }); busy=false; });
+  obs.observe(document.body,{subtree:true,childList:true,characterData:true});
+}
+function setLang(l,init){
+  if(l===cur)return;
+  observe(false);
+  swapPairs(); walk(l==='en'?D:R); swapRich(l);
+  document.documentElement.lang=l; document.documentElement.dir=(l==='en'?'ltr':'rtl'); cur=l;
+  document.querySelectorAll('.mq-lang button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});
+  try{localStorage.setItem('mq_lang',l)}catch(e){}
+  window.dispatchEvent(new Event('mqlang'));
+  if(l==='en')observe(true);
+  else if(USE_T&&!init){ document.querySelectorAll('input,select').forEach(function(e){ if(e.offsetParent!==null) e.dispatchEvent(new Event('input',{bubbles:true})); }); }
+}
+document.querySelectorAll('option').forEach(function(o){ if(!o.hasAttribute('value')) o.setAttribute('value',o.textContent); });
+document.querySelectorAll('.mq-lang button').forEach(function(b){b.onclick=function(){setLang(b.dataset.l)}});
+function boot(){ try{ if(localStorage.getItem('mq_lang')==='en')setLang('en',true) }catch(e){} }
+if(document.readyState==='complete')setTimeout(boot,0); else window.addEventListener('load',function(){setTimeout(boot,0)});
+})();
 </script>
 </body>
 </html>
