@@ -399,7 +399,7 @@ const AR_VERBS=['ادرت','قدت','طورت','حققت','نفذت','اشرفت
 const PASSIVE=/(responsible for|duties included|duties include|tasked with|in charge of|worked on|helped with|\bwas\b|\bwere\b|\bbeen\b|مسؤول عن|مسؤوله عن|مسوول عن|تم |يتم |من مهامي|كانت مهامي|المساعده في|ساعدت في)/;
 const BULLET_RE=/^\s*([•\-\*▪●◦○–—►✓✔➤■□·]|\d{1,2}[.)])\s*/;
 
-function isVerb(w){const n=norm(w).replace(/^و/,'');if(!window.__AV){try{window.__AV=new Set([...Object.values(AR_MAP).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0]).replace(/^ال/,''))])}catch(e){window.__AV=new Set()}}if(EN_VERBS.has(n)||AR_VERBS.includes(n)||AR_VERBS.includes(n.replace(/^ال/,''))||window.__AV.has(n))return true;
+function isVerb(w){const n=norm(w).replace(/^و/,'');if(!window.__AV){try{window.__AV=new Set([...Object.values(AR_MAP).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0])),...Object.values(AR_M_SRC).map(v=>norm(v.split(' ')[0]).replace(/^ال/,''))])}catch(e){window.__AV=new Set()}}if(EN_VERBS.has(n)||(/^[a-z]{4,}ed$/.test(n)&&!['need','seed','speed','feed','breed','bred','red','bed','united','based','related','detailed','skilled','advanced','limited','certified','qualified','dedicated','motivated','talented','experienced'].includes(n))||AR_VERBS.includes(n)||AR_VERBS.includes(n.replace(/^ال/,''))||window.__AV.has(n))return true;
   // Arabic first-person past verb: أغلقت، تابعت، هيأت، استكملت… (not plurals ending in ـات)
   if(/^[\u0621-\u064A]{2,5}[أإ]ت$/.test(String(w).replace(/^و/,'').replace(/[\u064B-\u0652]/g,'')))return true; // هيأت، أنشأت، بدأت
   return /^[\u0621-\u064A]{3,7}ت$/.test(n)&&!/ات$/.test(n)&&!/^ال/.test(n)&&!['وقت','بيت','صوت','ثابت','مؤقت','سكوت'].includes(n)}
@@ -444,6 +444,36 @@ function matchKeywords(kws,cv){
     return {...k,st};
   });
 }
+
+
+/* ---------- spelling: common CV misspellings (EN + AR) ---------- */
+const SP_EN={jiddah:'Jeddah',jedda:'Jeddah',jidda:'Jeddah',jaddah:'Jeddah',jeddha:'Jeddah',jedah:'Jeddah',riyad:'Riyadh',ryadh:'Riyadh',riyadth:'Riyadh',ryiadh:'Riyadh',damam:'Dammam',dammaam:'Dammam',makka:'Makkah',suadi:'Saudi',saudia:'Saudi',arabiya:'Arabia',
+managment:'management',mangement:'management',manegement:'management',experiance:'experience',expereince:'experience',experince:'experience',experiences:null,responsiblity:'responsibility',responsibilty:'responsibility',responsiblities:'responsibilities',reponsible:'responsible',responsable:'responsible',
+recieve:'receive',recieved:'received',acheive:'achieve',acheived:'achieved',acheivement:'achievement',acheivements:'achievements',adminstration:'administration',administation:'administration',adminstrative:'administrative',administartive:'administrative',
+comunication:'communication',communcation:'communication',comunications:'communications',coordiantion:'coordination',cordination:'coordination',coordenation:'coordination',employess:'employees',empolyee:'employee',empolyees:'employees',employes:'employees',
+recrutiment:'recruitment',recruitement:'recruitment',recruiment:'recruitment',recrutment:'recruitment',maintanance:'maintenance',maintainance:'maintenance',enviroment:'environment',profesional:'professional',proffesional:'professional',proffessional:'professional',
+univeristy:'university',universty:'university',univercity:'university',bachlor:'Bachelor',bachelour:'Bachelor',batchelor:'Bachelor',bacholar:'Bachelor',diplome:'diploma',deploma:'diploma',certificat:'certificate',certifcate:'certificate',excell:'Excel',offical:'official',
+succesful:'successful',successfull:'successful',succesfully:'successfully',accomodation:'accommodation',attendence:'attendance',attendace:'attendance',documention:'documentation',occured:'occurred',seperate:'separate',langauge:'language',langauges:'languages',languges:'languages',
+englich:'English',engilsh:'English',englsih:'English',arbic:'Arabic',arabice:'Arabic',detial:'detail',detials:'details',procces:'process',proccess:'process',proccessing:'processing',abilty:'ability',knowlege:'knowledge',skils:'skills',teamwrok:'teamwork',oracel:'Oracle',
+analisys:'analysis',anaylsis:'analysis',analysys:'analysis',reprot:'report',reprots:'reports',sallary:'salary',salery:'salary',payrol:'payroll',secratary:'secretary',secretery:'secretary',assistent:'assistant',asistant:'assistant',supervisior:'supervisor',superviser:'supervisor',
+commitee:'committee',comittee:'committee',benifits:'benefits',benefites:'benefits',performence:'performance',perfomance:'performance',develope:'develop',developement:'development',relaitions:'relations',realtions:'relations',sucess:'success',strenght:'strength',calender:'calendar',
+untill:'until',thier:'their',wich:'which',beleive:'believe',fluant:'fluent',fleunt:'fluent',intermidiate:'intermediate',begginer:'beginner',advanse:'advanced',imployee:'employee',reqeusts:'requests',requsts:'requests'};
+const SP_AR={'جده':'جدة','السعوديه':'السعودية','المملكه':'المملكة','العربيه':'العربية','الانجليزيه':'الإنجليزية','الإنجليزيه':'الإنجليزية','اللغه':'اللغة','الاداره':'الإدارة','الإداره':'الإدارة','اداره':'إدارة','إداره':'إدارة','البشريه':'البشرية','خبره':'خبرة','الخبره':'الخبرة','شهاده':'شهادة','الشهاده':'الشهادة','دوره':'دورة','تدريبيه':'تدريبية','الجامعه':'الجامعة','جامعه':'جامعة','الشركه':'الشركة','شركه':'شركة','مسؤوليه':'مسؤولية','مهاره':'مهارة','السيره':'السيرة','الذاتيه':'الذاتية','الوظيفيه':'الوظيفية','الماليه':'المالية','المحاسبه':'المحاسبة','الهندسه':'الهندسة','العامه':'العامة','المهنيه':'المهنية','الاداريه':'الإدارية','الإداريه':'الإدارية','اداريه':'إدارية','الحكوميه':'الحكومية','المكتبيه':'المكتبية','انشاء الله':'إن شاء الله','إنشاء الله':'إن شاء الله','الإنجليزيّه':'الإنجليزية'};
+const AR_B='(^|[\\s،,.:؛()\\-|•/])',AR_E='(?=$|[\\s،,.:؛()\\-|•/])';
+function spellIssues(text){const out=[],seen=new Set();const add=(w,r)=>{const k=w+'→'+r;if(!seen.has(k)){seen.add(k);out.push({w,r})}};
+  const T=String(text).replace(/[\w.+-]+@[\w-]+\.[\w.]+/g,' ').replace(/(https?:\/\/)?(www\.)?[\w-]+\.(com|net|org|sa|io)(\/\S*)?/gi,' ');
+  (T.match(/[A-Za-z]+/g)||[]).forEach(w=>{const r=SP_EN[w.toLowerCase()];if(r)add(w,/^[A-Z]/.test(w)&&/^[a-z]/.test(r)?r[0].toUpperCase()+r.slice(1):r)});
+  Object.keys(SP_AR).forEach(w=>{const m=T.match(new RegExp(AR_B+'(وب|ول|و|ب|ف)?'+w+AR_E));if(m)add((m[2]||'')+w,(m[2]||'')+SP_AR[w])});
+  // repeated word: «the the», «في في»
+  (T.match(/(^|\s)([A-Za-zء-ي]{2,})\s+\2(?=\s|$|[.,،])/gi)||[]).forEach(m=>{const w=m.trim().split(/\s+/)[0];if(!/^(very|so|بعد|جدا)$/i.test(w))add(m.trim(),w)});
+  // missing space after a comma/period: «records,attendance»
+  (T.match(/[a-z]{3,}[,.][A-Z]?[a-z]{3,}/g)||[]).filter(m=>!/^(e\.g|i\.e)/i.test(m)).forEach(m=>add(m,m.replace(/([,.])/,'$1 ')));
+  return out}
+function spellFix(text){let t=String(text);
+  t=t.replace(/[A-Za-z]+/g,w=>{if(/@|\./.test(w))return w;const r=SP_EN[w.toLowerCase()];return r?(/^[A-Z]/.test(w)&&/^[a-z]/.test(r)?r[0].toUpperCase()+r.slice(1):r):w});
+  Object.keys(SP_AR).sort((a,b)=>b.length-a.length).forEach(w=>{t=t.replace(new RegExp(AR_B+'(وب|ول|و|ب|ف)?'+w+AR_E,'g'),(all,p1,p2)=>p1+(p2||'')+SP_AR[w])});
+  t=t.replace(/(^|\s)([A-Za-zء-ي]{2,})(\s+\2)+(?=\s|$|[.,،])/gi,'$1$2');
+  return t}
 
 /* ---------- bullets ---------- */
 function getBullets(text){
@@ -550,6 +580,7 @@ function analyze(cv,jd,meta){
   }else F.push({w:4,tag:'الكلمات المفتاحية',t:'أضف الوصف الوظيفي وأعد الفحص عشان تعرف الكلمات المفتاحية الناقصة لكل وظيفة تتقدم لها.'});
   const nv=scored.filter(b=>!b.verb).length;if(scored.length&&nv/scored.length>.4)F.push({w:7,tag:'قوة النقاط',t:`${nv} من نقاطك لا تبدأ بفعل قوي — ابدأ كل نقطة بكلمة إنجاز مثل: إدارة، تطوير، تحقيق، خفض (Led, Developed, Achieved).`});
   const np=scored.filter(b=>b.pas).length;if(np)F.push({w:5,tag:'قوة النقاط',t:`${np} نقطة بصياغة سلبية مثل «مسؤول عن» أو «تم» — حوّلها لصياغة فاعلة تبرز دورك.`});
+  const SPx=spellIssues(cv);if(SPx.length)F.push({w:12,tag:'الإملاء',t:`فيه ${SPx.length} خطأ إملائي — صحّحها قبل الإرسال: ${SPx.slice(0,8).map(x=>`«${x.w}» ← «${x.r}»`).join('، ')}${SPx.length>8?'…':''}`});
   F.sort((a,b)=>b.w-a.w);
   return {total,fmtScore,bScore,kwScore,C,kw,scored,detected:B.detected,F:F.slice(0,10),words};
 }
@@ -619,7 +650,7 @@ const SECS=[
  ['skills','المهارات','Skills',/^(skills|technical skills|core competencies|competencies|key skills|expertise|soft skills|المهارات.*|مهارات.*|الكفاءات)$/],
  ['certs','الدورات والشهادات','Certifications & Courses',/^(certifications?|certificates|courses|training( courses)?|licenses?|الدورات.*|الشهادات.*|التدريب.*|الرخص.*)$/],
  ['langs','اللغات','Languages',/^(languages|اللغات|اللغه)$/],
- ['other','معلومات إضافية','Additional Information',/^(projects|volunteer.*|achievements|awards|interests|hobbies|المشاريع|التطوع.*|الانجازات|الجوائز|الهوايات|معلومات اضافيه)$/],
+ ['other','معلومات إضافية','Additional Information',/^(additional information|additional info|projects|volunteer.*|achievements|awards|interests|hobbies|المشاريع|التطوع.*|الانجازات|الجوائز|الهوايات|معلومات اضافيه)$/],
 ];
 const DROP=/^(references|المعرفون|المراجع|personal (info|information|details)|معلومات شخصيه|البيانات الشخصيه)$/;
 const EMAIL_RE=/[\w.+-]+@[\w-]+\.[\w.]+/,PHONE_RE=/(\+?966|00966)?[\s-]?0?5\d(?:[\s-]?\d){7}|\+?\d[\d\s-]{8,}\d/,LI_RE=/(https?:\/\/)?(www\.)?linkedin\.com\/[^\s|,]+/i;
@@ -628,10 +659,22 @@ function headOf(line){
   if(!c||c.split(' ').length>5)return null;
   if(DROP.test(c))return 'drop';
   for(const s of SECS)if(s[3].test(c))return s[0];
+  const j=c.replace(/ /g,'');if(/^[a-z]+$/.test(j)&&c.split(' ').length<=3){if(DROP.test(j))return 'drop';for(const s of SECS)if(s[3].test(j))return s[0];}
   return null;
 }
 function parseCV(text){
-  const lines=text.split('\n').map(l=>l.replace(/\t+/g,' ').trim()).filter(Boolean);
+  const lines=[];
+  text.split('\n').map(l=>l.replace(/\t+/g,' ').trim()).forEach(l=>{
+    l=l.replace(/(^|\s|•)\d{1,2}\s*\/\s*\d{1,2}(?=\s|•|$)/g,'$1').replace(/(•\s*){2,}/g,'• ').replace(/^[\s•|]+|[\s•|]+$/g,'').trim(); // page numbers 1/2
+    if(!l||/^(page|صفحه|صفحة)\s*\d+/i.test(l))return;
+    // a heading glued inside a line («… • LANGUAGES • Arabic English • Additional Information») → split it out
+    const segs=l.split(/\s*[•|]\s*/);
+    if(segs.length>1&&!EMAIL_RE.test(l)&&!PHONE_RE.test(l)&&!LI_RE.test(l)&&segs.some(x=>headOf(x))&&!segs.every(x=>headOf(x))){let buf=[];const flush=()=>{if(buf.length)lines.push(buf.join(' • '));buf=[]};
+      segs.forEach(x=>{if(!x)return;const h=headOf(x);if(h){flush();lines.push(x)}else{
+        const m=x.match(/^(.*?)\s+(additional information|languages|skills|education|certifications?|courses|معلومات اضافية|معلومات إضافية|اللغات)$/i);
+        if(m&&headOf(m[2])){buf.push(m[1]);flush();lines.push(m[2])}else buf.push(x)}});flush();return}
+    lines.push(l);
+  });
   const out={name:'',title:'',email:'',phone:'',li:'',city:'',sec:{}};SECS.forEach(s=>out.sec[s[0]]=[]);
   const em=text.match(EMAIL_RE);if(em)out.email=em[0];
   const li=text.match(LI_RE);if(li)out.li=li[0].replace(/^https?:\/\/(www\.)?/,'').replace(/[?#].*$/,'').replace(/\/$/,'');
@@ -657,12 +700,15 @@ function parseCV(text){
     const contactLine=EMAIL_RE.test(h)||PHONE_RE.test(h)||LI_RE.test(h);
     if(!contactLine&&parts.length<=1){if(parts[0])rest.push(parts[0]);return}
     parts.forEach(x=>{
+      if(headOf(x))return;
       if(/^[a-z0-9][a-z0-9_.-]{2,}$/i.test(x)&&/[-_.]/.test(x)&&!out.li)out.li=x;
       else if(x.split(/\s+/).length<=3&&!/\d/.test(x)&&!out.city)out.city=x;
       else rest.push(x);
     });
   });
   if(rest.length)out.name=rest.shift();
+  const CITY_RE=/(saudi|ksa|jeddah|jiddah|riyadh|dammam|makkah|mecca|madinah|khobar|السعودي|جده|جدة|الرياض|الدمام|مكه|مكة|المدينه|المدينة|الخبر)/i;
+  if(rest.length&&!out.city&&CITY_RE.test(rest[0])&&rest[0].split(/\s+/).length<=4)out.city=rest.shift();
   if(rest.length&&rest[0].split(/\s+/).length<=7)out.title=rest.shift();
   if(rest.length&&rest[0].split(/\s+/).length<=4&&!/\d/.test(rest[0]))out.city=rest.shift();
   if(rest.length)out.sec.summary.unshift(...rest);
@@ -698,8 +744,29 @@ const EN_MAP={'responsible for':'Managed','in charge of':'Led','tasked with':'Le
 // formal Arabic CV style: bullets start with a verbal noun (إدارة، إعداد، تطبيق…)
 const AR_M_SRC={'أدرت':'إدارة','أعددت':'إعداد','طبقت':'تطبيق','حدثت':'تحديث','تابعت':'متابعة','رفعت':'رفع','راجعت':'مراجعة','نسقت':'تنسيق','نفذت':'تنفيذ','طورت':'تطوير','حسنت':'تحسين','دربت':'تدريب','وظفت':'توظيف','استقطبت':'استقطاب','حللت':'تحليل','صممت':'تصميم','بنيت':'بناء','أطلقت':'إطلاق','أصدرت':'إصدار','نشرت':'نشر','فرزت':'فرز','أجريت':'إجراء','دعمت':'دعم','أدخلت':'إدخال','نظمت':'تنظيم','عالجت':'معالجة','قللت':'تقليل','خفضت':'خفض','زدت':'زيادة','أنشأت':'إنشاء','أسست':'تأسيس','قدت':'قيادة','أشرفت':'الإشراف','جهزت':'تجهيز','صغت':'صياغة','وضعت':'وضع','اعتمدت':'اعتماد','قيمت':'تقييم','قست':'قياس','وحدت':'توحيد','ضبطت':'ضبط','فعلت':'تفعيل','وفرت':'توفير','حسبت':'حساب','دققت':'تدقيق','استلمت':'استلام','تعاملت':'التعامل','مثلت':'تمثيل','تواصلت':'التواصل','عملت':'العمل','شاركت':'المشاركة','ساهمت':'المساهمة','وزعت':'توزيع','رتبت':'ترتيب','حفظت':'حفظ','أرشفت':'أرشفة','استقبلت':'استقبال','سجلت':'تسجيل','ضمنت':'ضمان','استكملت':'استكمال','حققت':'تحقيق','أغلقت':'إغلاق','هيأت':'تهيئة','عينت':'تعيين','قابلت':'مقابلة','أنهيت':'إنهاء','ساعدت':'المساعدة','تحققت':'التحقق','أشرفت مباشرة':'الإشراف المباشر'};
 const AR_M={};Object.entries(AR_M_SRC).forEach(([v,m])=>AR_M[norm(v)]=m);
+// fixes common editing mistakes: «Led Entered…», «__%90», «by 50%» with no improvement, stray number at the end
+function dblVerb(a,b){if(/^[A-Za-z]/.test(a))return isVerb(a)&&/^[A-Za-z]+$/.test(b)&&(EN_VERBS.has(norm(b))||/^[a-z]{4,}ed$/.test(norm(b)))&&isVerb(b);
+  // Arabic: a chip word (إدارة، تطوير…) followed by a first-person past verb (أدخلت، أعددت)
+  return VERB_CHIPS_AR.map(norm).includes(norm(a))&&/^[\u0621-\u064A]{3,7}ت$/.test(norm(b))&&!/ات$/.test(norm(b))&&isVerb(b)}
+function tidyBullet(t){
+  let o=String(t).trim();
+  o=o.replace(/__\s*(%|٪)\s*(\d+(?:\.\d+)?)/g,'$2$1').replace(/(\d+(?:\.\d+)?)\s*__\s*(%|٪)/g,'$1$2').replace(/__\s*(\d+)/g,'$1').replace(/(\d+)\s*__/g,'$1');
+  // two opening verbs: keep the real one (the second)
+  const w=o.split(/\s+/);
+  if(w.length>3&&dblVerb(w[0],w[1]))o=w.slice(1).join(' ');
+  o=o.replace(/^\S/,c=>/[a-z]/.test(c)?c.toUpperCase():c);
+  // stray number glued at the end («…documentation.50»)
+  o=o.replace(/([.،])\s*\d{1,3}\s*$/,'$1');
+  return o.replace(/\s+/g,' ').trim();
+}
+function lintBullet(t){const P=[],n=norm(t);
+  if(/__|\[[^\]]*\]/.test(t))P.push(isAr(t)?'فيه فراغ __ أو [قوس] ما تعبّى':'Unfilled __ or [placeholder]');
+  if(/(بنسبه|by)\s*\d+(\.\d+)?\s*(%|٪)/i.test(t)&&!/(improv|increas|reduc|decreas|cut|rais|boost|grew|grow|sav|lower|shorten|تحسين|حسن|زياده|زاد|رفع|خفض|تقليل|قلل|تخفيض|توفير|وفر|تقليص)/i.test(n))P.push(isAr(t)?'«بنسبة X%» بدون تحسين أو تقليل ما لها معنى — اكتبي «بدقة X%» أو احذفيها':'“by X%” with no improvement means nothing — use “with X% accuracy” or remove it');
+  const w=t.trim().split(/\s+/);if(w.length>3&&dblVerb(w[0],w[1]))P.push(isAr(t)?'بدأت بكلمتين إنجاز ورا بعض — خلي وحدة':'Two opening verbs — keep one');
+  if(/[.،]\s*\d{1,3}\s*$/.test(t))P.push(isAr(t)?'رقم زايد في آخر الجملة':'Stray number at the end');
+  return P}
 function improveBullet(t){
-  t=t.trim();let o=t;
+  t=tidyBullet(t);let o=t;
   if(isAr(t)){
     o=o.replace(/^(من مهامي|كانت مهامي|مهامي)\s*[:：]?\s*/,'');
     o=o.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة|المسؤول|المسؤولة)\s+عن\s+/,'إدارة ');
@@ -831,6 +898,7 @@ function renderImprove(){
     ta.style.height='auto';ta.style.height=(ta.scrollHeight+4)+'px';
     const probs=[];if(!sc.verb)probs.push(ar?'ابدئي بكلمة إنجاز (إدارة، تطوير، إعداد…)':'Start with a strong verb');if(sc.pas)probs.push(ar?'استبدلي «مسؤول عن / تم» بكلمة إنجاز مثل «إدارة»':'Remove passive phrasing');
     if(sc.odd)probs.push(ar?'«1 أشهر» صيغة غير صحيحة — اكتبي «خلال شهر» أو رقماً حقيقياً':'Check the number wording');if(sc.unfinished)probs.push(ar?'الجملة غير مكتملة — كمّليها':'Sentence looks unfinished');
+    probs.push(...lintBullet(t));
     if(sc.thin)probs.push(ar?'قصيرة — وضّحي النتيجة':'Too short');if(sc.long)probs.push(ar?'طويلة — اختصريها':'Too long');
     const td=document.querySelector(`[data-tips="${j}"]`);
     if(probs.length)td.innerHTML='<span style="color:var(--warn)">⚠️ '+probs.map(esc).join(' • ')+'</span>';
@@ -846,11 +914,12 @@ function renderImprove(){
   items.forEach((x,j)=>{const ta=document.querySelector(`[data-ed="${j}"]`);ta.value=x.t;ta.oninput=()=>commit(j);refresh(j)});
   document.querySelectorAll('[data-vb]').forEach(c=>c.onclick=()=>{const j=+c.dataset.vb,ta=document.querySelector(`[data-ed="${j}"]`);let t=ta.value.trim();
     const w=t.split(/\s+/)[0]||'';const stripped=t.replace(/^(كنت\s+)?(مسؤول|مسؤولة|مسئول|مسئولة)\s+عن\s+/,'').replace(/^(responsible for|in charge of)\s+/i,'');
-    if(stripped!==t)t=stripped;else if(isVerb(w)||AR_MAP[norm(w).replace(/^ال/,'')])t=t.split(/\s+/).slice(1).join(' ');
+    if(stripped!==t)t=stripped;else if(isVerb(w)||AR_MAP[norm(w).replace(/^ال/,'')]||/^[A-Za-z]+(ed|ing)$/.test(w))t=t.split(/\s+/).slice(1).join(' ');
     ta.value=c.dataset.v+' '+t;commit(j);ta.focus()});
   document.querySelectorAll('[data-ntog]').forEach(c=>c.onclick=()=>{const r=document.querySelector(`[data-nrow="${c.dataset.ntog}"]`);r.style.display=r.style.display==='none'?'flex':'none'});
   document.querySelectorAll('[data-nm]').forEach(c=>c.onclick=()=>{const j=+c.dataset.nm,ta=document.querySelector(`[data-ed="${j}"]`),ar=isAr(ta.value);
-    const add=ar?[' لعدد __ موظفاً',' بنسبة __%',' خلال __ أشهر'][+c.dataset.k]:[' for __ employees',' by __%',' within __ months'][+c.dataset.k];
+    const imp=/(improv|increas|reduc|decreas|cut|rais|boost|تحسين|حسن|زياده|رفع|خفض|تقليل|تخفيض|توفير|تقليص)/i.test(norm(ta.value));
+    const add=ar?[' لعدد __ موظفاً',imp?' بنسبة __%':' بدقة __%',' خلال __ أشهر'][+c.dataset.k]:[' for __ employees',imp?' by __%':' with __% accuracy',' within __ months'][+c.dataset.k];
     ta.value=ta.value.trim().replace(/[.]$/,'')+add;commit(j);ta.focus();const i=ta.value.lastIndexOf('__');try{ta.setSelectionRange(i,i+2)}catch(e){}});
   $('fixAll').onclick=()=>{items.forEach((x,j)=>{const ta=document.querySelector(`[data-ed="${j}"]`);const n=improveBullet(ta.value);if(n!==ta.value.trim()){ta.value=n;commit(j)}});0};
 }
@@ -901,11 +970,19 @@ async function buildDocx(d){
   z.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${rels.join('')}</Relationships>`);
   return z.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
 }
+function cvIssues(d){const out=[];const sp=spellIssues([d.name,d.title,d.contact.join(' | '),...d.secs.flatMap(s=>s.lines)].join('\n'));if(sp.length)out.push({t:'أخطاء إملائية',P:sp.map(x=>`«${x.w}» ← «${x.r}»`)});d.secs.forEach(s=>s.lines.forEach(l=>{const t=l.replace(BULLET_RE,'').trim();const P=s.id==='experience'||s.id==='other'?lintBullet(t):(/__|\[[^\]]*\]/.test(t)?['فراغ __ أو [قوس] ما تعبّى']:[]);if(P.length)out.push({t,P})}));return out}
+let issuesOk=false;
+function checkBeforeSave(d,btn){if(issuesOk)return true;const I=cvIssues(d);if(!I.length)return true;
+  $('dlErr').style.cssText='display:block;background:var(--warn-l);color:var(--warn);text-align:start';
+  $('dlErr').innerHTML=`<b>⚠️ قبل التحميل صحّحي ${I.length} ملاحظة:</b><ul style="margin:6px 0;padding-inline-start:18px">${I.slice(0,8).map(x=>`<li><span dir="auto">${esc(x.t.length>70?x.t.slice(0,70)+'…':x.t)}</span><br><small>${x.P.map(esc).join(' • ')}</small></li>`).join('')}</ul><button class="btn2" id="fixIss" style="padding:4px 10px;font-size:13px">✨ صحّح تلقائياً</button> <button class="btn2" id="ignIss" style="padding:4px 10px;font-size:13px">تحميل على أي حال</button>`;
+  $('fixIss').onclick=()=>{['f-name','f-title','f-city'].forEach(id=>{const e=$(id);if(e)e.value=spellFix(e.value)});SECS.forEach(s=>{const ta0=$('s-'+s[0]);if(ta0)ta0.value=ta0.value.split('\n').map(spellFix).join('\n')});SECS.forEach(s=>{if(s[0]!=='experience'&&s[0]!=='other')return;const ta=$('s-'+s[0]);ta.value=ta.value.split('\n').map(l=>BULLET_RE.test(l)?'• '+tidyBullet(l.replace(BULLET_RE,'')):l).join('\n')});updatePreview();try{renderImprove()}catch(e){}$('dlErr').style.display='none';const r=cvIssues(collect());toast(r.length?`باقي ${r.length} ملاحظة تحتاج تعديل يدوي`:'تم التصحيح ✅');if(!r.length)btn.click()};
+  $('ignIss').onclick=()=>{issuesOk=true;$('dlErr').style.display='none';btn.click();setTimeout(()=>issuesOk=false,500)};
+  $('dlErr').scrollIntoView({behavior:'smooth',block:'center'});return false}
 $('dl').onclick=async()=>{
   $('dlErr').style.display='none';
   const d=collect();
+  if(d.secs.length&&!checkBeforeSave(d,$('dl')))return;
   if(!d.secs.length){$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';$('dlErr').style.display='block';return}
-  if(/\[[^\]]+\]|__/.test(cvText(d)))toast('⚠️ تذكير: فيه __ أو [أقواس] ما عبّأتها');
   try{
     if(!window.JSZip)throw new Error('nozip');
     const blob=await buildDocx(d);const fname=((d.name||'CV').replace(/[\\/:*?"<>|]+/g,'').trim()||'CV')+' - ATS CV.docx';
@@ -973,6 +1050,7 @@ function cvHTML(d){
 }
 $('pdfBtn').onclick=()=>{
   const d=collect();
+  if(d.secs.length&&!checkBeforeSave(d,$('pdfBtn')))return;
   if(!d.secs.length){$('dlErr').style.cssText='display:block';$('dlErr').textContent='عبّئ قسماً واحداً على الأقل.';return}
   $('printArea').innerHTML=cvHTML(d);
   const inClaude=window.top!==window.self;
