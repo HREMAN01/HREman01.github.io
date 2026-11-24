@@ -183,6 +183,7 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
       </div>
     </div>
 
+    <div class="card" id="errCard" style="display:none"><h3>🔍 الأخطاء في سيرتك <span class="cnt" id="errCnt"></span></h3><div id="errList"></div></div>
     <div class="card"><h3>🛠️ أهم الإصلاحات بالترتيب <span class="cnt" id="fixCnt"></span></h3><ol class="fix" id="fixes"></ol></div>
     <div class="card" id="kwCard"><h3>🎯 الكلمات المفتاحية <span class="cnt" id="kwCnt"></span></h3>
       <div class="legend"><span><i style="background:var(--ok)"></i>موجودة</span><span><i style="background:var(--warn)"></i>تطابق جزئي</span><span><i style="background:var(--bad)"></i>ناقصة</span><span>★ = أهمية عالية</span></div>
@@ -197,6 +198,7 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
       <div id="builder" style="display:none">
         <div id="reRes" style="display:none;margin-top:4px;border-radius:12px;padding:12px;text-align:center;font-weight:800;font-size:17px"></div>
         <h4 style="margin:16px 0 8px;font-size:16px">✨ سيرتك بعد التحسين — جاهزة بقالب ATS</h4>
+        <div id="fixLog"></div>
         <div id="cvPreview" class="cvp"></div>
         <div id="suggest" style="margin-top:12px"></div>
         <div class="hint" style="margin-top:8px">🔎 راجع سيرتك قبل التحميل — حسّنا الصياغة بأسلوب السيرة الرسمي تلقائياً بدون تغيير معلوماتك.</div>
@@ -609,6 +611,7 @@ function render(R,noScroll){
   const subs=[['التنسيق',R.fmtScore],['قوة النقاط',R.bScore],['الكلمات المفتاحية',R.kwScore]];
   $('subs').innerHTML=subs.map(([t,s])=>`<div class="sb"><div class="v" style="color:${s==null?'var(--mut)':col(s)}">${s==null?'—':s}</div><div class="t">${t}</div><div class="bar"><i style="width:${s||0}%;background:${s==null?'#ccc':col(s)}"></i></div></div>`).join('');
   // fixes
+  try{renderErrors(detectErrors(lastCV))}catch(e){console.warn(e);$('errCard').style.display='none'}
   $('fixCnt').textContent=R.F.length;
   $('fixes').innerHTML=R.F.map((f,i)=>`<li><span class="pr ${i<3?'h':i<6?'md':'lo'}">${i<3?'عالية':i<6?'متوسطة':'منخفضة'}</span>${esc(f.t)}</li>`).join('')||'<li>لا توجد إصلاحات — سيرتك ممتازة 🎉</li>';
   // keywords
@@ -726,10 +729,11 @@ $('openB').onclick=()=>{
   ['name','title','email','phone','city'].forEach(k=>$('f-'+k).value=P[k]);$('f-li').value=P.li;
   $('secFields').innerHTML=SECS.map(s=>`<label class="l" id="lb-${s[0]}"></label><textarea id="s-${s[0]}" dir="auto"></textarea>`).join('');
   SECS.forEach(s=>$('s-'+s[0]).value=P.sec[s[0]].join('\n'));
+  const before=snapCV();
   // fix spelling automatically (Jiddah → Jeddah …)
   try{const allT=['f-name','f-title','f-city'].map(id=>$(id).value).concat(SECS.map(s=>$('s-'+s[0]).value)).join('\n');const sp=spellIssues(allT);
     if(sp.length){['f-name','f-title','f-city'].forEach(id=>$(id).value=spellFix($(id).value));SECS.forEach(s=>{const ta=$('s-'+s[0]);ta.value=ta.value.split('\n').map(spellFix).join('\n')});
-      setTimeout(()=>toast(`✅ صحّحنا ${sp.length} خطأ إملائي تلقائياً: ${sp.slice(0,3).map(x=>x.w+' ← '+x.r).join('، ')}`),400)}}catch(e){console.warn(e)}
+    }}catch(e){console.warn(e)}
   setLang(isAr(lastCV)?'ar':'en');
   // missing keywords
   const miss=lastR&&lastR.kw?lastR.kw.filter(k=>k.st!=='p'):[];
@@ -742,9 +746,49 @@ $('openB').onclick=()=>{
   // apply the automatic improvements straight away, then show the result
   try{$('fixAll').click()}catch(e){}
   try{autoFixAll();renderImprove()}catch(e){}
+  try{showFixLog(before,snapCV())}catch(e){console.warn(e)}
   doRescan(false);updatePreview();try{renderSuggest()}catch(e){console.warn(e)}
   setTimeout(()=>$('reRes').scrollIntoView({behavior:'smooth',block:'start'}),250);
 };
+
+/* ---------- what we corrected (shown to the user) ---------- */
+const FLD=[['f-name','الاسم'],['f-title','المسمى'],['f-city','المدينة']];
+function snapCV(){const o={};FLD.forEach(([id])=>o[id]=[$(id).value]);SECS.forEach(s=>o['s-'+s[0]]=$('s-'+s[0]).value.split('\n'));return o}
+function fixReasons(b,a){const R=[],t=b.replace(BULLET_RE,'').trim();
+  spellIssues(t).forEach(x=>R.push(`خطأ إملائي: «${x.w}» ← «${x.r}»`));
+  if(/__|\[[^\]]*\]/.test(t))R.push('فراغ أو قوس ما تعبّى');
+  const w=t.split(/\s+/);if(w.length>3&&dblVerb(w[0],w[1]))R.push(`كلمتين إنجاز ورا بعض («${w[0]} ${w[1]}»)`);
+  if(/[.،]\s*\d{1,3}\s*$/.test(t))R.push('رقم زايد في آخر الجملة');
+  if(/(بنسب[ةه]|\bby)\s*\d+(\.\d+)?\s*(%|٪)/i.test(t)&&!/(بنسب[ةه]|\bby)\s*\d+(\.\d+)?\s*(%|٪)/i.test(a))R.push('نسبة بدون معنى (ما فيها تحسين أو تقليل)');
+  if(PASSIVE.test(norm(t)+' ')&&!PASSIVE.test(norm(a)+' '))R.push('صياغة سلبية (مسؤول عن / تم / responsible for) ← صياغة فاعلة');
+  if(!R.length)R.push('تحسين الصياغة');return R}
+// find every mistake in the CV before fixing anything: where it is, what's wrong, and the correction
+function detectErrors(cv){const P=parseCV(cv),L=[];const lab=Object.fromEntries(SECS.map(s=>[s[0],s[1]]));
+  const chk=(where,b,isB)=>{if(!b||!b.trim())return;let a=spellFix(b);
+    if(isB)a='• '+improveBullet(a.replace(BULLET_RE,''));else if(/__|\[[^\]]*\]/.test(a))a=a.replace(/\s*\[[^\]]*\]\s*/g,' ').replace(/__+/g,'').replace(/\s+/g,' ').trim();
+    if(a.replace(BULLET_RE,'').trim()!==b.replace(BULLET_RE,'').trim())L.push({where,b:b.replace(BULLET_RE,'').trim(),a:a.replace(BULLET_RE,'').trim(),r:fixReasons(b,a)})};
+  chk('الاسم',P.name);chk('المسمى',P.title);chk('المدينة',P.city);
+  SECS.forEach(s=>P.sec[s[0]].forEach(l=>chk(lab[s[0]],l,(s[0]==='experience'||s[0]==='other')&&BULLET_RE.test(l))));
+  // spelling first, then real problems, then wording
+  const rank=x=>x.r.some(r=>r.startsWith('خطأ إملائي'))?0:x.r[0]==='تحسين الصياغة'?2:1;
+  return L.sort((x,y)=>rank(x)-rank(y))}
+function renderErrors(E){const c=$('errCard');if(!E.length){c.style.display='none';return}c.style.display='';$('errCnt').textContent=E.length;
+  const hl=x=>{let h=esc(x.b);spellIssues(x.b).forEach(s=>{h=h.split(esc(s.w)).join(`<mark style="background:#fde2e1;color:#b3261e;border-radius:3px;padding:0 2px">${esc(s.w)}</mark>`)});return h};
+  const item=x=>`<li style="margin-bottom:10px"><span style="font-size:12px;color:var(--mut)">📍 ${esc(x.where)}</span><br><b style="color:var(--warn)">❌ ${x.r.map(esc).join(' • ')}</b><br><span dir="auto">${hl(x)}</span><br><span style="color:var(--ok)">✅ التصحيح: </span><span dir="auto" style="color:var(--ok)">${esc(x.a)}</span></li>`;
+  $('errList').innerHTML=`<ol style="margin:0;padding-inline-start:20px;font-size:14px">${E.slice(0,6).map(item).join('')}</ol>`+
+    (E.length>6?`<details><summary style="cursor:pointer;color:var(--blue);font-weight:700;font-size:13.5px">عرض باقي الأخطاء (${E.length-6})</summary><ol start="7" style="margin:6px 0 0;padding-inline-start:20px;font-size:14px">${E.slice(6).map(item).join('')}</ol></details>`:'')+
+    `<div class="hint" style="margin-top:8px;font-size:13px">اضغط «✨ حسّن سيرتي تلقائياً» تحت، ونصحّح لك كل هذي الأخطاء.</div>`}
+function showFixLog(B,A){const L=[];
+  Object.keys(B).forEach(k=>{const b=B[k],a=A[k];if(!a)return;if(b.length!==a.length){if(b.join('\n').trim()!==a.join('\n').trim())L.push({b:b.join(' '),a:a.join(' '),r:['تحسين الصياغة']});return}
+    b.forEach((x,i)=>{if(x.trim()&&x.trim()!==a[i].trim())L.push({b:x.replace(BULLET_RE,'').trim(),a:a[i].replace(BULLET_RE,'').trim(),r:fixReasons(x,a[i])})})});
+  const box=$('fixLog');if(!L.length){box.innerHTML='';return}
+  const sp=L.filter(x=>x.r.some(r=>r.startsWith('خطأ إملائي'))).length;
+  const item=x=>`<li style="margin-bottom:8px"><b style="color:var(--warn)">${x.r.map(esc).join(' • ')}</b><br><span dir="auto" style="color:#b3261e;text-decoration:line-through">${esc(x.b)}</span><br><span dir="auto" style="color:var(--ok)">${esc(x.a)}</span></li>`;
+  box.innerHTML=`<div style="margin:10px 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;text-align:start">
+    <b style="font-size:15px">🔧 صحّحنا لك ${L.length} ${L.length<=10&&L.length>2?'أخطاء':'خطأ'} تلقائياً${sp?` (منها ${sp} إملائية)`:''}</b>
+    <ol style="margin:8px 0 0;padding-inline-start:20px;font-size:13.5px">${L.slice(0,5).map(item).join('')}</ol>
+    ${L.length>5?`<details><summary style="cursor:pointer;color:var(--blue);font-weight:700;font-size:13px">عرض الباقي (${L.length-5})</summary><ol start="6" style="margin:6px 0 0;padding-inline-start:20px;font-size:13.5px">${L.slice(5).map(item).join('')}</ol></details>`:''}
+    <div style="font-size:12.5px;color:var(--mut);margin-top:6px">الأحمر = قبل، والأخضر = بعد التصحيح.</div></div>`}
 
 /* ---------- rule-based bullet rewriter ---------- */
 const AR_MAP={'اداره':'أدرت','اعداد':'أعددت','تطبيق':'طبّقت','تحديث':'حدّثت','متابعه':'تابعت','رفع':'رفعت','مراجعه':'راجعت','تنسيق':'نسّقت','تنفيذ':'نفّذت','تطوير':'طوّرت','تحسين':'حسّنت','تدريب':'درّبت','توظيف':'وظّفت','استقطاب':'استقطبت','تحليل':'حلّلت','تصميم':'صمّمت','بناء':'بنيت','اطلاق':'أطلقت','اصدار':'أصدرت','نشر':'نشرت','فرز':'فرزت','اجراء':'أجريت','دعم':'دعمت','ادخال':'أدخلت','تنظيم':'نظّمت','معالجه':'عالجت','تقليل':'قلّلت','تخفيض':'خفّضت','خفض':'خفّضت','زياده':'زدت','انشاء':'أنشأت','تاسيس':'أسّست','قياده':'قدت','اشراف':'أشرفت على','تجهيز':'جهّزت','صياغه':'صغت','وضع':'وضعت','اعتماد':'اعتمدت','تقييم':'قيّمت','قياس':'قست','توحيد':'وحّدت','ضبط':'ضبطت','تفعيل':'فعّلت','توفير':'وفّرت','حساب':'حسبت','تدقيق':'دقّقت','استلام':'استلمت','اعداده':'أعددت','التعامل':'تعاملت','تعامل':'تعاملت','تمثيل':'مثّلت','التواصل':'تواصلت','تواصل':'تواصلت','عمل':'عملت','العمل':'عملت','المشاركه':'شاركت','مشاركه':'شاركت','المساهمه':'ساهمت','مساهمه':'ساهمت','توزيع':'وزّعت','ترتيب':'رتّبت','حفظ':'حفظت','ارشفه':'أرشفت','استقبال':'استقبلت','تسجيل':'سجّلت','ضمان':'ضمنت','استكمال':'استكملت','تحقيق':'حققت','اداره':'أدرت'};
