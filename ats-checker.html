@@ -580,7 +580,7 @@ function analyze(cv,jd,meta){
   }else F.push({w:4,tag:'الكلمات المفتاحية',t:'أضف الوصف الوظيفي وأعد الفحص عشان تعرف الكلمات المفتاحية الناقصة لكل وظيفة تتقدم لها.'});
   const nv=scored.filter(b=>!b.verb).length;if(scored.length&&nv/scored.length>.4)F.push({w:7,tag:'قوة النقاط',t:`${nv} من نقاطك لا تبدأ بفعل قوي — ابدأ كل نقطة بكلمة إنجاز مثل: إدارة، تطوير، تحقيق، خفض (Led, Developed, Achieved).`});
   const np=scored.filter(b=>b.pas).length;if(np)F.push({w:5,tag:'قوة النقاط',t:`${np} نقطة بصياغة سلبية مثل «مسؤول عن» أو «تم» — حوّلها لصياغة فاعلة تبرز دورك.`});
-  const SPx=spellIssues(cv);if(SPx.length)F.push({w:12,tag:'الإملاء',t:`فيه ${SPx.length} خطأ إملائي — صحّحها قبل الإرسال: ${SPx.slice(0,8).map(x=>`«${x.w}» ← «${x.r}»`).join('، ')}${SPx.length>8?'…':''}`});
+  const SPx=spellIssues(cv);if(SPx.length)F.push({w:12,tag:'الإملاء',t:`فيه ${SPx.length} خطأ إملائي — نصحّحها تلقائياً في السيرة المحسّنة: ${SPx.slice(0,8).map(x=>`«${x.w}» ← «${x.r}»`).join('، ')}${SPx.length>8?'…':''}`});
   F.sort((a,b)=>b.w-a.w);
   return {total,fmtScore,bScore,kwScore,C,kw,scored,detected:B.detected,F:F.slice(0,10),words};
 }
@@ -687,9 +687,12 @@ function parseCV(text){
     if(!cur){head.push(l);continue}
     out.sec[cur].push(BULLET_RE.test(l)?'• '+l.replace(BULLET_RE,'').trim():l);
   }
+  // experience lines that start with an action verb are bullets even when the PDF has no bullet marks
+  ['experience','other'].forEach(k=>{out.sec[k]=out.sec[k].map(l=>{if(BULLET_RE.test(l)||/\|/.test(l)||/\b(19|20)\d\d\b/.test(l))return l;const w=l.split(/\s+/);
+    return w.length>=4&&isVerb(w[0])&&(/^[A-Z]/.test(w[0])||isAr(w[0]))?'• '+l:l})});
   // two-column blocks (e.g. languages: names on one row, levels on the next) → pair them up
   for(const k in out.sec){const m=[];out.sec[k].forEach(l=>{const p=m[m.length-1];
-    if(p&&!/[.،:؛!?؟]$/.test(p)&&p.split(/\s+/).length>=(k==='summary'||k==='experience'||k==='other'?8:14)&&!/\|/.test(p)&&!/\b(19|20)\d\d\b/.test(p)&&!BULLET_RE.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&!/\|/.test(l))m[m.length-1]=p+' '+l;else m.push(l)});out.sec[k]=m;}
+    if(p&&!/[.،:؛!?؟]$/.test(p)&&!BULLET_RE.test(l)&&!(/^[A-Z]/.test(l)&&isVerb(l.split(/\s+/)[0]))&&p.split(/\s+/).length>=(k==='summary'||k==='experience'||k==='other'?8:14)&&!/\|/.test(p)&&!/\b(19|20)\d\d\b/.test(p)&&!BULLET_RE.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&!/\|/.test(l))m[m.length-1]=p+' '+l;else m.push(l)});out.sec[k]=m;}
   const L=out.sec.langs;
   if(L.length===2){const a=L[0].split(/\s*\|\s*/),b=L[1].split(/\s*\|\s*/);if(a.length>=2&&a.length===b.length)out.sec.langs=a.map((x,i)=>x+' — '+b[i]);}
   out.sec.skills=out.sec.skills.flatMap(l=>/\|/.test(l)&&!BULLET_RE.test(l)?l.split(/\s*\|\s*/).filter(Boolean).map(x=>'• '+x):[l]);
@@ -723,6 +726,10 @@ $('openB').onclick=()=>{
   ['name','title','email','phone','city'].forEach(k=>$('f-'+k).value=P[k]);$('f-li').value=P.li;
   $('secFields').innerHTML=SECS.map(s=>`<label class="l" id="lb-${s[0]}"></label><textarea id="s-${s[0]}" dir="auto"></textarea>`).join('');
   SECS.forEach(s=>$('s-'+s[0]).value=P.sec[s[0]].join('\n'));
+  // fix spelling automatically (Jiddah → Jeddah …)
+  try{const allT=['f-name','f-title','f-city'].map(id=>$(id).value).concat(SECS.map(s=>$('s-'+s[0]).value)).join('\n');const sp=spellIssues(allT);
+    if(sp.length){['f-name','f-title','f-city'].forEach(id=>$(id).value=spellFix($(id).value));SECS.forEach(s=>{const ta=$('s-'+s[0]);ta.value=ta.value.split('\n').map(spellFix).join('\n')});
+      setTimeout(()=>toast(`✅ صحّحنا ${sp.length} خطأ إملائي تلقائياً: ${sp.slice(0,3).map(x=>x.w+' ← '+x.r).join('، ')}`),400)}}catch(e){console.warn(e)}
   setLang(isAr(lastCV)?'ar':'en');
   // missing keywords
   const miss=lastR&&lastR.kw?lastR.kw.filter(k=>k.st!=='p'):[];
@@ -734,6 +741,7 @@ $('openB').onclick=()=>{
   try{const sm=$('s-summary');sm.value=improveSummary(sm.value)}catch(e){}
   // apply the automatic improvements straight away, then show the result
   try{$('fixAll').click()}catch(e){}
+  try{autoFixAll();renderImprove()}catch(e){}
   doRescan(false);updatePreview();try{renderSuggest()}catch(e){console.warn(e)}
   setTimeout(()=>$('reRes').scrollIntoView({behavior:'smooth',block:'start'}),250);
 };
@@ -751,6 +759,14 @@ function dblVerb(a,b){if(/^[A-Za-z]/.test(a))return isVerb(a)&&/^[A-Za-z]+$/.tes
 function tidyBullet(t){
   let o=String(t).trim();
   o=o.replace(/__\s*(%|٪)\s*(\d+(?:\.\d+)?)/g,'$2$1').replace(/(\d+(?:\.\d+)?)\s*__\s*(%|٪)/g,'$1$2').replace(/__\s*(\d+)/g,'$1').replace(/(\d+)\s*__/g,'$1');
+  // unfilled placeholders → drop the phrase
+  o=o.replace(/\s*(لعدد|بنسبة|بنسبه|بدقة|بدقه|خلال|for|by|with|within)\s+__\s*(%|٪)?\s*(موظفاً|موظفا|موظف|أشهر|اشهر|employees|months|accuracy)?/gi,'').replace(/__+/g,'');
+  o=o.replace(/^\[([^\]\/]+)\/[^\]]*\]\s*/,(m,v)=>v.trim()+' '); // «[Led / Developed] …» → first choice
+  o=o.replace(/\s*(,\s*resulting in|—\s*مما أدى إلى|-\s*مما أدى إلى)[^.]*\[[^.]*\.?$/,'.'); // unfilled result template
+  o=o.replace(/\s*[—-]?\s*\[[^\]]*\]\s*/g,' ').replace(/\s+([.,،])/g,'$1').replace(/\.{2,}$/,'.');
+  // «by 50%» / «بنسبة 50%» with no improvement or reduction → accuracy
+  if(!/(improv|increas|reduc|decreas|cut|rais|boost|grew|grow|sav|lower|shorten|تحسين|حسن|زياده|زاد|رفع|خفض|تقليل|قلل|تخفيض|توفير|وفر|تقليص)/i.test(norm(o)))
+    o=o.replace(/\s*\bby\s+(\d+(?:\.\d+)?)\s*%/gi,(m,n)=>/accura/i.test(o)?'':' with '+n+'% accuracy').replace(/\s*بنسب[ةه]\s+(\d+(?:\.\d+)?)\s*(%|٪)/g,(m,n)=>/دق[ةه]/.test(o)?'':' بدقة '+n+'%');
   // two opening verbs: keep the real one (the second)
   const w=o.split(/\s+/);
   if(w.length>3&&dblVerb(w[0],w[1]))o=w.slice(1).join(' ');
@@ -972,12 +988,13 @@ async function buildDocx(d){
 }
 function cvIssues(d){const out=[];const sp=spellIssues([d.name,d.title,d.contact.join(' | '),...d.secs.flatMap(s=>s.lines)].join('\n'));if(sp.length)out.push({t:'أخطاء إملائية',P:sp.map(x=>`«${x.w}» ← «${x.r}»`)});d.secs.forEach(s=>s.lines.forEach(l=>{const t=l.replace(BULLET_RE,'').trim();const P=s.id==='experience'||s.id==='other'?lintBullet(t):(/__|\[[^\]]*\]/.test(t)?['فراغ __ أو [قوس] ما تعبّى']:[]);if(P.length)out.push({t,P})}));return out}
 let issuesOk=false;
-function checkBeforeSave(d,btn){if(issuesOk)return true;const I=cvIssues(d);if(!I.length)return true;
-  $('dlErr').style.cssText='display:block;background:var(--warn-l);color:var(--warn);text-align:start';
-  $('dlErr').innerHTML=`<b>⚠️ قبل التحميل صحّحي ${I.length} ملاحظة:</b><ul style="margin:6px 0;padding-inline-start:18px">${I.slice(0,8).map(x=>`<li><span dir="auto">${esc(x.t.length>70?x.t.slice(0,70)+'…':x.t)}</span><br><small>${x.P.map(esc).join(' • ')}</small></li>`).join('')}</ul><button class="btn2" id="fixIss" style="padding:4px 10px;font-size:13px">✨ صحّح تلقائياً</button> <button class="btn2" id="ignIss" style="padding:4px 10px;font-size:13px">تحميل على أي حال</button>`;
-  $('fixIss').onclick=()=>{['f-name','f-title','f-city'].forEach(id=>{const e=$(id);if(e)e.value=spellFix(e.value)});SECS.forEach(s=>{const ta0=$('s-'+s[0]);if(ta0)ta0.value=ta0.value.split('\n').map(spellFix).join('\n')});SECS.forEach(s=>{if(s[0]!=='experience'&&s[0]!=='other')return;const ta=$('s-'+s[0]);ta.value=ta.value.split('\n').map(l=>BULLET_RE.test(l)?'• '+tidyBullet(l.replace(BULLET_RE,'')):l).join('\n')});updatePreview();try{renderImprove()}catch(e){}$('dlErr').style.display='none';const r=cvIssues(collect());toast(r.length?`باقي ${r.length} ملاحظة تحتاج تعديل يدوي`:'تم التصحيح ✅');if(!r.length)btn.click()};
-  $('ignIss').onclick=()=>{issuesOk=true;$('dlErr').style.display='none';btn.click();setTimeout(()=>issuesOk=false,500)};
-  $('dlErr').scrollIntoView({behavior:'smooth',block:'center'});return false}
+function autoFixAll(){let n=0;const fx=(v,f)=>{const r=f(v);if(r!==v)n++;return r};
+  ['f-name','f-title','f-city'].forEach(id=>{const e=$(id);if(e)e.value=fx(e.value,spellFix)});
+  SECS.forEach(s=>{const ta=$('s-'+s[0]);if(!ta)return;ta.value=ta.value.split('\n').map(l=>{l=fx(l,spellFix);
+    if((s[0]==='experience'||s[0]==='other')&&BULLET_RE.test(l))l='• '+fx(l.replace(BULLET_RE,''),improveBullet);
+    else if(/__|\[[^\]]*\]/.test(l))l=fx(l,x=>x.replace(/\s*\[[^\]]*\]\s*/g,' ').replace(/__+/g,'').replace(/\s+/g,' ').trim());return l}).join('\n')});
+  return n}
+function checkBeforeSave(d,btn){const n=autoFixAll();if(n){updatePreview();try{renderImprove()}catch(e){}toast(`✅ صحّحنا ${n} سطر تلقائياً`)}return true}
 $('dl').onclick=async()=>{
   $('dlErr').style.display='none';
   const d=collect();
