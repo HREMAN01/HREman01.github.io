@@ -75,6 +75,7 @@ h3 .cnt{font-size:12px;background:var(--blue-l);color:var(--blue-d);padding:2px 
 .coach .was{color:var(--mut);font-size:14px;margin-bottom:6px;unicode-bidi:plaintext}
 .coach .why{color:var(--bad);font-size:13px;font-weight:700;margin-bottom:6px}
 .coach .lab{font-size:13px;font-weight:800;color:var(--ok)}
+.coach textarea.better{display:block;box-sizing:border-box}
 .coach .better{background:var(--ok-l,#e9f7ef);border-radius:8px;padding:8px 10px;margin-top:4px;font-weight:700;font-size:14.5px;line-height:1.9;unicode-bidi:plaintext}
 .coach .kwh{margin-top:8px;font-size:13.5px}
 .coach .opt{display:flex;gap:6px;align-items:center;margin-top:8px;font-size:13.5px;font-weight:700;cursor:pointer}.coach .opt input{width:17px;height:17px}
@@ -847,7 +848,7 @@ function render(R,noScroll){
         ${addon?`<label class="opt"><input type="checkbox" class="addon-on"> <span>${tr('أضف رقم (اختياري — بس إذا عندك رقم حقيقي):','Add a number (optional — only if you have a real one):')}</span></label>
           <div class="addon" dir="${d}" style="text-align:${al}">…${esc(addon).split(SLOT).join(inp)}</div>`:''}
         ${kws.length?`<div class="kwh">🎯 ${tr('كلمات مفتاحية — اختر اللي تنطبق عليك:','Keywords — pick the ones that apply to you:')}<div class="chips" style="margin-top:6px">${kws.map(k=>`<span class="chip m kwc" data-k="${esc(k.k)}" style="cursor:pointer" title="${k.jd?tr('مطلوبة في الإعلان','in the job ad'):''}">+ ${esc(k.k)}${k.jd?' ★':''}</span>`).join('')}</div></div>`:''}
-        <div class="lab" style="margin-top:8px">✅ ${tr('صياغتك بعد اختيارك:','Your bullet with your choices:')}</div><div class="better" dir="${d}" style="text-align:${al}">${esc(c.same?b.t.replace(/^[\s•●▪◦‣\-–*·]+/,''):base)}</div>
+        <div class="lab" style="margin-top:8px">✅ ${tr('صياغتك بعد اختيارك:','Your bullet with your choices:')}</div><textarea class="better cedit" dir="${d}" rows="3" style="text-align:${al};width:100%;border:1.5px solid var(--ok);font:inherit;resize:vertical">${esc(c.same?b.t.replace(/^[\s•●▪◦‣\-–*·]+/,''):base)}</textarea><div class="cskills" style="font-size:12.5px;color:var(--mut)"></div><div style="font-size:12px;color:var(--mut)">${tr('✏️ تقدر تعدّل النص بنفسك قبل ما تعتمده.','✏️ You can edit the text yourself before applying.')}</div>
         <button class="btn2 capply" style="width:100%;margin-top:8px">${tr('✓ اعتمدها في سيرتي','✓ Use it in my CV')}</button>`}
       </div>`};
     h+=ord.slice(0,5).map(card).join('');
@@ -1062,6 +1063,42 @@ function recruiterEval(cv,jd,R){
 }
 
 let lastRec=null;
+
+/* ---------- تصحيح سريع: المستخدم يشوف الاقتراح، يعدّله، ويضيفه بنفسه أو يتجاهله ---------- */
+function qfWidget(mode,val,orig,btn,multi){const id='qf'+Math.random().toString(36).slice(2,8);
+  const fld=multi?`<textarea class="qfin" dir="auto" rows="${Math.min(5,Math.max(2,Math.ceil(val.length/42)))}" style="width:100%;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8;resize:vertical">${esc(val)}</textarea>`
+    :`<input class="qfin" dir="auto" value="${esc(val)}" style="flex:1;min-width:0;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8">`;
+  return `<div class="qf" data-mode="${mode}" data-orig="${esc(orig||'')}" style="margin-top:6px;${multi?'':'display:flex;gap:6px;align-items:center'}">${fld}<button class="btn2 qfgo" style="${multi?'width:100%;margin-top:6px':'white-space:nowrap'};padding:7px 12px">${btn||tr('✓ أضفه','✓ Add')}</button></div>`}
+function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);
+  const L=(a,e)=>ar?a:e;
+  if(/(الاقامه قابله للنقل|transferable iqama)/i.test(n)&&!/الجنسيه:/.test(n))return qfWidget('add',L('الإقامة قابلة للنقل','Transferable Iqama'));
+  if(/(الجنسيه: سعودي|add: nationality)/i.test(n))return qfWidget('add',L('الجنسية: سعودي','Nationality: Saudi'));
+  if(/(مدينتك اعلى|add your city)/i.test(n))return qfWidget('add',L('جدة، السعودية','Jeddah, Saudi Arabia'));
+  if(/(مستعد للانتقال|willing to relocate)/i.test(n)){const m=fix.match(/(?:إلى|to)\s+([^»”"]+)/);return qfWidget('add',L('مستعد للانتقال إلى '+(m?m[1].trim():''),'Willing to relocate to '+(m?m[1].trim():'')))}
+  if(/(متاح للمباشره|available immediately)/i.test(n))return qfWidget('add',L('متاح للمباشرة فورًا','Available to join immediately'));
+  if(/(سنه التخرج|graduation year)/i.test(n)&&!/الدرجه/.test(n))return qfWidget('year','',null,tr('✓ أضف السنة','✓ Add year')).replace('class="qfin"','class="qfin" inputmode="numeric" placeholder="2020"');
+  if(/(مسمى قريب|headline close)/i.test(n)){const t=parseCV(cv).name?parseCV(cv).title||'':'';return qfWidget('title',t,t,tr('✓ عدّله','✓ Update'))}
+  if(/(استبدلها بانجاز|real, measurable)/i.test(n)){
+    const re=/(أطمح|اطمح|أتطلع|اتطلع|أحب العمل|احب العمل|شخص(?:ية)? (?:طموح|مجتهد|اجتماعي)[ةه]?|أعمل بجد|اعمل بجد|العمل تحت الضغط|روح الفريق|سريع[ةه]? التعلم|hard[- ]?working|team player|passionate|highly motivated|self[- ]starter)/i;
+    const lines=cv.split('\n').filter(l=>re.test(l)).slice(0,3);
+    return lines.map(l=>`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('السطر الحالي — عدّله واكتب بداله إنجاز حقيقي (أو امسح العبارة):','Current line — edit it with a real achievement (or delete the phrase):')}</div>`+qfWidget('replace',l.replace(/^[\s•●▪◦‣\-–*·]+/,''),l,tr('✓ عدّله','✓ Update'),true)).join('');}
+  return '';
+}
+function qfApply(box){const mode=box.dataset.mode,orig=box.dataset.orig,v=box.querySelector('.qfin').value.trim();
+  let L=lastCV.split('\n');
+  if(mode==='add'){if(!v){toast(tr('اكتب النص أول','Type the text first'));return}
+    let ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci<0)ci=Math.min(1,L.length-1);L.splice(ci+1,0,v);}
+  else if(mode==='year'){if(!/^(19|20)\d\d$/.test(v)){toast(tr('اكتب سنة صحيحة مثل 2020','Enter a valid year, e.g. 2020'));return}
+    const hi=L.findIndex(l=>/^\s*(التعليم|المؤهلات|المؤهل العلمي|education|academic)/i.test(l.trim()));let j=hi+1;while(j<L.length&&!L[j].trim())j++;
+    if(hi<0||j>=L.length){toast(tr('ما لقينا قسم التعليم','Education section not found'));return}L[j]=L[j].replace(/[.\s]+$/,'')+' – '+v;}
+  else if(mode==='title'){if(!v)return;const i=orig?L.findIndex(l=>l.trim()===orig.trim()):-1;if(i>=0)L[i]=v;else{let k=L.findIndex(l=>l.trim());L.splice(k+1,0,v)}}
+  else{let i=L.findIndex(l=>l===orig||l.trim()===orig.trim());if(i<0)i=L.findIndex(l=>l.replace(/^[\s•●▪◦‣\-–*·]+/,'').trim()===orig.trim());if(i<0){toast(tr('ما لقينا السطر في السيرة','Line not found in the CV'));return}
+    const bul=/^\s*[•●▪◦‣\-–*·]/.test(L[i]);if(v)L[i]=(bul?'• ':'')+v.replace(/^[\s•●▪◦‣\-–*·]+/,'');else L.splice(i,1);}
+  qfRescan(L.join('\n'));
+}
+function qfRescan(t){lastCV=t;if($('cvText'))$('cvText').value=t;const y=window.scrollY;lastR=analyze(lastCV,$('jd').value,window.__meta||null);render(lastR,true);window.scrollTo(0,y);
+  toast(tr(`✅ تم — درجتك الحين ${lastR.total}/100`,`✅ Done — your score is now ${lastR.total}/100`))}
+document.addEventListener('click',e=>{const b=e.target.closest('.qfgo');if(b){qfApply(b.closest('.qf'))}});
 function renderRec(E){
   lastRec=E;const box=$('recCard');if(!box)return;box.style.display='';
   const V={ok:[tr('✅ مرشح للمقابلة','✅ Shortlisted for interview'),'var(--ok)','var(--ok-l)',tr('لو كنت مسؤول التوظيف، كنت بتواصل معك. راجع الملاحظات البسيطة تحت.','As a recruiter, I would call you. Check the minor notes below.')],
@@ -1075,7 +1112,7 @@ function renderRec(E){
     <div class="bar"><i style="width:${s||0}%;background:${cl}"></i></div>
     ${c.strong.map(x=>`<div style="font-size:13.5px;color:var(--ok);margin-top:5px">✓ ${esc(x)}</div>`).join('')}
     ${c.reasons.map(x=>`<div style="font-size:13.5px;color:${s==null?'var(--mut)':'var(--bad)'};margin-top:5px">${s==null?'ℹ️':'✕'} ${esc(x)}</div>`).join('')}
-    ${c.fixes.length?`<div class="wf"><b>${tr('كيف تصلحها:','How to fix:')}</b><ul style="margin:4px 0 0;padding-inline-start:18px">${c.fixes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}</div>`}).join('');
+    ${c.fixes.length?`<div class="wf"><b>${tr('كيف تصلحها:','How to fix:')}</b><ul style="margin:4px 0 0;padding-inline-start:18px">${c.fixes.map(x=>`<li>${esc(x)}${qfFor(x,lastCV)}</li>`).join('')}</ul></div>`:''}</div>`}).join('');
   if(!E.kwS.length&&!E.hasJD)h+=`<div class="wf" style="margin-top:12px">🎯 ${tr('عشان نطلع لك الكلمات المفتاحية ونحسّنها: الصق إعلان الوظيفة فوق واضغط فحص مرة ثانية.','To get keyword suggestions: paste the job ad above and check again.')} <a href="#jd" style="color:var(--blue);font-weight:700" onclick="document.getElementById('jd').focus()">${tr('الصق الإعلان ↑','Paste the ad ↑')}</a></div>`;
   const M=E.miss6,AC=E.accr&&!E.accr.has?E.accr:null,needB=M.nat||M.iq||M.reloc||M.avail||AC;
   if(E.kwS.length||needB){
@@ -1268,10 +1305,10 @@ function detectErrors(cv){const P=parseCV(cv),L=[];const lab=Object.fromEntries(
   return L.sort((x,y)=>rank(x)-rank(y))}
 function renderErrors(E){const c=$('errCard');if(!E.length){c.style.display='none';return}c.style.display='';$('errCnt').textContent=E.length;
   const hl=x=>{let h=esc(x.b);spellIssues(x.b).forEach(s=>{h=h.split(esc(s.w)).join(`<mark style="background:#fde2e1;color:#b3261e;border-radius:3px;padding:0 2px">${esc(s.w)}</mark>`)});return h};
-  const item=x=>`<li style="margin-bottom:10px"><span style="font-size:12px;color:var(--mut)">📍 ${esc(x.where)}</span><br><b style="color:var(--warn)">❌ ${x.r.map(esc).join(' • ')}</b><br><span dir="auto">${hl(x)}</span><br><span style="color:var(--ok)">✅ ${tr('التصحيح:','Fix:')} </span><span dir="auto" style="color:var(--ok)">${esc(x.a)}</span></li>`;
+  const item=x=>`<li style="margin-bottom:10px"><span style="font-size:12px;color:var(--mut)">📍 ${esc(x.where)}</span><br><b style="color:var(--warn)">❌ ${x.r.map(esc).join(' • ')}</b><br><span dir="auto">${hl(x)}</span><br><span style="color:var(--ok);font-size:13px;font-weight:700">✅ ${tr('التصحيح المقترح — عدّله إذا تبغى، واضغط «صحّحها»:','Suggested fix — edit if you like, then tap “Fix it”:')}</span>${qfWidget('fixline',x.a,x.b,tr('✓ صحّحها','✓ Fix it'),true)}</li>`;
   $('errList').innerHTML=`<ol style="margin:0;padding-inline-start:20px;font-size:14px">${E.slice(0,6).map(item).join('')}</ol>`+
     (E.length>6?`<details><summary style="cursor:pointer;color:var(--blue);font-weight:700;font-size:13.5px">${tr('عرض باقي الأخطاء','Show remaining mistakes')} (${E.length-6})</summary><ol start="7" style="margin:6px 0 0;padding-inline-start:20px;font-size:14px">${E.slice(6).map(item).join('')}</ol></details>`:'')+
-    `<div class="hint" style="margin-top:8px;font-size:13px">${tr('اضغط «✨ حسّن سيرتي تلقائياً» تحت، ونصحّح لك كل هذي الأخطاء.','Tap “✨ Improve my CV automatically” below and we’ll fix all of these.')}</div>`}
+    `<div class="hint" style="margin-top:8px;font-size:13px">${tr('كل تصحيح اختياري — صحّح اللي يناسبك وتجاهل الباقي. أو اضغط «✨ حسّن سيرتي تلقائياً» تحت ونصحّحها كلها.','Every fix is optional — apply what suits you. Or tap “✨ Improve my CV automatically” below to fix them all.')}</div>`}
 function showFixLog(B,A){const L=[];
   Object.keys(B).forEach(k=>{const b=B[k],a=A[k];if(!a)return;if(b.length!==a.length){if(b.join('\n').trim()!==a.join('\n').trim())L.push({b:b.join(' '),a:a.join(' '),r:['تحسين الصياغة']});return}
     b.forEach((x,i)=>{if(x.trim()&&x.trim()!==a[i].trim())L.push({b:x.replace(BULLET_RE,'').trim(),a:a[i].replace(BULLET_RE,'').trim(),r:fixReasons(x,a[i])})})});
@@ -1689,10 +1726,11 @@ document.addEventListener('click',e=>{const k=e.target.closest('.coach .kwc');if
 document.addEventListener('input',e=>{if(e.target.closest('.coach .addon')){const r=e.target.closest('.coach'),cb=r.querySelector('.addon-on');if(cb&&!cb.checked&&e.target.value.trim()){cb.checked=true}coachUpd(r)}});
 document.addEventListener('change',e=>{if(e.target.classList&&e.target.classList.contains('addon-on'))coachUpd(e.target.closest('.coach'))});
 function coachUpd(r){const i=+r.dataset.ci,ad=r.querySelector('.addon'),cb=r.querySelector('.addon-on');if(ad)ad.classList.toggle('on',!!(cb&&cb.checked));
-  const sk=coachSkills(r);r.querySelector('.better').innerHTML=esc(coachCompose(i,r))+(sk.length?`<div style="font-size:12.5px;font-weight:600;color:var(--mut);margin-top:4px">${tr('+ تنضاف لقسم المهارات:','+ added to Skills:')} ${sk.map(esc).join('، ')}</div>`:'')}
+  const sk=coachSkills(r),ta=r.querySelector('.cedit');if(ta&&!ta.dataset.touched)ta.value=coachCompose(i,r);r.querySelector('.cskills').textContent=sk.length?tr('+ تنضاف لقسم المهارات: ','+ added to Skills: ')+sk.join('، '):''}
+document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('cedit'))e.target.dataset.touched='1'});
 function coachApply(r){const i=+r.dataset.ci,c=COACH[i];if(!c)return;
-  const cb=r.querySelector('.addon-on');if(cb&&cb.checked&&[...r.querySelectorAll('.slotin')].some(x=>!x.value.trim())){toast(tr('اكتب الرقم في الخانات الصفراء، أو شيل الصح من «أضف رقم».','Fill the yellow boxes, or untick “Add a number”.'));return}
-  const nt=coachCompose(i,r),sk=coachSkills(r);
+  const cb=r.querySelector('.addon-on');if(!((r.querySelector('.cedit')||{}).dataset||{}).touched&&cb&&cb.checked&&[...r.querySelectorAll('.slotin')].some(x=>!x.value.trim())){toast(tr('اكتب الرقم في الخانات الصفراء، أو شيل الصح من «أضف رقم».','Fill the yellow boxes, or untick “Add a number”.'));return}
+  const ta=r.querySelector('.cedit');const nt=(ta&&ta.value.trim())?ta.value.trim().replace(/^[\s•●▪◦‣\-–*·]+/,''):coachCompose(i,r),sk=coachSkills(r);
   let L=lastCV.split('\n');const o=c.orig.replace(/^[\s•●▪◦‣\-–*·]+/,'').trim();
   let hit=L.findIndex(l=>l.replace(/^[\s•●▪◦‣\-–*·]+/,'').trim()===o);if(hit<0)hit=L.findIndex(l=>l.includes(o.slice(0,40)));
   if(hit<0){toast(tr('ما قدرنا نلقى النقطة في السيرة.','Couldn’t find that bullet in the CV.'));return}
