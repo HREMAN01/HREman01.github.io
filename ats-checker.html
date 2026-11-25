@@ -108,6 +108,7 @@ ol.fix li:last-child{border:0}
 .wf{background:var(--bg);border-radius:10px;padding:10px;margin-top:8px;font-size:13.5px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 html,body{overflow-x:hidden;max-width:100%}
+html[lang=en] .gl{display:none!important}
 #printArea{display:none}
 .fitm{position:absolute;left:0;top:0;width:184mm;font-family:Arial,'Tajawal',sans-serif;font-size:9.9pt;line-height:1.4;visibility:hidden}
 .fitm .pn{font-size:17pt;font-weight:700;margin:0;text-align:center}.fitm .pt{font-size:11pt;margin:1px 0;text-align:center}.fitm .pc{font-size:9pt;margin:1px 0 6px;text-align:center}
@@ -862,8 +863,8 @@ function render(R,noScroll){
         ${nothing?`<div style="color:var(--ok);font-weight:700;font-size:13.5px">✅ ${tr('نقطة قوية — خلّها زي ما هي.','Strong bullet — keep it.')}</div>`:`
         ${c.why.length?`<div class="why">❌ ${c.why.map(esc).join(' • ')}</div>`:''}
         ${addon?`<label class="opt"><input type="checkbox" class="addon-on" checked> <span>${tr('أضف رقم للنقطة (اختياري):','Add a number (optional):')}</span></label>
-          <div class="addon on" dir="${d}" style="text-align:${al}">…${esc(addon).split(SLOT).map((p,j)=>j?inp()+p:p).join('')}</div><div style="font-size:12px;color:#8a6d00;margin-top:3px">${tr('⚠️ أرقام تقريبية حطيناها لك — عدّلها لأرقامك الحقيقية، لأن مسؤول التوظيف يسأل عنها في المقابلة.','⚠️ Approximate numbers — change them to your real ones; recruiters ask about them in interviews.')}</div>`:''}
-        ${kws.length?`<div class="kwh">🎯 ${tr('كلمات مفتاحية — اختر اللي تنطبق عليك:','Keywords — pick the ones that apply to you:')}<div class="chips" style="margin-top:6px">${kws.map(k=>`<span class="chip m kwc" data-k="${esc(k.k)}" style="cursor:pointer" title="${k.jd?tr('مطلوبة في الإعلان','in the job ad'):''}">+ ${esc(k.k)}${k.jd?' ★':''}</span>`).join('')}</div></div>`:''}
+          <div class="addon on" dir="${d}" style="text-align:${al}">…${esc(addon).split(SLOT).map((p,j)=>j?inp()+p:p).join('')}</div>${wantGloss()?`<div class="gl" style="font-size:12.5px;color:var(--mut);margin-top:3px">🔤 ${tr('بالعربي:','Arabic:')} …${esc(numSlot(b.t,true).split(SLOT).join('_'))}</div>`:''}<div style="font-size:12px;color:#8a6d00;margin-top:3px">${tr('⚠️ أرقام تقريبية حطيناها لك — عدّلها لأرقامك الحقيقية، لأن مسؤول التوظيف يسأل عنها في المقابلة.','⚠️ Approximate numbers — change them to your real ones; recruiters ask about them in interviews.')}</div>`:''}
+        ${kws.length?`<div class="kwh">🎯 ${tr('كلمات مفتاحية — اختر اللي تنطبق عليك:','Keywords — pick the ones that apply to you:')}<div class="chips" style="margin-top:6px">${kws.map(k=>`<span class="chip m kwc" data-k="${esc(k.k)}" style="cursor:pointer" title="${k.jd?tr('مطلوبة في الإعلان','in the job ad'):''}">+ ${esc(k.k)}${k.jd?' ★':''}</span>`).join('')}</div>${glossLine(kws.map(k=>k.k))}</div>`:''}
         <div class="lab" style="margin-top:8px">✅ ${tr('صياغتك بعد اختيارك:','Your bullet with your choices:')}</div><textarea class="better cedit" dir="${d}" rows="3" style="text-align:${al};width:100%;border:1.5px solid var(--ok);font:inherit;resize:vertical">${esc(init)}</textarea><div class="cskills" style="font-size:12.5px;color:var(--mut)"></div><div style="font-size:12px;color:var(--mut)">${tr('✏️ تقدر تعدّل النص بنفسك قبل ما تعتمده.','✏️ You can edit the text yourself before applying.')}</div>
         <button class="btn2 capply" style="width:100%;margin-top:8px">${tr('✓ اعتمدها في سيرتي','✓ Use it in my CV')}</button>`}
       </div>`};
@@ -1092,7 +1093,7 @@ function recruiterEval(cv,jd,R){
    add('basic',tr('البيانات الأساسية','Key details'),ks.reduce((a,b)=>a+b,0)/ks.length,kr,kf,kg);}
   let kwS=[],kwSrc='';
   if(R.kw){kwS=kwClean(R.kw.filter(k=>k.st==='m').sort((a,b)=>b.imp-a.imp).map(k=>k.k),jd).slice(0,10);kwSrc='jd'}
-  else{try{const ro=cvRole(cv),nA0=norm(cv);if(ro&&ro.sk){const ar=isAr(cv);kwS=(ar?ro.sk:ro.skEn).filter(k=>!nA0.includes(norm(k.split(' (')[0].split(' / ')[0])));kwSrc=ar?ro.ar:ro.en}
+  else{try{const ro=cvRole(cv),nA0=norm(cv);if(ro&&ro.sk){const ar=isAr(cv);kwS=(ar?ro.sk:ro.skEn).filter(k=>!skHave(nA0,k));kwSrc=ar?ro.ar:ro.en}
     else{const f=detectField(cv),nA=norm(cv);if(f){kwS=isAr(cv)?FIELDS[f].skills.filter(k=>!hasSkill(nA,k)).slice(0,10):FIELDS[f].skills.map(k=>FSK_EN[k]||k).filter((k,i,a)=>a.indexOf(k)===i&&!nA.includes(norm(k.split(' (')[0]))&&!(k==='Employee Affairs'&&/employee (affairs|records|relations)|personnel/.test(nA))).slice(0,10);kwSrc=f}}}catch(e){}}
   const sc=crit.filter(c=>c.score!=null),avg=Math.round(sc.reduce((a,c)=>a+c.score,0)/sc.length);
   const verdict=K.length?'rej':avg>=75?'ok':avg>=55?'imp':'rej';
@@ -1102,6 +1103,18 @@ function recruiterEval(cv,jd,R){
 let lastRec=null;
 
 /* ---------- تصحيح سريع: المستخدم يشوف الاقتراح، يعدّله، ويضيفه بنفسه أو يتجاهله ---------- */
+
+/* ---------- ترجمة عربية للاقتراحات الإنجليزية (لمن لغته الإنجليزية ضعيفة) ---------- */
+let GLOSS=null;
+function glossMap(){if(GLOSS)return GLOSS;GLOSS=new Map();const put=(e,a)=>{if(e&&a&&!GLOSS.has(e))GLOSS.set(e,a)};
+  try{ROLES.forEach(r=>{(r.skEn||[]).forEach((e,i)=>put(e,(r.sk||[])[i]));(r.bEn||[]).forEach((e,i)=>put(e,(r.b||[])[i]))})}catch(e){}
+  try{Object.values(FIELD_BUL).forEach(o=>o.en.forEach((e,i)=>put(e,o.ar[i])))}catch(e){}
+  try{Object.entries(FSK_EN).forEach(([a,e])=>put(e,a))}catch(e){}
+  try{KD.forEach(k=>put(k.en,k.d))}catch(e){}
+  return GLOSS}
+function wantGloss(){return !UIen()&&window.__cvAr===false}
+function gl(e){if(!wantGloss())return '';const a=glossMap().get(e);return a&&a!==e?a:''}
+function glossLine(list){if(!wantGloss())return '';const L=list.map(e=>[e,gl(e)]).filter(x=>x[1]);return L.length?`<div class="gl" style="font-size:12.5px;color:var(--mut);margin-top:6px;line-height:1.9">🔤 ${tr('المعنى بالعربي:','Arabic:')} ${L.map(([e,a])=>`<span dir="ltr">${esc(e)}</span> = ${esc(a)}`).join(' ، ')}</div>`:''}
 function qfWidget(mode,val,orig,btn,multi){const id='qf'+Math.random().toString(36).slice(2,8);
   const fld=multi?`<textarea class="qfin" dir="auto" rows="${Math.min(5,Math.max(2,Math.ceil(val.length/42)))}" style="width:100%;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8;resize:vertical">${esc(val)}</textarea>`
     :`<input class="qfin" dir="auto" value="${esc(val)}" style="flex:1;min-width:0;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8">`;
@@ -1196,7 +1209,8 @@ function detectRole(t){const n=norm(t||'');
   const eng=/(مهندس|engineer|architect\b)/.test(n)&&!/(رسام|draftsman|draughtsman|فني|technician)/.test(n);
   const order=eng?ROLES.filter(r=>r.cat==='pro'):[...ROLES.filter(r=>r.cat!=='pro'),...ROLES.filter(r=>r.cat==='pro')];
   return order.find(r=>r.re.test(n))||null}
-function roleSkills(cv,ar){const r=cvRole(cv);if(!r||!r.sk)return null;const nA=norm(cv);return (ar?r.sk:r.skEn).filter(k=>!nA.includes(norm(k.split(' (')[0].split(' / ')[0])))}
+function skHave(nA,k){const b=norm(k.split(' (')[0].split(' / ')[0]);if(nA.includes(b))return true;const w=b.split(/\s+/).filter(x=>x.length>=4);return w.length>0&&w.every(x=>nA.includes(x))}
+function roleSkills(cv,ar){const r=cvRole(cv);if(!r||!r.sk)return null;const nA=norm(cv);return (ar?r.sk:r.skEn).filter(k=>!skHave(nA,k))}
 function jobTitles(cv){const L=(cv||'').split('\n'),out=[];L.forEach((l,i)=>{if(/\b(19|20)\d\d\b/.test(l)&&!/^\s*[•●▪◦‣\-–*·]/.test(l)){out.push(l);const pv=(L[i-1]||'').trim();if(pv&&pv.split(/\s+/).length<=8&&!/\b(19|20)\d\d\b/.test(pv)&&!/[.،:]$/.test(pv))out.push(pv)}});return out}
 function cvRole(cv){const L=(cv||'').split('\n');const head=L.slice(0,4).join(' ');return detectRole(head)||detectRole(jobTitles(cv).slice(0,2).join(' '))||detectRole(L.filter(l=>/\|/.test(l)).slice(0,1).join(' '))}
 const ROLE_BUL=[
@@ -1216,7 +1230,7 @@ function fmtQF(c,cv){if(c.st==='pass')return '';const nm=c.name,ar=isAr(cv),Lc=c
     const r=secRange(Lc,'experience'),jd=($('jd')||{}).value||'',fall=detectFields(jd+' '+cv)[0];let out='';
     const jobs=[];if(r)for(let j=r[0]+1;j<r[1];j++){const l=Lc[j];if(l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&/\b(19|20)\d\d\b/.test(l)){let k=j+1,bt='';while(k<r[1]&&/^\s*[•●▪◦‣\-–*·]/.test(Lc[k]))bt+=' '+Lc[k++];const pv=(Lc[j-1]||'').trim();const hasT=pv&&j-1>r[0]&&!/\b(19|20)\d\d\b/.test(pv)&&!/^\s*[•●▪◦‣\-–*·]/.test(pv)&&pv.split(/\s+/).length<=8;const title=hasT?pv:l.split('|')[0].trim();jobs.push({h:l,t:(hasT?pv+' ':'')+l+bt,title})}}
     (jobs.length?jobs.slice(0,3):[{h:'',t:''}]).forEach((jb,ix)=>{const f=detectFields(jb.t)[0]||fall;const B=(roleBul(jb.title||jb.h,ar)||roleBul(jb.t,ar)||(FIELD_BUL[f]||FIELD_BUL._)[ar?'ar':'en']).slice(0,ix?2:3);
-      out+=note((jb.h?`${tr('نقاط مقترحة لوظيفة','Suggested bullets for')}: <b dir="auto">${esc(jb.title||jb.h.split('|')[0].trim())}</b>`:tr('نقاط مقترحة تضيفها لخبرتك','Suggested bullets to add'))+tr(' (عدّل الأرقام لأرقامك الحقيقية):',' (change the numbers to your real ones):'))+B.map(b=>qfWidget('addbullet',b,jb.h,tr('✓ أضفها','✓ Add'),true)).join('')});
+      out+=note((jb.h?`${tr('نقاط مقترحة لوظيفة','Suggested bullets for')}: <b dir="auto">${esc(jb.title||jb.h.split('|')[0].trim())}</b>`:tr('نقاط مقترحة تضيفها لخبرتك','Suggested bullets to add'))+tr(' (عدّل الأرقام لأرقامك الحقيقية):',' (change the numbers to your real ones):'))+B.map(b=>qfWidget('addbullet',b,jb.h,tr('✓ أضفها','✓ Add'),true)+(gl(b)?`<div class="gl" style="font-size:12.5px;color:var(--mut);margin:2px 0 6px">🔤 ${tr('بالعربي:','Arabic:')} ${esc(gl(b))}</div>`:'')).join('')});
     return out}
   if(is('النقاط (Bullets)','Bullet points')){const r=secRange(Lc,'experience');if(!r)return '';return note(tr('نحوّل أسطر الخبرات لنقاط (•) بضغطة:','Turn experience lines into bullets (•) in one tap:'))+`<div class="qf" data-mode="bulletize" style="margin-top:6px"><input class="qfin" type="hidden" value="1"><button class="btn2 qfgo" style="width:100%">${tr('✓ حوّلها لنقاط','✓ Convert to bullets')}</button></div>`}
   if(is('الإنجازات بالأرقام','Quantified achievements'))return `<button class="btn2 qfscroll" style="width:100%;margin-top:6px">${tr('🔢 روح لملاحظات النقاط — الأرقام جاهزة تختار منها','🔢 Go to bullet notes — numbers ready to pick')}</button>`;
@@ -1266,7 +1280,7 @@ function renderRec(E){
       ${M.avail?`<div style="margin-top:6px">${tr('المباشرة:','Availability:')} ${sel1('bAv',[tr('— اختر —','— select —'),tr('متاح للمباشرة فورًا','Available immediately'),tr('فترة الإشعار: أسبوعين','Notice period: 2 weeks'),tr('فترة الإشعار: شهر','Notice period: 1 month'),tr('فترة الإشعار: شهرين','Notice period: 2 months'),tr('✏️ أخرى — اكتبها بنفسك','✏️ Other — type it')])}<input id="bAvT" dir="auto" placeholder="${tr('مثال: متاح للمباشرة بعد 10 أيام','e.g. Available in 10 days')}" style="display:none;width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:13.5px"></div>`:''}</div>`;
     if(E.kwS.length)h+=`<div style="margin-top:8px"><b>🎯 ${tr('كلمات مفتاحية مقترحة','Suggested keywords')}</b></div>
     ${E.kwS.length?'':''}<div class="hint" style="margin:2px 0 8px;${E.kwS.length?'':'display:none'}">${E.kwSrc==='jd'?tr('من إعلان الوظيفة وناقصة في سيرتك.','From the job ad and missing in your CV.'):tr(`مهارات مطلوبة لمهنة «${E.kwSrc}».`,`Skills expected for “${E.kwSrc}”.`)} ${E.kwSrc==='jd'?tr('اخترناها لك ✓ — اضغط على أي كلمة ما تتقنها عشان تشيلها.','All selected ✓ — tap any you don’t have to remove it.'):tr('اضغط على الكلمات اللي تتقنها فعلًا عشان نضيفها.','Tap only the ones you truly have to add them.')}</div>
-    <div class="chips" id="recKw">${E.kwS.map(k=>E.kwSrc==='jd'?`<span class="chip p" data-rk="${esc(k)}" style="cursor:pointer">✓ ${esc(k)}</span>`:`<span class="chip m" data-rk="${esc(k)}" style="cursor:pointer">+ ${esc(k)}</span>`).join('')}</div>`;
+    ${glossLine(E.kwS)}<div class="chips" id="recKw">${E.kwS.map(k=>E.kwSrc==='jd'?`<span class="chip p" data-rk="${esc(k)}" style="cursor:pointer">✓ ${esc(k)}</span>`:`<span class="chip m" data-rk="${esc(k)}" style="cursor:pointer">+ ${esc(k)}</span>`).join('')}</div>`;
     h+=`
     <div class="actions" style="margin-top:10px;justify-content:stretch">
       <button class="btn2" id="recAuto" style="flex:1;background:var(--blue);color:#fff">✨ ${tr('طبّق الاقتراحات وحسّن سيرتي','Apply suggestions & improve my CV')}</button>
@@ -1589,13 +1603,16 @@ function renderSuggest(){
   const sm=suggestSummary(),cur=$('s-summary').value.trim();
   if(sm&&norm(sm)!==norm(cur))h+=`<div style="margin-bottom:10px"><b style="font-size:13.5px">📝 ملخص مهني مقترح</b> <span style="font-size:12px;color:var(--mut)">(مبني من بياناتك)</span><div dir="auto" style="background:#fff;border-radius:8px;padding:8px 10px;margin-top:5px;font-size:13.5px">${esc(sm)}</div><button class="btn2" id="useSum" style="margin-top:6px;padding:5px 12px;font-size:13px">استخدمه بدل الملخص الحالي</button></div>`;
   // skills
-  if(field){const have=FIELDS[field].skills.filter(k=>!hasSkill(nA,k));
-    if(have.length)h+=`<div style="margin-bottom:10px"><b style="font-size:13.5px">🧩 مهارات شائعة في مجال ${field}</b> <span style="font-size:12px;color:var(--mut)">— أضف بس اللي تتقنه فعلاً</span><div class="chips" style="margin-top:6px;gap:6px">${have.slice(0,10).map(k=>`<span class="chip pa addk" data-sk="${esc(k)}" style="font-size:12.5px;padding:4px 10px">+ ${esc(k)}</span>`).join('')}</div></div>`;}
+  const roB=cvRole(all),arB=isAr(all);let have=[],lab='';
+  if(roB&&roB.sk){have=(arB?roB.sk:roB.skEn).filter(k=>!skHave(nA,k));lab=`مهارات مطلوبة لمهنة «${arB?roB.ar:roB.en}»`}
+  else if(field){have=FIELDS[field].skills.filter(k=>!hasSkill(nA,k)).map(k=>arB?k:(FSK_EN[k]||k));lab=`مهارات شائعة في مجال ${field}`}
+  if(have.length){
+    if(have.length)h+=`<div style="margin-bottom:10px"><b style="font-size:13.5px">🧩 ${lab}</b> <span style="font-size:12px;color:var(--mut)">— أضف بس اللي تتقنه فعلاً</span><div class="chips" style="margin-top:6px;gap:6px">${have.slice(0,10).map(k=>`<span class="chip pa addk" data-sk="${esc(k)}" style="font-size:12.5px;padding:4px 10px">+ ${esc(k)}</span>`).join('')}</div>${glossLine(have.slice(0,10))}</div>`;}
   // basics
   const miss=[];
   if(!d.title){const t=(($('s-experience').value.split('\n').find(l=>!BULLET_RE.test(l)&&l.trim())||'').split('|')[0]||'').trim();if(t)miss.push(`<span class="chip pa addk" data-ttl="${esc(t)}" style="font-size:12.5px;padding:4px 10px">+ المسمى: ${esc(t)}</span>`)}
   if(!$('s-langs').value.trim()){miss.push(`<span style="font-size:13px">🌐 اللغات: الإنجليزية —</span> ${['ممتاز','جيد جداً','جيد','متوسط'].map(l=>`<span class="chip pa addk" data-lng="${l}" style="font-size:12.5px;padding:3px 9px">${l}</span>`).join(' ')}`)}
-  if(!$('f-li').value.trim())miss.push(`<span style="font-size:13px">🔗 أضف رابط LinkedIn من «تعديل يدوي» بالأسفل</span>`);
+  if(!$('f-li').value.trim()&&!(roB&&(roB.cat==='tech'||roB.cat==='front')))miss.push(`<span style="font-size:13px">🔗 أضف رابط LinkedIn من «تعديل يدوي» بالأسفل</span>`);
   if(!$('f-city').value.trim())miss.push(`<span style="font-size:13px">📍 أضف المدينة من «تعديل يدوي» بالأسفل</span>`);
   if(miss.length)h+=`<div><b style="font-size:13.5px">✅ أساسيات ناقصة</b><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${miss.map(x=>`<div class="chips" style="gap:5px;align-items:center">${x}</div>`).join('')}</div></div>`;
   h+='</div>';
@@ -1771,7 +1788,9 @@ function compactSecs(secs){
       for(let i=0;i<L.length;i++){const l=L[i],n=L[i+1];
         const isHead=x=>!BULLET_RE.test(x)&&(/\|/.test(x)||/\b(19|20)\d\d\b/.test(x));
         const isTitle=x=>x&&!BULLET_RE.test(x)&&!/\|/.test(x)&&!/\b(19|20)\d\d\b/.test(x)&&x.split(/\s+/).length<=8&&!/[.،:]$/.test(x);
-        if(isHead(l)&&isTitle(n)){out.push(n+' | '+l);i++}else out.push(l)}
+        const nn=L[i+2];
+        if(isTitle(l)&&isHead(n)){out.push(l+' | '+n);i++}
+        else if(isHead(l)&&isTitle(n)&&!(nn&&isHead(nn))){out.push(n+' | '+l);i++}else out.push(l)}
       L=out;
     }
     if((s.id==='skills'||s.id==='langs')&&L.length>2&&L.every(x=>x.replace(BULLET_RE,'').split(/\s+/).length<=7))
