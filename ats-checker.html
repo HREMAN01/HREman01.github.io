@@ -292,7 +292,7 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
 <footer>
   <div>© <span id="yr"></span> <b>إيمان خالد</b> — منقذك | EMAN HR. جميع الحقوق محفوظة.</div>
   <div class="en">All rights reserved. Unauthorized copying or redistribution is prohibited.</div>
-  <div style="margin-top:6px;font-weight:800;color:var(--blue)">🔖 الإصدار: 25/11 — 21:30</div>
+  <div style="margin-top:6px;font-weight:800;color:var(--blue)">🔖 الإصدار: 25/11 — 21:45</div>
   <div style="margin-top:6px">أدوات HR أخرى: <a href="https://hreman01.github.io" target="_blank" rel="noopener">hreman01.github.io</a></div>
 </footer>
 <div class="toast" id="toast"></div>
@@ -910,11 +910,13 @@ function datePeriods(lines){
     if(!b.now&&b.y*12+(b.mo||6)<a.y*12+(a.mo||6)){const t=a;a=b;b=t}
     /* سنة بدون شهر: نحسبها من منتصف السنة عشان ما تتضخم الخبرة (2020–2022 = سنتين مو 3) */
     const s=a.y*12+(a.mo?a.mo-1:6),e=b.now?nowM:b.y*12+(b.mo?b.mo-1:5);
-    if(e>=s&&e-s<=12*45)P.push({s,e,cur:!!b.now,i:li});
+    if(e>=s&&e-s<=12*45)P.push({s,e,cur:!!b.now,i:li,sy:!a.mo,ey:!b.now&&!b.mo});
   });
   return P;
 }
-function mergeP(P){const s=[...P].sort((a,b)=>a.s-b.s),out=[];s.forEach(p=>{const l=out[out.length-1];if(l&&p.s<=l.e+1)l.e=Math.max(l.e,p.e);else out.push({...p})});return out}
+function mergeP(P){const s=[...P].sort((a,b)=>a.s-b.s),out=[];s.forEach(p=>{const l=out[out.length-1];if(l&&p.s<=l.e+1){if(p.e>l.e){l.e=p.e;l.ey=p.ey;l.cur=p.cur}}else out.push({...p})});return out}
+/* فجوة حقيقية؟ إذا التاريخ سنة بدون شهر (2022 ثم 2023) ما نقدر نجزم بفجوة — نحسبها بس إذا فيه سنة كاملة ناقصة */
+function realGap(a,b){if(a.ey||b.sy){const ya=Math.floor(a.e/12),yb=Math.floor(b.s/12);return yb-ya>=2}return b.s-a.e-1>6}
 const NUMW={'سنه واحده':1,'سنتين':2,'سنتان':2,'ثلاث':3,'ثلاثه':3,'اربع':4,'اربعه':4,'خمس':5,'خمسه':5,'ست':6,'سته':6,'سبع':7,'سبعه':7,'ثمان':8,'ثماني':8,'ثمانيه':8,'تسع':9,'عشر':10,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'ten':10};
 function reqYears(jd){
   const n=norm(jd);
@@ -977,10 +979,10 @@ function recruiterEval(cv,jd,R){
       else if(yrs>=need*.65){es=62;er.push(tr(`خبرتك ${relYrs!=null?'ذات العلاقة ':''}${yrs} سنة والمطلوب ${need} — قريبة لكن أقل`,`${yrs} years vs ${need} required — close but short`));ef.push(tr('أبرز أي خبرة إضافية (تدريب تعاوني، عمل جزئي، مشاريع) لها علاقة بالوظيفة','Add any related extra experience (internship, part-time, projects)'))}
       else{es=25;const k=tr(`خبرتك ${relYrs!=null?'ذات العلاقة ':''}${yrs} سنة والمطلوب ${need} سنوات`,`You have ${yrs} years; the job requires ${need}`);er.push(k);K.push(k);ef.push(tr('قدّم على وظائف بمستوى خبرة أقل، أو أضف خبراتك ذات العلاقة إن وُجدت','Apply for roles matching your level, or add related experience if you have it'))}}
     else{es=yrsC>=3?90:yrsC>=1?78:58;if(relYrs===0){es=35;K.push(tr('خبرتك في مجال مختلف عن الوظيفة المعلنة','Your experience is in a different field from this job'))}eg.push(tr(`إجمالي خبرتك تقريبًا ${yrs} ${yrs>=3&&yrs<=10?'سنوات':'سنة'}`,`About ${yrs} years of total experience`));if(yrs<1)er.push(tr('خبرتك أقل من سنة — يناسبك التركيز على الدورات والمشاريع','Less than one year — highlight courses and projects'))}
-    let gaps=0;for(let i=1;i<mp.length;i++){const g=mp[i].s-mp[i-1].e-1;if(g>6)gaps++}
+    let gaps=0;for(let i=1;i<mp.length;i++){if(realGap(mp[i-1],mp[i]))gaps++}
     const now=new Date(),nowM=now.getFullYear()*12+now.getMonth(),last=mp[mp.length-1];
     if(last&&!per.some(p=>p.cur)&&nowM-last.e>6)gaps++;
-    if(gaps){es-=Math.min(20,gaps*10);er.push(tr(`فيه ${gaps} فجوة وظيفية أكثر من 6 أشهر بدون توضيح`,`${gaps} employment gap(s) over 6 months with no explanation`));ef.push(tr('وضّح سبب الفجوة بسطر (دراسة، دورة، ظرف عائلي) بدل ما تتركها فاضية','Explain gaps in one line (study, course, family) instead of leaving them blank'))}
+    if(gaps){es-=Math.min(20,gaps*10);er.push(tr(gaps===1?'فيه فجوة وظيفية أكثر من 6 أشهر بدون توضيح':gaps===2?'فيه فجوتين وظيفيتين أكثر من 6 أشهر بدون توضيح':`فيه ${gaps} فجوات وظيفية أكثر من 6 أشهر بدون توضيح`,`${gaps} employment gap(s) over 6 months with no explanation`));ef.push(tr('وضّح سبب الفجوة بسطر (دراسة، دورة، ظرف عائلي) بدل ما تتركها فاضية','Explain gaps in one line (study, course, family) instead of leaving them blank'))}
     const ended=per.filter(p=>!p.cur),short=ended.filter(p=>p.e-p.s+1<12).length;
     if(per.length>=3&&short>=2){es-=15;er.push(tr(`تنقّل كثير: ${short} وظائف أقل من سنة`,`Frequent job changes: ${short} roles under one year`));ef.push(tr('اذكر سبب التنقل باختصار (عقد مؤقت، مشروع انتهى) أو ادمج الوظائف القصيرة','Briefly state why (fixed-term contract, project ended) or group short roles'))}
     /* حكم مسؤول التوظيف — من التواريخ نفسها */
@@ -1155,8 +1157,8 @@ function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);const LP=(a,e)=>{if(!ar)glo
     return H.map(l=>`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('أضف التاريخ لهذي الوظيفة:','Add dates to this job:')}</div>`+qfWidget('replace',l.trim()+(ar?' | 01/2022 – حتى الآن':' | 01/2022 – Present'),l,tr('✓ عدّله','✓ Update'),true)).join('')}
   if(/(دوام جزئي \/ عمل حر|part-time \/ freelance)/i.test(n))return note0(tr('اكتب التوضيح (ينضاف لمعلومات إضافية):','Write the clarification (added to Additional Info):'))+qfWidget('other',L('الوظيفة الثانية كانت دوام جزئي بالتوازي مع العمل الأساسي','The overlapping role was a part-time position held alongside the main job.'),'',tr('✓ أضفه','✓ Add'),true);
   if(/(متدرب محاماه|trainee lawyer)/i.test(n)){const r=secRange(Lc,'experience');if(!r)return '';const H=Lc.slice(r[0]+1,r[1]).filter(l=>{const lic=Lc.find(x=>/(رخص[هة] (ال)?محاما[هة]|license to practice law|law license)/i.test(x)&&/\b(19|20)\d\d\b/.test(x));const ly=lic?+lic.match(/\b(19|20)\d\d\b/)[0]:0;const y=(l.match(/\b(19|20)\d\d\b/)||[])[0];return /(محامي|attorney|lawyer)/i.test(l)&&y&&ly&&+y<ly}).slice(0,3);return H.map(l=>note0(tr('عدّل مسمى الوظيفة قبل الرخصة:','Edit the pre-license title:'))+qfWidget('replace',l.replace(/محامي|محامية/,'متدرب محاماة').replace(/\b(Attorney|Lawyer)\b/,'Legal Specialist').trim(),l,tr('✓ عدّله','✓ Update'),true)).join('')}
-  if(/(سبب الفجوه|سبب التنقل|explain gaps|briefly state why)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب السبب بسطر (ينضاف لمعلومات إضافية):','Write the reason in one line (added to Additional Info):')}</div>`+qfWidget('other',/فجو|gap/i.test(n)?(()=>{const r=secRange(Lc,'experience');const mp=mergeP(datePeriods(r?Lc.slice(r[0]+1,r[1]):Lc));let g=null;for(let i=1;i<mp.length;i++)if(mp[i].s-mp[i-1].e-1>6){g=[mp[i-1].e+1,mp[i].s-1];break}
-      const f=m=>String(m%12+1).padStart(2,'0')+'/'+Math.floor(m/12);const per=g?f(g[0])+' – '+f(g[1]):'';return L(`${per}: تطوير مهارات ودورات تدريبية`,`${per}: Professional development and training courses`).replace(/^: /,'')})():L('الوظائف القصيرة كانت بعقود مشاريع مؤقتة وانتهت بانتهاء المشروع','Short tenures reflect fixed-term project contracts that ended on project completion.'),'',tr('✓ أضفه','✓ Add'),true);
+  if(/(سبب الفجوه|سبب التنقل|explain gaps|briefly state why)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب السبب بسطر (ينضاف لمعلومات إضافية):','Write the reason in one line (added to Additional Info):')}</div>`+qfWidget('other',/فجو|gap/i.test(n)?(()=>{const r=secRange(Lc,'experience');const mp=mergeP(datePeriods(r?Lc.slice(r[0]+1,r[1]):Lc));let g=null;for(let i=1;i<mp.length;i++)if(realGap(mp[i-1],mp[i])){g=[mp[i-1].e+1,mp[i].s-1,mp[i-1].ey||mp[i].sy];break}
+      const f=m=>String(m%12+1).padStart(2,'0')+'/'+Math.floor(m/12);const per=g?(g[2]?(Math.floor(g[0]/12)===Math.floor(g[1]/12)?String(Math.floor(g[0]/12)):Math.floor(g[0]/12)+' – '+Math.floor(g[1]/12)):f(g[0])+' – '+f(g[1])):'';return L(`${per}: تطوير مهارات ودورات تدريبية`,`${per}: Professional development and training courses`).replace(/^: /,'')})():L('الوظائف القصيرة كانت بعقود مشاريع مؤقتة وانتهت بانتهاء المشروع','Short tenures reflect fixed-term project contracts that ended on project completion.'),'',tr('✓ أضفه','✓ Add'),true);
   if(/(تعوض المؤهل|ابرز اي خبره اضافيه|وضح في نقاط كل وظيفه|خصص سيرتك|compensates|related extra experience|tailor your summary|in each role, highlight)/i.test(n)){const r=secRange(Lc,'summary');
     if(!r)return qfWidget('summary',L('أخصائي ... بخبرة ... سنوات في ...، متمكن من ...','... professional with ... years of experience in ...'),'',tr('✓ أضف الملخص','✓ Add summary'),true);
     const t=Lc.slice(r[0]+1,r[1]).filter(x=>x.trim()).join(' ');return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('عدّل ملخصك هنا:','Edit your summary here:')}</div>`+qfWidget('summary',t,'',tr('✓ عدّل الملخص','✓ Update summary'),true)}
