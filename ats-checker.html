@@ -68,6 +68,16 @@ h3 .cnt{font-size:12px;background:var(--blue-l);color:var(--blue-d);padding:2px 
 .chip .imp{font-size:10px;opacity:.8;margin-inline-start:4px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin-bottom:12px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:5px;vertical-align:middle}
+.coach{border:1px solid var(--line,#E4DFEE);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.coach.bad{border-color:#f1b8b4;background:#fffafa}.coach.mid{border-color:#f3d9a6}
+.coach .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px}
+.coach .sc{border-radius:20px;padding:2px 8px;font-weight:800;font-size:12px}
+.coach .was{color:var(--mut);font-size:14px;margin-bottom:6px;unicode-bidi:plaintext}
+.coach .why{color:var(--bad);font-size:13px;font-weight:700;margin-bottom:6px}
+.coach .lab{font-size:13px;font-weight:800;color:var(--ok)}
+.coach .better{background:var(--ok-l,#e9f7ef);border-radius:8px;padding:8px 10px;margin-top:4px;font-weight:700;font-size:14.5px;line-height:1.9;unicode-bidi:plaintext}
+.coach .kwh{margin-top:8px;font-size:13.5px}
+mark.slot{background:#ffe08a;color:#5a4300;border-radius:6px;padding:1px 6px;font-weight:800;white-space:nowrap}
 .weak{background:var(--bad-l);border-radius:12px;padding:14px;margin-bottom:12px}
 .weak .q{font-weight:700;margin:4px 0 8px}
 .tip{background:#fff;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px}
@@ -475,7 +485,7 @@ function dictKW(text){const j=' '+toks(text).join(' ')+' ';return KD.filter(e=>e
 function extractKeywords(jd){
   const DK=dictKW(jd),jj=' '+toks(jd).join(' ')+' ';
   const covered=new Set();DK.forEach(e=>e.a.filter(a=>hasPh(jj,a)).forEach(a=>a.split(' ').forEach(w=>{covered.add(w);covered.add(stem(w))})));
-  const jAr=isAr(jd);const dl=DK.map(e=>{const a=e.a.find(x=>hasPh(jj,x));KD_SET.add(a);const pd=kwPretty(a,jd);const sen=jd.split(/[\n.;؛،,]+/).find(x=>hasPh(' '+toks(x).join(' ')+' ',a))||'';const opt=/(plus|preferred|advantage|nice to have|desirable|ميزه|ميزة|يفضل|أفضلية|افضليه|ميزة إضافية)/i.test(sen);return {k:a,opt,d:UIen()?e.en:jAr||/[ء-ي]/.test(pd)?e.d:(pd.length<=4?pd.toUpperCase():pd.replace(/\b\w/g,c=>c.toUpperCase())),dict:e,c:9,phrase:true,imp:opt?1:3}});
+  const jAr=isAr(jd);const dl=DK.map(e=>{const a=e.a.find(x=>hasPh(jj,x));KD_SET.add(a);const pd=kwPretty(a,jd);const sen=jd.split(/[\n.;؛،,]+/).find(x=>hasPh(' '+toks(x).join(' ')+' ',a))||'';const opt=/(plus|preferred|advantage|nice to have|desirable|ميزه|ميزة|يفضل|أفضلية|افضليه|ميزة إضافية)/i.test(sen);return {k:a,opt,d:(jAr&&!UIen()?e.d:e.en),dict:e,c:9,phrase:true,imp:opt?1:3}});
   const lines=jd.split(/[\n.;،,:؛•\-\(\)\/|]+/);
   const uni={},bi={};
   lines.forEach(l=>{
@@ -663,19 +673,86 @@ function analyze(cv,jd,meta){
 const col=s=>s>=80?'var(--ok)':s>=60?'var(--warn)':'var(--bad)';
 const colL=s=>s>=80?'var(--ok-l)':s>=60?'var(--warn-l)':'var(--bad-l)';
 let lastReport='';
+
+/* ---------- ملاحظات مسؤول التوظيف على كل نقطة: الأحسن + وين تحط الرقم + الكلمة المفتاحية ---------- */
+const SLOT='⟦#⟧';
+function numSlot(t,ar){
+  const n=norm(t);
+  if(ar){
+    if(/(طلب|معامل)/.test(n))return ' — بمعدل '+SLOT+' طلب شهريًا وإنجازها خلال '+SLOT+' أيام';
+    if(/(انذار|خصم|جزاء|تحقيق|مخالف)/.test(n))return ' — '+SLOT+' حالة سنويًا دون أي اعتراض أو قضية عمالية';
+    if(/(توظيف|استقطاب|مباشر|تهيئ|مقابل)/.test(n))return ' — '+SLOT+' موظف جديد سنويًا خلال '+SLOT+' يوم للتعيين';
+    if(/(اشراف|فريق|ادار[ةه] الموظفين)/.test(n)&&!/\d/.test(n))return ' لفريق من '+SLOT+' موظف';
+    if(/(اجاز|حضور|دوام|اوراكل|جسر)/.test(n))return ' لعدد '+SLOT+' موظف شهريًا بدقة '+SLOT+'%';
+    if(/(راتب|رواتب|مسير)/.test(n))return ' لعدد '+SLOT+' موظف شهريًا دون أي خطأ في الصرف';
+    if(/(تقرير|تقارير)/.test(n))return ' — '+SLOT+' تقارير شهريًا';
+    if(/(خفض|تقليل|تحسين|توفير|رفع|زياد)/.test(n))return ' بنسبة '+SLOT+'% خلال '+SLOT+' أشهر';
+    if(/(مشروع|مشاريع)/.test(n))return ' — '+SLOT+' مشاريع بقيمة '+SLOT+' ريال';
+    if(/(تدريب|دورات)/.test(n))return ' لعدد '+SLOT+' موظف في '+SLOT+' برامج';
+    return ' — بمعدل '+SLOT+' شهريًا';
+  }
+  if(/(request|application|transaction|ticket)/.test(n))return ' — '+SLOT+' per month, completed within '+SLOT+' days';
+  if(/(disciplin|warning|deduction|investigat)/.test(n))return ' — '+SLOT+' cases/year with zero labor disputes';
+  if(/(recruit|hiring|hired|new hires|onboard|interview|sourc)/.test(n))return ' — '+SLOT+' hires/year, time-to-hire '+SLOT+' days';
+  if(/\b(supervis\w*|managed|led|team)\b/.test(n)&&!/\d/.test(n))return ' — team of '+SLOT+' employees';
+  if(/(leave|attendance|timesheet|oracle|jisr)/.test(n))return ' for '+SLOT+' employees monthly with '+SLOT+'% accuracy';
+  if(/(payroll|salar)/.test(n))return ' for '+SLOT+' employees monthly with zero payment errors';
+  if(/(report)/.test(n))return ' — '+SLOT+' reports monthly';
+  if(/(reduc|cut|improv|increas|sav|boost)/.test(n))return ' by '+SLOT+'% within '+SLOT+' months';
+  if(/(project|boq|site)/.test(n))return ' — '+SLOT+' projects worth SAR '+SLOT;
+  if(/(train)/.test(n))return ' — '+SLOT+' employees across '+SLOT+' programs';
+  return ' — '+SLOT+' per month';
+}
+const KW_FOR=[
+ [/(طلب|معامل|request|clearance|اخلاء|استقال|resign|مخالص|settlement)/,['حساب نهاية الخدمة','إنهاء الخدمة والمخالصات','نظام العمل السعودي','أنظمة HRIS']],
+ [/(انذار|خصم|جزاء|تحقيق|disciplin|warning|deduction)/,['نظام العمل السعودي','الجزاءات والتأديب','علاقات الموظفين']],
+ [/(توظيف|استقطاب|مباشر|تهيئ|مقابل|recruit|hiring|onboard|interview)/,['منصة قوى','التأمينات الاجتماعية (GOSI)','التهيئة والمباشرة','التوطين ونطاقات']],
+ [/(اجاز|حضور|دوام|leave|attendance|timesheet)/,['إدارة الإجازات','الحضور والانصراف','مسير الرواتب','Oracle','جسر']],
+ [/(راتب|رواتب|مسير|payroll|salar)/,['مسير الرواتب','مدد','التأمينات الاجتماعية (GOSI)','حساب الرواتب والبدلات']],
+ [/(اشراف|فريق|supervis|team|managed)/,['إدارة الأداء','علاقات الموظفين','التدريب والتطوير']],
+ [/(تقرير|report)/,['التقارير ومؤشرات الأداء','Excel','Power BI']],
+ [/(اوراكل|oracle|sap|جسر|jisr|نظام)/,['أنظمة HRIS','Oracle','جسر']],
+];
+function bulletKW(t,R,used){used=used||new Set();
+  const n=norm(t),miss=(R.kw||[]).filter(k=>k.st!=='p'&&!used.has(k.d||k.k));
+  const want=[];KW_FOR.forEach(([re,L])=>{if(re.test(n))want.push(...L)});
+  if(R.kw){const hit=miss.find(k=>k.dict&&want.includes(k.dict.d));if(hit)return {k:hit.d||hit.k,fromJD:true};
+    const tk=new Set(toks(t).map(stem));const o=miss.find(k=>k.k.split(' ').some(w=>w.length>=3&&tk.has(stem(w))));if(o)return {k:o.d||o.k,fromJD:true};return null}
+  const cvn=' '+toks(t).join(' ')+' ';const w=want.find(d=>{const e=KD.find(x=>x.d===d);return e&&!used.has(UIen()?e.en:e.d)&&!e.a.some(a=>hasPh(cvn,a))});
+  if(!w)return null;const e=KD.find(x=>x.d===w);return {k:UIen()?e.en:e.d,fromJD:false};
+}
+function coachBullet(b,R,used){
+  const sg=suggest(b),ar=sg.ar;
+  let better=sg.tpl.replace(/\.$/,'');
+  if(!b.num)better+=numSlot(b.t,ar);
+  better+='.';
+  const kw=bulletKW(b.t,R,used);if(kw&&used)used.add(kw.k);
+  const why=[];
+  if(b.pas)why.push(tr('صياغة سلبية («مسؤول عن / تم») — ما توضح وش سويت أنت','Passive (“Responsible for”) — doesn’t show what you did'));
+  else if(!b.verb)why.push(tr('ما تبدأ بكلمة إنجاز','Doesn’t start with an action verb'));
+  if(!b.num)why.push(tr('ما فيها رقم — مسؤول التوظيف يقارن بالأرقام','No number — recruiters compare by numbers'));
+  if(b.thin)why.push(tr('قصيرة — ما توضح الحجم ولا النتيجة','Too short — no scale or result'));
+  if(b.long)why.push(tr('طويلة — اختصرها','Too long — trim it'));
+  return {sg,ar,better,kw,why};
+}
+function slotHTML(t){return esc(t).split(SLOT).join(`<mark class="slot">${tr('🔢 رقمك','🔢 your #')}</mark>`)}
 function suggest(b){
   const ar=isAr(b.t),tips=[],qs=[];
   let core=improveBullet(b.t.replace(/^[\s•●▪◦‣\-–*·]+/,'').trim()).replace(/[.،,;:\s]+$/,'');
-  // اختصار القوائم الطويلة: مسؤول التوظيف يقرأ أول 3-4 عناصر فقط
+  // القوائم الطويلة: نختصر صياغة كل بند بدل ما نحذف بنود (المعلومة مهمة لمسؤول التوظيف)
   const m=core.match(/^(.*?)(,?\s*(?:including|such as|مثل|تشمل|بما في ذلك)\s+)(.*)$/i);
   let cut=false;
-  if(m){const items=m[3].split(/\s*(?:,|،|\band\b|\bو(?=\S))\s*/).filter(x=>x.trim());
-    if(items.length>4){core=m[1]+(ar?' (':' (')+items.slice(0,4).join(ar?'، ':', ')+')';cut=true;}}
+  if(m){let items=m[3].split(/\s*(?:,|،)\s*(?:and\s+|و(?=\S))?|\s+and\s+/i).map(x=>x.replace(/^(and|و)\s+/i,'').trim()).filter(Boolean);
+    if(items.length>=4){
+      const short=x=>ar?x.replace(/^(طلبات|معاملات|إجراءات|اجراءات)\s+/,'').replace(/^ال/,'ال'):x.replace(/^(.+?)\s+(applications|requests|procedures)$/i,(m0,base)=>/(leave|s)$/i.test(base)?base:base+'s').replace(/\s+(application|request|documentation|processing|management|procedure)$/i,'').replace(/^employment$/i,'employment letters');
+      items=items.map(short);if(items.length>7)items=items.slice(0,7);
+      const last=items.pop();core=m[1].replace(/[,،]\s*$/,'')+' — '+items.join(ar?'، ':', ')+(ar?' و':' and ')+last;cut=true;}}
   if(!b.verb&&!b.pas)tips.push(tr(ar?'ابدأ النقطة بكلمة إنجاز (إدارة، إعداد، تطوير) بدل الوصف العام.':'ابدأ النقطة بفعل إنجاز (Managed, Prepared, Improved).','Start with an action verb (Managed, Prepared, Improved) instead of a description.'));
   if(b.pas)tips.push(tr(ar?'شيل «مسؤول عن / تم» — مسؤول التوظيف يبغى وش سويت أنت.':'شيل «Responsible for» — مسؤول التوظيف يبغى وش سويت أنت.','Drop “Responsible for” — recruiters want to see what you actually did.'));
-  if(cut)tips.push(tr('القائمة طويلة — اختصرتها لأهم 4، الباقي ما أحد يقرأه.','The list is too long — trimmed to the top 4; nobody reads the rest.'));
+  if(cut)tips.push(tr('القائمة طويلة — اختصرت صياغة كل بند وخليت البنود كلها.','Long list — shortened each item and kept them all.'));
   if(!b.num){tips.push(tr('ما فيها ولا رقم — هذي أكبر نقطة ضعف. مسؤول التوظيف يقارن بالأرقام.','No numbers at all — the biggest weakness. Recruiters compare candidates by numbers.'));
-    qs.push(...(UIen()?['How many (per month or year)?','For how many projects, employees or clients?','What was the result, or in how long?']:['كم عددها (بالشهر أو بالسنة)؟','لكم مشروع أو موظف أو عميل؟','وش النتيجة، أو خلال كم مدة؟']));}
+    const rq=/(request|طلب|معامل|application)/i.test(b.t);
+    qs.push(...(rq?(UIen()?['How many requests per month?','For how many employees?','Completed within how many days?']:['كم طلب بالشهر؟','لكم موظف؟','تنجزها خلال كم يوم؟']):(UIen()?['How many (per month or year)?','For how many projects, employees or clients?','What was the result, or in how long?']:['كم عددها (بالشهر أو بالسنة)؟','لكم مشروع أو موظف أو عميل؟','وش النتيجة، أو خلال كم مدة؟'])));}
   if(b.thin)tips.push(tr('قصيرة جدًا — وضّح وش سويت ولمين.','Too short — say what you did and for whom.'));
   const tpl=core+'.';
   return {tips,tpl,ar,qs};
@@ -708,13 +785,21 @@ function render(R,noScroll){
   const S=R.scored;$('bCnt').textContent=S.length?tr(`${S.length} ${S.length>=3&&S.length<=10?'نقاط':'نقطة'}`,`${S.length} bullets`):'';
   if(!S.length){$('bullets').innerHTML=`<div class="hint" style="font-size:14px">${tr('لم نتمكن من استخراج نقاط من سيرتك. اكتب خبراتك على شكل نقاط تبدأ بـ (•).','We couldn’t find bullets in your CV. Write your experience as bullets starting with (•).')}</div>`;}
   else{
-    const weak=[...S].sort((a,b)=>a.s-b.s)[0],sg=suggest(weak);
+    const ord=[...S].sort((a,b)=>a.s-b.s);
     let h='';
     if(!R.detected)h+=`<div class="hint" style="margin-bottom:8px">${tr('⚠️ ما لقينا نقاط منظمة، فحللنا أطول الأسطر بدلاً منها.','⚠️ No structured bullets found, so we analyzed your longest lines instead.')}</div>`;
-    h+=`<div class="weak"><div style="font-size:13px;color:var(--bad);font-weight:800">${tr('أضعف نقطة في سيرتك','Your weakest bullet')} — ${weak.s}/100</div><div class="q" dir="${sg.ar?'rtl':'ltr'}" style="text-align:${sg.ar?'right':'left'}">${esc(weak.t.replace(/^[\s•●▪◦‣\-–*·]+/,''))}</div>
-      <div class="tip"><b>${tr('كيف تحسّنها:','How to improve it:')}</b><ul style="margin:4px 0;padding-inline-start:18px">${sg.tips.map(t=>`<li>${esc(t)}</li>`).join('')||`<li>${tr('جيدة — يمكنك إضافة نتيجة أوضح.','Good — you could add a clearer result.')}</li>`}</ul>
-      ${tr('الصياغة بعد التعديل:','Rewritten:')}<code dir="${sg.ar?'rtl':'ltr'}" style="text-align:${sg.ar?'right':'left'}">${esc(sg.tpl)}</code>${sg.qs.length?`<div style="font-size:13px;margin-top:6px"><b>${tr('جاوب وحط الرقم الحقيقي في النقطة:','Answer these and add your real numbers:')}</b> ${sg.qs.map(esc).join(' — ')}</div>`:''}</div></div>`;
-    h+=`<div class="blist"><details><summary>${tr('عرض تقييم كل النقاط','Show all bullet scores')} (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?`<em>${tr('✓ فعل قوي','✓ strong verb')}</em>`:`<em>${tr('✕ بدون فعل','✕ no verb')}</em>`}${b.num?`<em>${tr('✓ أرقام','✓ numbers')}</em>`:b.res?`<em>${tr('✓ نتيجة','✓ result')}</em>`:`<em>${tr('— بدون رقم','— no number')}</em>`}${b.unfinished?`<em>${tr('✕ غير مكتملة','✕ unfinished')}</em>`:''}${b.odd?`<em>${tr('✕ رقم غير منطقي','✕ odd number')}</em>`:''}${b.pas?`<em>${tr('✕ صياغة سلبية','✕ passive')}</em>`:''}${b.thin?`<em>${tr('✕ قصيرة','✕ too short')}</em>`:''}</div></div></div>`).join('')}</details></div>`;
+    h+=`<div class="hint" style="margin-bottom:8px">${tr('🧑‍💼 ملاحظاتي على كل نقطة: وش المشكلة، والصياغة الأحسن، ووين تحط رقمك، والكلمة المفتاحية اللي تضيفها. بدّل <mark class="slot">🔢 رقمك</mark> برقمك الحقيقي.','🧑‍💼 My notes on each bullet: the problem, a better version, where to put your number, and a keyword to add. Replace <mark class="slot">🔢 your #</mark> with your real number.')}</div>`;
+    const usedK=new Set();
+    const card=(b,i)=>{const c=coachBullet(b,R,usedK),d=c.ar?'rtl':'ltr',al=c.ar?'right':'left';const good=b.s>=85&&!c.kw;
+      return `<div class="coach ${b.s<50?'bad':b.s<75?'mid':'ok'}"><div class="ch"><b>${tr('نقطة','Bullet')} ${i+1}</b><span class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}/100</span></div>
+        <div class="was" dir="${d}" style="text-align:${al}">${esc(b.t.replace(/^[\s•●▪◦‣\-–*·]+/,''))}</div>
+        ${good?`<div style="color:var(--ok);font-weight:700;font-size:13.5px">✅ ${tr('نقطة قوية — خلّها زي ما هي.','Strong bullet — keep it.')}</div>`:`
+        ${c.why.length?`<div class="why">❌ ${c.why.map(esc).join(' • ')}</div>`:''}
+        <div class="lab">✅ ${tr('الأحسن تكتبها كذا:','Better:')}</div><div class="better" dir="${d}" style="text-align:${al}">${slotHTML(c.better)}</div>
+        ${c.kw?`<div class="kwh">🎯 ${tr('كلمة مفتاحية تضيفها هنا','Keyword to add here')}: <b dir="auto">${esc(c.kw.k)}</b>${c.kw.fromJD?` <span style="color:var(--mut)">${tr('(مطلوبة في الإعلان)','(in the job ad)')}</span>`:` <span style="color:var(--mut)">${tr('(إذا تتقنها)','(if you have it)')}</span>`}</div>`:''}`}
+      </div>`};
+    h+=ord.slice(0,5).map(card).join('');
+    if(ord.length>5)h+=`<details class="blist"><summary>${tr('ملاحظاتي على باقي النقاط','My notes on the remaining bullets')} (${ord.length-5})</summary>${ord.slice(5).map((b,i)=>card(b,i+5)).join('')}</details>`;
     h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">${tr('✏️ عدّل نقاطك بنفسك مع اقتراحات','✏️ Edit your bullets with suggestions')}</button>`;$('bullets').innerHTML=h;$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
   }
   try{renderRec(recruiterEval(lastCV,$('jd').value,R))}catch(e){console.warn(e);$('recCard').style.display='none'}
@@ -770,7 +855,7 @@ function kwPretty(k,jd){const W=jd.split(/[\s\n]+/).map(w=>w.replace(/^[^\wء-ي
   for(let i=0;i+n<=W.length;i++){const seg=W.slice(i,i+n);if(toks(seg.join(' ')).join(' ')===k){let o=seg.join(' ');if(/^و/.test(o)&&!/^و/.test(k))o=o.slice(1);return o}}return k}
 const KW_GEN=new Set(['hiring','membership','looking','seeking','join','team','company','candidate','candidates','role','position','ميزه','افضليه','يفضل','مطلوبه','بشريه','موارد','اخصائي','اخصائيه','منصه','بنظام','حساب','اعداد','شهاده','ادخال','الماميه','فهم','تطبيق','وجود','لديه','لديها','قادر','قادره','candidate','preferred','plus','advantage','بخبره','برنامج','برامج','اتقان','مراجعه','اعداد','متابعه','القدره','العمل','المام','معرفه','اجاده','جداول','الموقع','موقع','الهيئه','هيئه','عضويه','شركه','الشركه','location','جيده','ممتازه','program','knowledge','ability','good','strong','excellent','proficiency','proficient']);
 function kwClean(list,jd){
-  const jAr=isAr(jd),dmap={};KD.forEach(e=>e.a.forEach(a=>{const pd=kwPretty(a,jd);dmap[a]=UIen()?e.en:jAr||/[ء-ي]/.test(pd)?e.d:(pd.length<=4?pd.toUpperCase():pd.replace(/\b\w/g,c=>c.toUpperCase()))}));
+  const jAr=isAr(jd),dmap={};KD.forEach(e=>e.a.forEach(a=>{const pd=kwPretty(a,jd);dmap[a]=(jAr&&!UIen()?e.d:e.en)}));
   const dk=list.filter(k=>dmap[k]).map(k=>dmap[k]);list=list.filter(k=>!dmap[k]);
   return [...new Set(dk)].concat(kwClean0(list,jd));
 }
