@@ -830,7 +830,7 @@ function render(R,noScroll){
   // format
   const pc=R.C.filter(c=>c.st==='pass').length;$('fmtCnt').textContent=tr(`${pc} / ${R.C.length} ناجح`,`${pc} / ${R.C.length} passed`);
   const so={fail:0,warn:1,pass:2};
-  $('fmt').innerHTML=[...R.C].sort((a,b)=>so[a.st]-so[b.st]||b.w-a.w).map(c=>`<div class="chk"><div class="ic ${c.st}">${c.st==='pass'?'✓':c.st==='warn'?'!':'✕'}</div><div><b>${esc(c.name)}</b><span>${esc(c.detail)}${c.st!=='pass'?' — '+esc(c.fix):''}</span></div></div>`).join('');
+  $('fmt').innerHTML=[...R.C].sort((a,b)=>so[a.st]-so[b.st]||b.w-a.w).map(c=>`<div class="chk"><div class="ic ${c.st}">${c.st==='pass'?'✓':c.st==='warn'?'!':'✕'}</div><div><b>${esc(c.name)}</b><span>${esc(c.detail)}${c.st!=='pass'?' — '+esc(c.fix):''}</span>${fmtQF(c,lastCV)}</div></div>`).join('');
   // bullets
   const S=R.scored;$('bCnt').textContent=S.length?tr(`${S.length} ${S.length>=3&&S.length<=10?'نقاط':'نقطة'}`,`${S.length} bullets`):'';
   if(!S.length){$('bullets').innerHTML=`<div class="hint" style="font-size:14px">${tr('لم نتمكن من استخراج نقاط من سيرتك. اكتب خبراتك على شكل نقاط تبدأ بـ (•).','We couldn’t find bullets in your CV. Write your experience as bullets starting with (•).')}</div>`;}
@@ -1084,7 +1084,7 @@ function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);
   const Lc=cv.split('\n');
   if(/(بريد باسمك|name-based email)/i.test(n)){const m=cv.match(/[\w.+-]+@[\w-]+\.[\w.]+/);return m?`<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('عدّل بريدك:','Edit your email:')}</div>`+qfWidget('email',m[0],m[0],tr('✓ عدّله','✓ Update')):''}
   if(/(اكتب لكل وظيفه: من|for each job write)/i.test(n)){const r=secRange(Lc,'experience');if(!r)return '';
-    const H=Lc.slice(r[0]+1,r[1]).filter(l=>l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&!/\b(19|20)\d\d\b/.test(l)).slice(0,4);
+    const H=Lc.slice(r[0]+1,r[1]).filter(l=>l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&!/\b(19|20)\d\d\b/.test(l)&&(/\|/.test(l)||(l.trim().split(/\s+/).length<=4&&!/[.،]$/.test(l.trim())))).slice(0,4);
     return H.map(l=>`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('أضف التاريخ لهذي الوظيفة:','Add dates to this job:')}</div>`+qfWidget('replace',l.trim()+(ar?' | 01/2022 – حتى الآن':' | 01/2022 – Present'),l,tr('✓ عدّله','✓ Update'),true)).join('')}
   if(/(سبب الفجوه|سبب التنقل|explain gaps|briefly state why)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب السبب بسطر (ينضاف لمعلومات إضافية):','Write the reason in one line (added to Additional Info):')}</div>`+qfWidget('other',/فجو|gap/i.test(n)?L('2022 – 2023: دراسة دبلوم الموارد البشرية','2022 – 2023: HR diploma studies'):L('الوظائف القصيرة كانت بعقود مشاريع مؤقتة وانتهت بانتهاء المشروع','Short roles were fixed-term project contracts that ended with the project'),'',tr('✓ أضفه','✓ Add'),true);
   if(/(تعوض المؤهل|ابرز اي خبره اضافيه|وضح في نقاط كل وظيفه|خصص سيرتك|compensates|related extra experience|tailor your summary|in each role, highlight)/i.test(n)){const r=secRange(Lc,'summary');
@@ -1131,6 +1131,10 @@ function qfApply(box){const mode=box.dataset.mode,orig=box.dataset.orig,v=box.qu
   else if(mode==='other'){if(!v)return;const ar=isAr(lastCV);const hi=L.findIndex(l=>/^\s*(معلومات إضافية|معلومات اضافية|additional information|additional info)\s*:?\s*$/i.test(l.trim()));if(hi>=0)L.splice(hi+1,0,'• '+v);else L.push('',ar?'معلومات إضافية':'Additional Information','• '+v)}
   else if(mode==='summary'){if(!v)return;const ar=isAr(lastCV);const r=secRange(L,'summary');if(r)L.splice(r[0]+1,r[1]-r[0]-1,v);else{const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));L.splice((ci>=0?ci:1)+1,0,ar?'الملخص المهني':'Professional Summary',v)}}
   else if(mode==='skillsset'){if(!v)return;const r=secRange(L,'skills');if(r)L.splice(r[0]+1,r[1]-r[0]-1,v)}
+  else if(mode==='addbullet'){if(!v)return;const r=secRange(L,'experience');const ar=isAr(lastCV);
+    if(!r){L.push('',ar?'الخبرات العملية':'Work Experience','• '+v)}else{let j=r[0]+1;while(j<r[1]&&!L[j].trim())j++;if(orig){const oi=L.findIndex(l=>l.trim()===orig.trim());if(oi>0)j=oi}let k=j+1;while(k<r[1]&&/^\s*[•●▪◦‣\-–*·]/.test(L[k]))k++;L.splice(k,0,'• '+v.replace(/^[\s•●▪◦‣\-–*·]+/,''))}}
+  else if(mode==='bulletize'){const r=secRange(L,'experience');if(!r)return;for(let j=r[0]+1;j<r[1];j++){const l=L[j];if(!l.trim()||/^\s*[•●▪◦‣\-–*·]/.test(l)||/\||\b(19|20)\d\d\b/.test(l)||l.trim().split(/\s+/).length<5)continue;L[j]='• '+l.trim()}}
+  else if(mode==='noemoji'){L=L.map(l=>l.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2705}\u{2714}\u{2716}\u{2728}\u{FE0F}★☆✓✔➤►▶◆◇■□]/gu,'').replace(/\s{2,}/g,' ').trimEnd())}
   else if(mode==='skills'){if(!v)return;const ar=isAr(lastCV);let si=L.findIndex(l=>/^\s*(المهارات|المهارات الفنية|skills|technical skills|core skills|key skills)\s*:?\s*$/i.test(l.trim()));
     if(si>=0){if(L[si+1]&&/[,،]/.test(L[si+1]))L[si+1]=L[si+1].replace(/[.\s]+$/,'')+(ar?'، ':', ')+v;else L.splice(si+1,0,v)}
     else L.push('',ar?'المهارات':'Skills',v);}
@@ -1146,6 +1150,40 @@ function qfRescan(t){lastCV=t;if($('cvText'))$('cvText').value=t;const y=window.
   toast(tr(`✅ تم — درجتك الحين ${lastR.total}/100`,`✅ Done — your score is now ${lastR.total}/100`))}
 document.addEventListener('click',e=>{const b=e.target.closest('.qfgo');if(b){qfApply(b.closest('.qf'))}});
 document.addEventListener('change',e=>{if(e.target.id==='bAv'){const t=$('bAvT');if(t){t.style.display=e.target.selectedIndex===5?'block':'none';if(e.target.selectedIndex===5)t.focus()}}});
+
+/* ---------- تصحيح وإضافة لفحوصات التنسيق ---------- */
+const FIELD_BUL={'الموارد البشرية':{ar:['معالجة طلبات الموظفين (إجازات، تعريف بالراتب، إخلاء طرف) بمعدل 40 طلب شهريًا خلال يومي عمل.','إعداد ومراجعة سجلات الحضور والدوام لعدد 50 موظف شهريًا بدقة 98%.','تنفيذ إجراءات التوظيف والتهيئة لعدد 20 موظف جديد سنويًا.'],en:['Processed 40+ employee requests monthly (leave, salary certificates, clearances) within 2 working days.','Prepared and reviewed attendance records for 50 employees monthly with 98% accuracy.','Handled recruitment and onboarding for 20 new hires per year.']},
+ 'الإدارة والسكرتارية':{ar:['إدارة المراسلات الصادرة والواردة بمعدل 100 معاملة شهريًا.','أرشفة 200 مستند شهريًا إلكترونيًا وورقيًا وتسهيل الرجوع لها.','تنظيم الاجتماعات وجداول الإدارة لعدد 5 مدراء.'],en:['Managed 100+ incoming and outgoing correspondence items monthly.','Archived 200+ documents monthly (digital and paper) for fast retrieval.','Coordinated meetings and calendars for 5 managers.']},
+ 'المحاسبة والمالية':{ar:['إعداد القيود اليومية والتسويات البنكية لعدد 3 حسابات شهريًا.','متابعة الحسابات الدائنة والمدينة بقيمة 2 مليون ريال شهريًا.','إعداد إقرارات ضريبة القيمة المضافة ربعيًا بدون أي غرامات.'],en:['Prepared journal entries and bank reconciliations for 3 accounts monthly.','Managed AP/AR worth SAR 2M per month.','Filed quarterly VAT returns with zero penalties.']},
+ 'الهندسة المدنية والإنشاءات':{ar:['إعداد جداول الكميات (BOQ) لعدد 5 مشاريع بقيمة 20 مليون ريال.','الإشراف على أعمال الموقع ومتابعة 3 مقاولين من الباطن.','إعداد المستخلصات الشهرية ومراجعتها مع الاستشاري.'],en:['Prepared BOQs for 5 projects worth SAR 20M.','Supervised site works and 3 subcontractors.','Prepared and reviewed monthly progress payment certificates with the consultant.']},
+ 'المبيعات':{ar:['تحقيق 110% من المستهدف البيعي السنوي.','إدارة محفظة 50 عميل وزيادة المبيعات بنسبة 15%.','إعداد عروض الأسعار ومتابعة 30 فرصة بيعية شهريًا.'],en:['Achieved 110% of annual sales target.','Managed a portfolio of 50 clients, growing sales by 15%.','Prepared quotations and followed up 30 sales opportunities monthly.']},
+ '_':{ar:['إنجاز 30 مهمة شهريًا ضمن المواعيد المحددة بدقة 98%.','تحسين إجراءات العمل وتقليل وقت التنفيذ بنسبة 20%.'],en:['Completed 30+ tasks monthly on schedule with 98% accuracy.','Improved work procedures, cutting turnaround time by 20%.']}};
+function fmtQF(c,cv){if(c.st==='pass')return '';const nm=c.name,ar=isAr(cv),Lc=cv.split('\n');const is=(...k)=>k.some(x=>nm.includes(x));
+  const note=t=>`<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${t}</div>`;
+  if(is('طول السيرة','CV length')&&/(قصير|short)/i.test(c.fix)){
+    /* على حسب الوظيفة: لكل وظيفة في السيرة نقاط من نفس مجالها (أو من إعلان الوظيفة إذا موجود) */
+    const r=secRange(Lc,'experience'),jd=($('jd')||{}).value||'',fall=detectFields(jd+' '+cv)[0];let out='';
+    const jobs=[];if(r)for(let j=r[0]+1;j<r[1];j++){const l=Lc[j];if(l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&(/\|/.test(l)||/\b(19|20)\d\d\b/.test(l))){let k=j+1,bt='';while(k<r[1]&&/^\s*[•●▪◦‣\-–*·]/.test(Lc[k]))bt+=' '+Lc[k++];jobs.push({h:l,t:l+bt})}}
+    (jobs.length?jobs.slice(0,3):[{h:'',t:''}]).forEach((jb,ix)=>{const f=detectFields(jb.h)[0]||detectFields(jb.t)[0]||fall;const B=(FIELD_BUL[f]||FIELD_BUL._)[ar?'ar':'en'].slice(0,ix?2:3);
+      out+=note((jb.h?`${tr('نقاط مقترحة لوظيفة','Suggested bullets for')}: <b dir="auto">${esc(jb.h.split('|')[0].trim())}</b>`:tr('نقاط مقترحة تضيفها لخبرتك','Suggested bullets to add'))+tr(' (عدّل الأرقام لأرقامك الحقيقية):',' (change the numbers to your real ones):'))+B.map(b=>qfWidget('addbullet',b,jb.h,tr('✓ أضفها','✓ Add'),true)).join('')});
+    return out}
+  if(is('النقاط (Bullets)','Bullet points')){const r=secRange(Lc,'experience');if(!r)return '';return note(tr('نحوّل أسطر الخبرات لنقاط (•) بضغطة:','Turn experience lines into bullets (•) in one tap:'))+`<div class="qf" data-mode="bulletize" style="margin-top:6px"><input class="qfin" type="hidden" value="1"><button class="btn2 qfgo" style="width:100%">${tr('✓ حوّلها لنقاط','✓ Convert to bullets')}</button></div>`}
+  if(is('الإنجازات بالأرقام','Quantified achievements'))return `<button class="btn2 qfscroll" style="width:100%;margin-top:6px">${tr('🔢 روح لملاحظات النقاط — الأرقام جاهزة تختار منها','🔢 Go to bullet notes — numbers ready to pick')}</button>`;
+  if(is('رابط LinkedIn','LinkedIn link'))return note(tr('اكتب رابط حسابك:','Type your profile link:'))+qfWidget('contact','linkedin.com/in/','',tr('✓ أضفه','✓ Add'));
+  if(is('البريد الإلكتروني','Email'))return qfWidget('contact','name@gmail.com','',tr('✓ أضفه','✓ Add'));
+  if(is('رقم الجوال','Phone number'))return qfWidget('contact',ar?'05XXXXXXXX':'+966 5X XXX XXXX','',tr('✓ أضفه','✓ Add'));
+  if(is('الملخص المهني','Professional Summary'))return qfWidget('summary',ar?'أخصائي ... بخبرة ... سنوات في ...، متمكن من ...':'... professional with ... years of experience in ..., skilled in ...','',tr('✓ أضف الملخص','✓ Add summary'),true);
+  if(is('قسم المهارات','Skills section')){const FL=detectFields(cv),nA=norm(cv);let L=[];FL.forEach(f=>L.push(...FIELDS[f].skills));L=L.filter((k,i,a)=>a.indexOf(k)===i&&!hasSkill(nA,k)).map(k=>ar?k:(FSK_EN[k]||k)).slice(0,10);
+    return note(tr('احذف اللي ما تتقنه وأضف اللي عندك:','Remove any you don’t have, add your own:'))+qfWidget('skills',L.join(ar?'، ':', '),'',tr('✓ أضفها','✓ Add'),true)}
+  if(is('قسم التعليم','Education section'))return qfWidget('edu',ar?'بكالوريوس ... – جامعة ... – 2020':'Bachelor of ... – ... University – 2020','',tr('✓ أضفه','✓ Add'),true);
+  if(is('الدورات والشهادات','Courses & Certifications'))return qfWidget('cert',ar?'اسم الدورة – الجهة – 2024':'Course name – Provider – 2024','',tr('✓ أضفها','✓ Add'),true);
+  if(is('رموز خاصة','Special symbols'))return `<div class="qf" data-mode="noemoji" style="margin-top:6px"><input class="qfin" type="hidden" value="1"><button class="btn2 qfgo" style="width:100%">${tr('✓ احذف الإيموجي والرموز','✓ Remove emoji & symbols')}</button></div>`;
+  if(is('عبارات عامة','Generic phrases'))return qfFor(tr('استبدلها بإنجاز حقيقي برقم','Replace them with a real, measurable achievement'),cv);
+  if(is('التواريخ','Dates'))return qfFor(tr('اكتب لكل وظيفة: من (شهر/سنة) – إلى (شهر/سنة أو حتى الآن)','For each job write: from (MM/YYYY) – to (MM/YYYY or Present)'),cv);
+  if(is('ضمير المتكلم','First person')){const lines=Lc.filter(l=>/\b(I|my)\b/.test(l)).slice(0,3);return lines.map(l=>note(tr('عدّل السطر بدون I / My:','Edit without I / My:'))+qfWidget('replace',l.replace(/^[\s•●▪◦‣\-–*·]+/,'').replace(/^(I|My)\s+/,''),l,tr('✓ عدّله','✓ Update'),true)).join('')}
+  return '';
+}
+document.addEventListener('click',e=>{if(e.target.closest('.qfscroll')){const b=$('bullets');if(b)b.scrollIntoView({behavior:'smooth',block:'start'})}});
 function renderRec(E){
   lastRec=E;const box=$('recCard');if(!box)return;box.style.display='';
   const V={ok:[tr('✅ مرشح للمقابلة','✅ Shortlisted for interview'),'var(--ok)','var(--ok-l)',tr('لو كنت مسؤول التوظيف، كنت بتواصل معك. راجع الملاحظات البسيطة تحت.','As a recruiter, I would call you. Check the minor notes below.')],
