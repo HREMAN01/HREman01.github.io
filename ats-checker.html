@@ -1661,7 +1661,7 @@ function linkOf(x){x=String(x).trim();if(/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(x))ret
 
 /* ---------- صفحة وحدة: نختصر المحتوى (مو الخط) لين تدخل في صفحة A4 ---------- */
 function fitsPages(d,pages){let m=document.getElementById('fitM');if(!m){const w=document.createElement('div');w.style.cssText='position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;z-index:-1';m=document.createElement('div');m.id='fitM';m.className='fitm';w.appendChild(m);document.body.appendChild(w)}
-  m.innerHTML=cvHTML(d);const pageH=250*96/25.4;/* هامش أمان لآيفون وWord */return m.scrollHeight<=pageH*pages+(pages>1?20:0)}
+  m.innerHTML=cvHTML(d);const arT=isAr(d.secs.map(x=>x.lines.join(' ')).join(' ')+d.name);const pageH=(arT?200:226)*96/25.4;/* العربي على الآيفون يطلع أعرض بخط Tajawal — هامش أمان أكبر *//* هامش أمان لآيفون وWord */return m.scrollHeight<=pageH*pages+(pages>1?20:0)}
 function fitTo(d0,pages,maxStep){
   const cut=[];let drop=0;if(fitsPages(d0,pages))return {d:d0,cut,ok:true,pages,drop};
   const clone=x=>JSON.parse(JSON.stringify(x));
@@ -1675,12 +1675,12 @@ function fitTo(d0,pages,maxStep){
   const other=(d,n)=>{let c=0;['certs','other'].forEach(id=>{const s=sec(d,id);if(s&&s.lines.length>n){c+=s.lines.length-n;s.lines=s.lines.slice(0,n)}});return c};
   const steps=[
     d=>summ(d,60)&&cut.push(tr('الملخص المهني لـ 3 أسطر','Summary to 3 lines')),
-    d=>{const n=jobs(d,5,3);n&&cut.push(tr(`${n} نقاط أقل أهمية من الوظائف القديمة`,`${n} lower-priority bullets from older jobs`))},
+    d=>{const n=jobs(d,5,3);n&&cut.push(tr(n===1?'نقطة وحدة أقل أهمية من وظيفة قديمة':`${n} نقاط أقل أهمية من الوظائف القديمة`,`${n} lower-priority bullets from older jobs`))},
     d=>{const n=other(d,4);n&&cut.push(tr('الدورات لأهم 4','Courses to the top 4'))},
-    d=>{const n=jobs(d,4,2);n&&cut.push(tr(`${n} نقاط إضافية`,`${n} more bullets`))},
+    d=>{const n=jobs(d,4,2);n&&cut.push(tr(n===1?'نقطة وحدة إضافية':`${n} نقاط إضافية`,`${n} more bullets`))},
     d=>summ(d,40)&&cut.push(tr('الملخص أقصر','Shorter summary')),
     d=>{const n=other(d,2);n&&cut.push(tr('الدورات لأهم 2','Courses to the top 2'))},
-    d=>{const n=jobs(d,3,1);n&&cut.push(tr(`${n} نقاط إضافية`,`${n} more bullets`))},
+    d=>{const n=jobs(d,3,1);n&&cut.push(tr(n===1?'نقطة وحدة إضافية':`${n} نقاط إضافية`,`${n} more bullets`))},
   ];
   let d=clone(d0);
   for(const st of steps.slice(0,maxStep||steps.length)){st(d);if(fitsPages(d,pages))return {d,cut,ok:true,pages,drop}}
@@ -1691,13 +1691,13 @@ function fitOne(d0){
   if(mode==='full')return {d:d0,cut:[],ok:true,pages:0,mode};
   if(mode==='one')return {...fitTo(d0,1),mode};
   /* تلقائي: اختصار خفيف لصفحة وحدة (بدون ما نضيّع إنجازات)، وإذا ما كفى نخليها صفحتين كاملة */
-  const a=fitTo(d0,1,3);if(a.ok&&a.drop<=6)return {...a,mode};
+  const a=fitTo(d0,1,6);if(a.ok&&a.drop<=4)return {...a,mode};
   return {...fitTo(d0,2),mode};
 }
 function oneNote(f){const el=$('oneNote');if(!el)return;
   if(f.mode==='full'||(!f.cut.length&&f.ok&&f.pages===1)){el.style.display='none';return}
   el.style.display='block';const L=f.cut.map(esc).join(tr('، ','; '));
-  if(f.pages===2&&f.ok)el.innerHTML=`📄 ${tr('سيرتك طويلة، ولو نختصرها لصفحة وحدة بنشيل إنجازات مهمة — فخليناها <b>صفحتين</b>.','Your CV is long; one page would cut important achievements — so we kept it to <b>two pages</b>.')}${L?' '+tr('واختصرنا بس','We only trimmed')+': '+L+'.':''}`;
+  if(f.pages===2&&f.ok)el.innerHTML=`📄 ${tr('سيرتك طويلة، ولو نختصرها لصفحة وحدة بنشيل إنجازات مهمة — فخليناها كاملة (<b>صفحتين</b> كحد أقصى). تبغاها صفحة وحدة؟ اختر «صفحة وحدة دائمًا».','Your CV is long; one page would cut important achievements — so we kept it full (<b>two pages</b> max). Want one page? Choose “One page only”.')}${L?' '+tr('واختصرنا بس','We only trimmed')+': '+L+'.':''}`;
   else if(f.ok)el.innerHTML=`📄 ${tr('عشان تطلع <b>صفحة وحدة</b> اختصرنا','To fit <b>one page</b> we trimmed')}: ${L}. ${tr('خلّينا النقاط اللي فيها أرقام لأنها الأقوى. سيرتك الأصلية ما تغيّرت.','We kept bullets with numbers since they’re strongest. Your full text is untouched.')}`;
   else el.innerHTML=`⚠️ ${tr('حتى بعد الاختصار تطلع أطول — قصّر نقاط الخبرات الطويلة يدويًا تحت، أو اختر «تلقائي».','Still too long after trimming — shorten long bullets manually below, or choose “Automatic”.')}`;
 }
