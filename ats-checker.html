@@ -1040,7 +1040,8 @@ function recruiterEval(cv,jd,R){
    // الجنسية
    const natM=nc.match(/(?:الجنسيه|nationality)\s*[:：\-]?\s*([a-zء-ي]+)/);
    const saudi=/(^|[^ء-ي])(سعودي|سعوديه)(?![ء-ي])/.test(nc)||/\bsaudi\b(?!\s*(arabia|council|aramco|electricity|german|airlines|labou?r|market|commission|ministry|post|stock|organization|authority|food|central|investment|british|american|fransi|hollandi|ceramic|cable|chemical|basic|industrial|engineers|binladin|oger|telecom|stc|national\s+guard|riyal|vision))/.test(nc)||(natM&&/^(سعودي|سعوديه|saudi)$/.test(natM[1]));
-   const nonS=!saudi&&(natM||/(اقامه|iqama|مقيم)/.test(nc));
+   const ncX=nc.replace(/(منصه|منصات|نظام|انظمه|platforms?|system)\s+[^\n]{0,40}?(مقيم|muqeem)|مقيم[،,]|muqeem|(تجديد|اصدار|متابعه|استخراج)\s+(ال)?اقامات?|iqama (renewal|processing|issuance)s?|renewals? of iqama/g,' ');
+   const nonS=!saudi&&(natM||/(رقم الاقامه|اقامه (ساريه|قابله|صالحه)|الاقامه (ساريه|قابله|صالحه)|نقل (ال)?كفاله|نقل خدمات|\biqama\b|transferable)/.test(ncX));
    const saOnly=hasJD&&/(سعودي(?:ين|ه)?\s+فقط|للسعوديين|للسعوديات|saudis?\s+only|saudi nationals? only)/.test(nj);
    if(saudi){ks.push(100);kg.push(tr('الجنسية واضحة: سعودي ✓','Nationality stated: Saudi ✓'))}
    else if(nonS){if(saOnly){ks.push(10);const k=tr('الوظيفة للسعوديين فقط','This job is for Saudi nationals only');kr.push(k);K.push(k)}
@@ -1076,7 +1077,7 @@ function qfWidget(mode,val,orig,btn,multi){const id='qf'+Math.random().toString(
   return `<div class="qf" data-mode="${mode}" data-orig="${esc(orig||'')}" style="margin-top:6px;${multi?'':'display:flex;gap:6px;align-items:center'}">${fld}<button class="btn2 qfgo" style="${multi?'width:100%;margin-top:6px':'white-space:nowrap'};padding:7px 12px">${btn||tr('✓ أضفه','✓ Add')}</button></div>`}
 function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);
   const L=(a,e)=>ar?a:e;
-  if(/(الاقامه قابله للنقل|transferable iqama)/i.test(n)&&!/الجنسيه:/.test(n))return qfWidget('add',L('الإقامة قابلة للنقل','Transferable Iqama'));
+  if(/(الاقامه قابله للنقل|transferable iqama)/i.test(n)&&!/الجنسيه:/.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('إذا غير سعودي:','If non-Saudi:')}</div>`+qfWidget('add',L('الإقامة قابلة للنقل','Transferable Iqama'))+`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('إذا سعودي:','If Saudi:')}</div>`+qfWidget('add',L('الجنسية: سعودي','Nationality: Saudi'));
   if(/(الجنسيه: سعودي|add: nationality)/i.test(n))return qfWidget('add',L('الجنسية: سعودي','Nationality: Saudi'));
   if(/(مدينتك اعلى|add your city)/i.test(n))return qfWidget('add',L('جدة، السعودية','Jeddah, Saudi Arabia'));
   if(/(مستعد للانتقال|willing to relocate)/i.test(n)){const m=fix.match(/(?:إلى|to)\s+([^»”"]+)/);return qfWidget('add',L('مستعد للانتقال إلى '+(m?m[1].trim():''),'Willing to relocate to '+(m?m[1].trim():'')))}
@@ -1135,7 +1136,7 @@ function renderRec(E){
     h+=`<div style="margin-top:14px;border:1.5px solid var(--blue);border-radius:12px;padding:12px 14px">
     <b>✨ ${tr('اقتراحات مسؤول التوظيف لسيرتك','Recruiter suggestions for your CV')}</b>`;
     if(needB)h+=`<div class="wf" style="margin:8px 0"><b>${tr('بيانات ناقصة — اختر وبنضيفها لسيرتك:','Missing details — choose and we’ll add them:')}</b>
-      ${M.nat?`<div style="margin-top:6px">${tr('الجنسية:','Nationality:')} ${sel1('bNat',[tr('— اختر —','— select —'),tr('سعودي','Saudi'),tr('غير سعودي','Non-Saudi')])}</div>`:''}
+      ${M.nat||M.iq?`<div style="margin-top:6px">${tr('الجنسية:','Nationality:')} ${sel1('bNat',[tr('— اختر —','— select —'),tr('سعودي','Saudi'),tr('غير سعودي','Non-Saudi')])}</div>`:''}
       ${M.nat||M.iq?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bIq"> ${tr('الإقامة قابلة للنقل (لغير السعودي)','Transferable Iqama (non-Saudi)')}</label>`:''}
       ${M.reloc?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bRel"> ${tr(`مستعد للانتقال إلى ${M.reloc}`,`Willing to relocate to ${M.reloc}`)}</label>`:''}
       ${AC?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bAc"> ${tr('عندي '+AC.ar+' سارية','I hold a valid '+AC.en)}</label>`:''}
@@ -1623,12 +1624,13 @@ let firstScore=null;
 function doRescan(scroll){
   const d=collect();if(!d.secs.length)return;
   if(firstScore==null&&lastR)firstScore=lastR.total;
-  const txt=cvText(d);
-  const R=analyze(txt,$('jd').value,{type:'built'});lastR=R;lastCV=txt;
+  const txt=cvText(d);let ftxt=txt;try{ftxt=cvText(fitOne(d).d)}catch(e){}window.__trim=ftxt!==txt;
+  /* الدرجة تنحسب على نفس النسخة اللي بتتحمّل (بعد اختصار الصفحة) عشان تطابق إذا فحصتها مرة ثانية */
+  const R=analyze(ftxt,$('jd').value,{type:'built'});lastR=R;lastCV=txt;
   render(R,true);
   const up=R.total-(firstScore||0);
   const box=$('reRes');box.style.display='block';box.style.background=up>0?'var(--ok-l)':'var(--blue-l)';box.style.color=up>0?'var(--ok)':'var(--blue-d)';
-  box.innerHTML=`${tr('الدرجة قبل:','Before:')} ${firstScore} ← ${tr('بعد التحسين:','After:')} <span style="font-size:24px">${R.total}</span>/100 ${up>0?'🎉 (+'+up+')':''}<div style="font-size:13px;font-weight:500;margin-top:4px">${up<=0?tr('الدرجة ما تغيّرت لأن صياغتك أصلًا قوية — اللي يرفعها الحين أرقامك الحقيقية: عبّها مكان «🔢 رقمك» في ملاحظات النقاط فوق، وما نقدر نخترعها عنك.','Score didn’t change because your wording is already strong — what raises it now is your real numbers: fill the “🔢” spots in the bullet notes above. We won’t invent them for you.'):R.total<80?tr('للوصول إلى 80+: راجع قائمة الإصلاحات بالأعلى، أو افتح «تعديل يدوي» بالأسفل','To reach 80+: review the fixes above or open manual editing below'):tr('سيرتك جاهزة للتحميل ✅','Your CV is ready to download ✅')}</div>`;
+  box.innerHTML=`${tr('الدرجة قبل:','Before:')} ${firstScore} ← ${tr('بعد التحسين:','After:')} <span style="font-size:24px">${R.total}</span>/100 ${up>0?'🎉 (+'+up+')':''}${window.__trim?`<div style="font-size:12.5px;font-weight:600;margin-top:4px;color:var(--mut)">${tr('📄 الدرجة محسوبة على نفس النسخة اللي بتتحمّل (بعد اختصار الصفحة)، عشان تطلع لك نفسها لو فحصتها مرة ثانية.','📄 Score is for the exact version you’ll download (after page trimming), so it matches if you re-check it.')}</div>`:''}<div style="font-size:13px;font-weight:500;margin-top:4px">${up<=0?tr('الدرجة ما تغيّرت لأن صياغتك أصلًا قوية — اللي يرفعها الحين أرقامك الحقيقية: عبّها مكان «🔢 رقمك» في ملاحظات النقاط فوق، وما نقدر نخترعها عنك.','Score didn’t change because your wording is already strong — what raises it now is your real numbers: fill the “🔢” spots in the bullet notes above. We won’t invent them for you.'):R.total<80?tr('للوصول إلى 80+: راجع قائمة الإصلاحات بالأعلى، أو افتح «تعديل يدوي» بالأسفل','To reach 80+: review the fixes above or open manual editing below'):tr('سيرتك جاهزة للتحميل ✅','Your CV is ready to download ✅')}</div>`;
   if(scroll)setTimeout(()=>box.scrollIntoView({behavior:'smooth',block:'center'}),300);
 }
 $('reScan').onclick=()=>{doRescan(true);updatePreview()};
@@ -1636,7 +1638,7 @@ $('reScan').onclick=()=>{doRescan(true);updatePreview()};
 const cleanLi=v=>{v=String(v).trim().replace(/^https?:\/\/(www\.)?/i,'').replace(/[?#].*$/,'').replace(/\/$/,'');return v&&!/linkedin\.com/i.test(v)&&/^[a-z0-9][a-z0-9_-]{2,}$/i.test(v)?'linkedin.com/in/'+v:v};
 ['input','change','blur'].forEach(ev=>$('f-li').addEventListener(ev,()=>{const c=cleanLi($('f-li').value);if(c!==$('f-li').value&&(ev!=='input'||/[?#]|https?:/i.test($('f-li').value)))$('f-li').value=c;updatePreview()}));
 let pvT=null;function updatePreview(){clearTimeout(pvT);pvT=setTimeout(()=>{try{const f=fitOne(collect());$('cvPreview').innerHTML=cvHTML(f.d);oneNote(f)}catch(e){console.warn(e)}},150)}
-$('manual').addEventListener('input',updatePreview);$('pageMode').addEventListener('change',updatePreview);$('manual').addEventListener('click',()=>setTimeout(updatePreview,50));
+$('manual').addEventListener('input',updatePreview);$('pageMode').addEventListener('change',()=>{updatePreview();try{doRescan(false)}catch(e){}});$('manual').addEventListener('click',()=>setTimeout(updatePreview,50));
 // one-page layout: title+company+date on one line; skills/languages as a single line
 function compactSecs(secs){
   return secs.map(s=>{
