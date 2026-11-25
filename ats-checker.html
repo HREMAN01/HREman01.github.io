@@ -108,6 +108,7 @@ ol.fix li:last-child{border:0}
 .wf{background:var(--bg);border-radius:10px;padding:10px;margin-top:8px;font-size:13.5px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 html,body{overflow-x:hidden;max-width:100%}
+.qf textarea.qfin{min-height:0!important;height:auto}
 html[lang=en] .gl{display:none!important}
 #printArea{display:none}
 .fitm{position:absolute;left:0;top:0;width:184mm;font-family:Arial,'Tajawal',sans-serif;font-size:9.9pt;line-height:1.4;visibility:hidden}
@@ -1003,11 +1004,18 @@ function recruiterEval(cv,jd,R){
     if(reqL)K.push(tr(`الإعلان يطلب ${DEG_N[reqL][0]} ومؤهلك غير مذكور`,`The job requires a ${DEG_N[reqL][1]} and yours isn’t stated`));}
   else if(reqL){if(cvL>=reqL){ds=100;dg.push(tr(`مؤهلك ${DEG_N[cvL][0]} يطابق المطلوب ✓`,`${DEG_N[cvL][1]} meets the requirement ✓`))}
     else{ds=30;const k=tr(`مؤهلك ${DEG_N[cvL][0]} والمطلوب ${DEG_N[reqL][0]}`,`You have a ${DEG_N[cvL][1]}; the job requires a ${DEG_N[reqL][1]}`);dr.push(k);K.push(k);df.push(tr('إذا عندك خبرة طويلة تعوّض المؤهل، اذكرها بوضوح في الملخص','If long experience compensates, state it clearly in your summary'))}}
-  else{ds=cvL>=3?95:cvL===2?80:65;dg.push(tr(`المؤهل: ${DEG_N[cvL][0]}`,`Qualification: ${DEG_N[cvL][1]}`))}
+  else{const roQ=cvRole(cv),cat=roQ?roQ.cat:'pro';const need0=cat==='front'?1:cat==='tech'?2:3;
+    ds=cvL>=need0?95:cvL===need0-1?78:60;
+    dg.push(tr(`المؤهل: ${DEG_N[cvL][0]}${roQ&&cvL>=need0&&cat!=='pro'?` — مناسب لمهنة «${roQ.ar}»`:''}`,`Qualification: ${DEG_N[cvL][1]}${roQ&&cvL>=need0&&cat!=='pro'?` — suits “${roQ.en}”`:''}`));
+    if(cvL<need0&&roQ){dr.push(tr(`أغلب وظائف «${roQ.ar}» تطلب ${DEG_N[need0][0]}`,`Most “${roQ.en}” roles ask for a ${DEG_N[need0][1]}`));df.push(tr('أبرز خبرتك العملية والدورات المعتمدة اللي تعوّض المؤهل','Highlight practical experience and certified courses that compensate'))}
+    /* التخصص الدراسي مقابل المهنة */
+    const eduAll=norm(eduTxt+'\n'+cv.split('\n').filter(l=>/(دبلوم|بكالوريوس|ماجستير|دكتوراه|diploma|bachelor|master|degree|b\.?sc|m\.?sc)/i.test(l)).join('\n'));
+    const rk=roQ?roQ.ar:'';const relRe=/موارد|اداري/.test(rk)?/(موارد (ال)?بشري|human resource|\bhr\b|اداره|ادارة|business|administ|اداري|office management)/:/(مهندس|رسام|مساح|فني|مطور)/.test(rk)?/(هندس|engineer|architect|معمار|civil|مدني|construction|انشاء|رسم|draft|survey|مساح|electric|كهرب|mechan|ميكانيك|تكييف|hvac|technolog|تقني|computer|حاسب|software|برمج)/:/محاسب/.test(rk)?/(محاسب|account|finance|مالي)/:/(محام|قانون)/.test(rk)?/(قانون|law|شريع|حقوق)/:(roQ?roQ.re:/$^/);
+    if(roQ&&cvL>=2&&!relRe.test(eduAll)){dr.push(tr(`تخصصك الدراسي مختلف عن مهنتك «${roQ.ar}»`,`Your degree differs from your profession (“${roQ.en}”)`));df.push(tr('خبرتك تعوّض — أبرز الدورات والشهادات المهنية في مجالك تحت التعليم','Your experience compensates — list relevant courses/certifications under Education'));ds-=5}}
   if(cvL&&!/\b(19|20)\d\d\b/.test(P.sec.education.join(' '))&&P.sec.education.length){ds-=8;dr.push(tr('سنة التخرج غير مذكورة','Graduation year is missing'));df.push(tr('أضف سنة التخرج','Add your graduation year'))}
   // الاعتماد المهني (السعودية)
   let accr=null;
-  {const role=norm(hasJD?jd.split('\n').slice(0,4).join(' '):(P.title||cv.split('\n').slice(0,3).join(' ')));const nc=norm(cv),nj=norm(jd);
+  {const role=norm(hasJD?jd.split('\n').slice(0,4).join(' '):(P.title||jobTitles(cv).slice(0,2).join(' ')||cv.split('\n').slice(0,3).join(' ')));const nc=norm(cv),nj=norm(jd);
    const AC=[
     {re:/(محامي|محاميه|lawyer|attorney)/,need:/(رخصه محاماه|رخصه مزاوله المحاماه|محامي مرخص|licensed (lawyer|attorney)|law license|الهيئه السعوديه للمحامين|saudi bar)/,ar:'رخصة المحاماة (وزارة العدل) وعضوية الهيئة السعودية للمحامين',en:'Law license (MoJ) & Saudi Bar membership'},
     {re:/^(?!.*(مهندس|engineer|\barchitect\b)).*((^|[^ء-ي])(رسام|مساح)([^ء-ي]|$)|فني(ه)? (هندسي|مساحه|كهرباء|ميكانيكا|تكييف|مدني|معماري|رسم)|draftsman|draughtsman|(?<!quantity )\bsurveyor\b|cad operator|engineering technician|architectural technician)/,need:/(هيئه المهندسين|الهيئه السعوديه للمهندسين|saudi council of engineers|\bsce\b|تصنيف فني|فني معتمد|مهني معتمد|اعتماد مهني)/,ar:'الاعتماد المهني (فني) من الهيئة السعودية للمهندسين',en:'SCE professional accreditation (technician)'},
