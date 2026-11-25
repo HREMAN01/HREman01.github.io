@@ -1075,11 +1075,30 @@ function qfWidget(mode,val,orig,btn,multi){const id='qf'+Math.random().toString(
   const fld=multi?`<textarea class="qfin" dir="auto" rows="${Math.min(5,Math.max(2,Math.ceil(val.length/42)))}" style="width:100%;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8;resize:vertical">${esc(val)}</textarea>`
     :`<input class="qfin" dir="auto" value="${esc(val)}" style="flex:1;min-width:0;border:1.5px solid var(--ok);border-radius:9px;padding:7px 9px;font:inherit;font-size:14px;background:#f6fcf8">`;
   return `<div class="qf" data-mode="${mode}" data-orig="${esc(orig||'')}" style="margin-top:6px;${multi?'':'display:flex;gap:6px;align-items:center'}">${fld}<button class="btn2 qfgo" style="${multi?'width:100%;margin-top:6px':'white-space:nowrap'};padding:7px 12px">${btn||tr('✓ أضفه','✓ Add')}</button></div>`}
+const SEC_RE={summary:/^\s*(الملخص|الملخص المهني|نبذة|نبذه|الهدف الوظيفي|summary|professional summary|profile|objective|about me)\s*:?\s*$/i,
+  experience:/^\s*(الخبرات|الخبرات العملية|الخبرة|الخبره|الخبرة العملية|experience|work experience|professional experience|employment history)\s*:?\s*$/i,
+  skills:/^\s*(المهارات|المهارات الفنية|skills|technical skills|core skills|key skills)\s*:?\s*$/i};
+const ANY_HEAD=/^\s*(الملخص|نبذة|الهدف|الخبرات|الخبرة|التعليم|المؤهلات|المهارات|الدورات|الشهادات|اللغات|معلومات|المشاريع|summary|profile|objective|experience|education|skills|certifications?|courses|languages|projects|additional)[^\n]{0,25}$/i;
+function secRange(L,id){const h=L.findIndex(l=>SEC_RE[id].test(l.trim()));if(h<0)return null;let e=h+1;while(e<L.length&&!(ANY_HEAD.test(L[e].trim())&&L[e].trim().length<40))e++;return [h,e]}
 function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);
+  const Lc=cv.split('\n');
+  if(/(بريد باسمك|name-based email)/i.test(n)){const m=cv.match(/[\w.+-]+@[\w-]+\.[\w.]+/);return m?`<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('عدّل بريدك:','Edit your email:')}</div>`+qfWidget('email',m[0],m[0],tr('✓ عدّله','✓ Update')):''}
+  if(/(اكتب لكل وظيفه: من|for each job write)/i.test(n)){const r=secRange(Lc,'experience');if(!r)return '';
+    const H=Lc.slice(r[0]+1,r[1]).filter(l=>l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&!/\b(19|20)\d\d\b/.test(l)).slice(0,4);
+    return H.map(l=>`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('أضف التاريخ لهذي الوظيفة:','Add dates to this job:')}</div>`+qfWidget('replace',l.trim()+(ar?' | 01/2022 – حتى الآن':' | 01/2022 – Present'),l,tr('✓ عدّله','✓ Update'),true)).join('')}
+  if(/(سبب الفجوه|سبب التنقل|explain gaps|briefly state why)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب السبب بسطر (ينضاف لمعلومات إضافية):','Write the reason in one line (added to Additional Info):')}</div>`+qfWidget('other',/فجو|gap/i.test(n)?L('2022 – 2023: دراسة دبلوم الموارد البشرية','2022 – 2023: HR diploma studies'):L('الوظائف القصيرة كانت بعقود مشاريع مؤقتة وانتهت بانتهاء المشروع','Short roles were fixed-term project contracts that ended with the project'),'',tr('✓ أضفه','✓ Add'),true);
+  if(/(تعوض المؤهل|ابرز اي خبره اضافيه|وضح في نقاط كل وظيفه|خصص سيرتك|compensates|related extra experience|tailor your summary|in each role, highlight)/i.test(n)){const r=secRange(Lc,'summary');
+    if(!r)return qfWidget('summary',L('أخصائي ... بخبرة ... سنوات في ...، متمكن من ...','... professional with ... years of experience in ...'),'',tr('✓ أضف الملخص','✓ Add summary'),true);
+    const t=Lc.slice(r[0]+1,r[1]).filter(x=>x.trim()).join(' ');return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('عدّل ملخصك هنا:','Edit your summary here:')}</div>`+qfWidget('summary',t,'',tr('✓ عدّل الملخص','✓ Update summary'),true)}
+  if(/(اذا تتقنها فعلا|if you truly have them|if you have them, add)/i.test(n)){const ms=(lastR&&lastR.kw||[]).filter(k=>k.st==='m').map(k=>k.d||k.k).filter(k=>ar||!/[ء-ي]/.test(k)).slice(0,10);
+    return ms.length?`<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('الكلمات الناقصة من الإعلان — احذف اللي ما تتقنه:','Missing job-ad keywords — remove any you don’t have:')}</div>`+qfWidget('skills',ms.join(ar?'، ':', '),'',tr('✓ أضفها للمهارات','✓ Add to Skills'),true):''}
+  if(/(اختصرها لاهم|trim to the top)/i.test(n)){const r=secRange(Lc,'skills');if(!r)return '';
+    const all=Lc.slice(r[0]+1,r[1]).join(ar?'، ':', ').split(/\s*(?:[,،•|]|\n)\s*/).map(x=>x.replace(/^[\s•●▪◦‣\-–*·]+/,'').trim()).filter(Boolean);
+    return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('خلّ أهم 10–15 مهارة واحذف الباقي:','Keep your top 10–15 skills:')}</div>`+qfWidget('skillsset',all.slice(0,15).join(ar?'، ':', '),'',tr('✓ اعتمدها','✓ Apply'),true)}
   const L=(a,e)=>ar?a:e;
   if(/(الاقامه قابله للنقل|transferable iqama)/i.test(n)&&!/الجنسيه:/.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('إذا غير سعودي:','If non-Saudi:')}</div>`+qfWidget('add',L('الإقامة قابلة للنقل','Transferable Iqama'))+`<div style="font-size:12.5px;color:var(--mut);margin-top:8px">${tr('إذا سعودي:','If Saudi:')}</div>`+qfWidget('add',L('الجنسية: سعودي','Nationality: Saudi'));
   if(/(الجنسيه: سعودي|add: nationality)/i.test(n))return qfWidget('add',L('الجنسية: سعودي','Nationality: Saudi'));
-  if(/(مدينتك اعلى|add your city)/i.test(n))return qfWidget('add',L('جدة، السعودية','Jeddah, Saudi Arabia'));
+  if(/(مدينتك اعل[يى]|add your city)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب مدينتك:','Type your city:')}</div>`+qfWidget('city',L('جدة، السعودية','Jeddah, Saudi Arabia'));
   if(/(مستعد للانتقال|willing to relocate)/i.test(n)){const m=fix.match(/(?:إلى|to)\s+([^»”"]+)/);return qfWidget('add',L('مستعد للانتقال إلى '+(m?m[1].trim():''),'Willing to relocate to '+(m?m[1].trim():'')))}
   if(/(متاح للمباشره|available immediately)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب موعدك بنفسك (مثل: فترة الإشعار: شهر):','Type your own (e.g. Notice period: 1 month):')}</div>`+qfWidget('add',L('متاح للمباشرة فورًا','Available to join immediately'));
   if(/(سنه التخرج|graduation year)/i.test(n)&&!/الدرجه/.test(n))return qfWidget('year','',null,tr('✓ أضف السنة','✓ Add year')).replace('class="qfin"','class="qfin" inputmode="numeric" placeholder="2020"');
@@ -1089,7 +1108,10 @@ function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);
     const sysm=(cv.match(/\b(SAP|Oracle(?: ERP)?|Excel|Microsoft Office|MS Office|Power BI|Jisr|AutoCAD|Primavera)\b|أوراكل|اوراكل|جسر|إكسل|اكسل/gi)||[]);
     const sk=[...new Set([...sysm,...L])].slice(0,10);
     return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('مهارات مقترحة من مجالك — احذف اللي ما تتقنه وأضف اللي عندك:','Suggested skills for your field — remove any you don’t have, add your own:')}</div>`+qfWidget('skills',sk.join(ar?'، ':', '),'',tr('✓ أضفها للمهارات','✓ Add to Skills'),true);}
-  if(/(مسمى قريب|headline close)/i.test(n)){const t=parseCV(cv).name?parseCV(cv).title||'':'';return qfWidget('title',t,t,tr('✓ عدّله','✓ Update'))}
+  if(/(اضف البريد والجوال|add email and phone)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب بريدك وجوالك:','Type your email and phone:')}</div>`+qfWidget('contact',L('example@gmail.com | 05XXXXXXXX','example@gmail.com | +966 5X XXX XXXX'));
+  if(/(اكتب المؤهل كاملا|write it fully: degree)/i.test(n))return qfWidget('edu',L('بكالوريوس إدارة أعمال – جامعة الملك عبدالعزيز – 2020','Bachelor of Business Administration – King Abdulaziz University – 2020'),'',tr('✓ أضفه للتعليم','✓ Add to Education'),true);
+  if(/(رقم العضويه|with the number and expiry)/i.test(n)){const m=fix.match(/عندك (.+?)، اذكرها|list (.+?) with/);const nm=m?(m[1]||m[2]):'';return qfWidget('cert',L(`${nm} – رقم العضوية: ____ – سارية حتى: ____`,`${nm} – Membership No.: ____ – Valid until: ____`),'',tr('✓ أضفها للشهادات','✓ Add to Certifications'),true)}
+  if(/(مسم[يى] قريب|headline close)/i.test(n)){const t=parseCV(cv).name?parseCV(cv).title||'':'';return qfWidget('title',t,t,tr('✓ عدّله','✓ Update'))}
   if(/(استبدلها بانجاز|real, measurable)/i.test(n)){
     const re=/(أطمح|اطمح|أتطلع|اتطلع|أحب العمل|احب العمل|شخص(?:ية)? (?:طموح|مجتهد|اجتماعي)[ةه]?|أعمل بجد|اعمل بجد|العمل تحت الضغط|روح الفريق|سريع[ةه]? التعلم|hard[- ]?working|team player|passionate|highly motivated|self[- ]starter)/i;
     const lines=cv.split('\n').filter(l=>re.test(l)).slice(0,3);
@@ -1100,6 +1122,15 @@ function qfApply(box){const mode=box.dataset.mode,orig=box.dataset.orig,v=box.qu
   let L=lastCV.split('\n');
   if(mode==='add'){if(!v){toast(tr('اكتب النص أول','Type the text first'));return}
     let ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci<0)ci=Math.min(1,L.length-1);L.splice(ci+1,0,v);}
+  else if(mode==='city'){if(!v)return;const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci>=0)L[ci]=v+' | '+L[ci].trim();else{let k=L.findIndex(l=>l.trim());L.splice(k+2,0,v)}}
+  else if(mode==='contact'){if(!v)return;let k=L.findIndex(l=>l.trim());const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci>=0)L[ci]=L[ci].trim()+' | '+v;else L.splice(k+2,0,v)}
+  else if(mode==='edu'||mode==='cert'){if(!v||/____/.test(v)){toast(tr('عبّي البيانات أول (مكان ____)','Fill in the details first (the ____ parts)'));return}const ar=isAr(lastCV);
+    const re=mode==='edu'?/^\s*(التعليم|المؤهلات|المؤهل العلمي|education|academic)/i:/^\s*(الدورات|الشهادات|الرخص|certifications?|certificates|courses|licenses?)/i;
+    const hi=L.findIndex(l=>re.test(l.trim())&&l.trim().length<40);if(hi>=0)L.splice(hi+1,0,v);else L.push('',mode==='edu'?(ar?'التعليم':'Education'):(ar?'الشهادات المهنية':'Certifications'),v)}
+  else if(mode==='email'){if(!v)return;L=L.map(l=>l.split(orig).join(v))}
+  else if(mode==='other'){if(!v)return;const ar=isAr(lastCV);const hi=L.findIndex(l=>/^\s*(معلومات إضافية|معلومات اضافية|additional information|additional info)\s*:?\s*$/i.test(l.trim()));if(hi>=0)L.splice(hi+1,0,'• '+v);else L.push('',ar?'معلومات إضافية':'Additional Information','• '+v)}
+  else if(mode==='summary'){if(!v)return;const ar=isAr(lastCV);const r=secRange(L,'summary');if(r)L.splice(r[0]+1,r[1]-r[0]-1,v);else{const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));L.splice((ci>=0?ci:1)+1,0,ar?'الملخص المهني':'Professional Summary',v)}}
+  else if(mode==='skillsset'){if(!v)return;const r=secRange(L,'skills');if(r)L.splice(r[0]+1,r[1]-r[0]-1,v)}
   else if(mode==='skills'){if(!v)return;const ar=isAr(lastCV);let si=L.findIndex(l=>/^\s*(المهارات|المهارات الفنية|skills|technical skills|core skills|key skills)\s*:?\s*$/i.test(l.trim()));
     if(si>=0){if(L[si+1]&&/[,،]/.test(L[si+1]))L[si+1]=L[si+1].replace(/[.\s]+$/,'')+(ar?'، ':', ')+v;else L.splice(si+1,0,v)}
     else L.push('',ar?'المهارات':'Skills',v);}
