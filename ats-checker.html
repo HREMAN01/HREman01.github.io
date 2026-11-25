@@ -183,6 +183,7 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
       </div>
     </div>
 
+    <div class="card wm" id="recCard" style="display:none"></div>
     <div class="card" id="errCard" style="display:none"><h3>🔍 الأخطاء في سيرتك <span class="cnt" id="errCnt"></span></h3><div id="errList"></div></div>
     <div class="card"><h3>🛠️ أهم الإصلاحات بالترتيب <span class="cnt" id="fixCnt"></span></h3><ol class="fix" id="fixes"></ol></div>
     <div class="card" id="kwCard"><h3>🎯 الكلمات المفتاحية <span class="cnt" id="kwCnt"></span></h3>
@@ -639,10 +640,282 @@ function render(R,noScroll){
     h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div></div></div>`).join('')}</details></div>`;
     h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">✏️ عدّلي نقاطك بنفسك مع اقتراحات</button>`;$('bullets').innerHTML=h;$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
   }
-  lastReport=[`تقرير فحص السيرة الذاتية ATS — منقذك | EMAN HR`,`الدرجة الشاملة: ${R.total}/100 — ${v[0]}`,`التنسيق: ${R.fmtScore} | قوة النقاط: ${R.bScore} | الكلمات المفتاحية: ${R.kwScore==null?'—':R.kwScore}`,``,`أهم الإصلاحات:`,...R.F.map((f,i)=>`${i+1}. ${f.t}`),
+  try{renderRec(recruiterEval(lastCV,$('jd').value,R))}catch(e){console.warn(e);$('recCard').style.display='none'}
+  lastReport=[`تقرير فحص السيرة الذاتية ATS — منقذك | EMAN HR`,`الدرجة الشاملة: ${R.total}/100 — ${v[0]}`,`التنسيق: ${R.fmtScore} | قوة النقاط: ${R.bScore} | الكلمات المفتاحية: ${R.kwScore==null?'—':R.kwScore}`,``,`أهم الإصلاحات:`,...R.F.map((f,i)=>`${i+1}. ${f.t}`),...(lastRec?['',`رأي مسؤول التوظيف: ${lastRec.avg}/100 — ${lastRec.verdict==='ok'?'مرشح للمقابلة':lastRec.verdict==='imp'?'يحتاج تحسين':'مرفوض مبدئيًا'}`,...lastRec.K.map(k=>'• '+k)]:[]),
     ...(R.kw?['',`الكلمات الناقصة: ${R.kw.filter(k=>k.st==='m').map(k=>k.k).join('، ')||'لا يوجد'}`]:[]),``,`© إيمان خالد — EMAN HR | hreman01.github.io`].join('\n');
   if(!noScroll)setTimeout(()=>$('results').scrollIntoView({behavior:'smooth'}),60);
 }
+
+
+/* ---------- رأي مسؤول التوظيف | Recruiter view ---------- */
+const UIen=()=>document.documentElement.lang==='en';
+const tr=(a,e)=>UIen()?e:a;
+const MON={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,sept:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12,
+  'يناير':1,'فبراير':2,'مارس':3,'ابريل':4,'مايو':5,'يونيو':6,'يوليو':7,'اغسطس':8,'سبتمبر':9,'اكتوبر':10,'نوفمبر':11,'ديسمبر':12,
+  'كانون الثاني':1,'شباط':2,'اذار':3,'نيسان':4,'ايار':5,'حزيران':6,'تموز':7,'اب':8,'ايلول':9,'تشرين الاول':10,'تشرين الثاني':11,'كانون الاول':12};
+const MON_RE=Object.keys(MON).sort((a,b)=>b.length-a.length).join('|');
+const PRESENT_RE='present|current|currently|now|today|to date|till date|حتي الان|الي الان|الى الان|لحد الان|للان|الان|حاليا|حالي|مستمر|علي راس العمل';
+function datePeriods(lines){
+  const now=new Date(),nowM=now.getFullYear()*12+now.getMonth();
+  const tokRe=new RegExp(`(\\d{1,2})\\s*[\\/\\-.]\\s*((?:19|20)\\d{2})|(${MON_RE})\\.?\\s*,?\\s*((?:19|20)\\d{2})|\\b((?:19|20)\\d{2})\\b|(${PRESENT_RE})`,'gi');
+  const P=[];
+  lines.forEach((l,li)=>{
+    const n=norm(l);const pts=[];let m;tokRe.lastIndex=0;
+    while((m=tokRe.exec(n))){
+      if(m[1]&&+m[1]>=1&&+m[1]<=12)pts.push({y:+m[2],mo:+m[1]});
+      else if(m[3])pts.push({y:+m[4],mo:MON[m[3].toLowerCase()]||1});
+      else if(m[5])pts.push({y:+m[5],mo:0});
+      else if(m[6])pts.push({now:true});
+    }
+    const yrs=pts.filter(p=>!p.now&&(p.y<1960||p.y>now.getFullYear()+1));if(yrs.length)return;
+    if(pts.length<2)return;
+    const a=pts[0],b=pts[1];if(a.now)return;
+    const s=a.y*12+(a.mo?a.mo-1:0),e=b.now?nowM:b.y*12+(b.mo?b.mo-1:11);
+    if(e>=s&&e-s<=12*45)P.push({s,e,cur:!!b.now,i:li});
+  });
+  return P;
+}
+function mergeP(P){const s=[...P].sort((a,b)=>a.s-b.s),out=[];s.forEach(p=>{const l=out[out.length-1];if(l&&p.s<=l.e+1)l.e=Math.max(l.e,p.e);else out.push({...p})});return out}
+const NUMW={'سنه واحده':1,'سنتين':2,'سنتان':2,'ثلاث':3,'ثلاثه':3,'اربع':4,'اربعه':4,'خمس':5,'خمسه':5,'ست':6,'سته':6,'سبع':7,'سبعه':7,'ثمان':8,'ثماني':8,'ثمانيه':8,'تسع':9,'عشر':10,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'ten':10};
+function reqYears(jd){
+  const n=norm(jd);
+  let m=n.match(/(\d{1,2})\s*\+?\s*(?:(?:-|الي|to)\s*\d{1,2}\s*)?(?:سنوات|سنه|سنين|اعوام|عام|years?|yrs)/);
+  if(m)return +m[1];
+  m=n.match(/(سنه واحده|سنتين|سنتان)/);if(m)return NUMW[m[1]];
+  m=n.match(/\b(ثلاث|ثلاثه|اربع|اربعه|خمس|خمسه|ست|سته|سبع|سبعه|ثمان|ثماني|ثمانيه|تسع|عشر|one|two|three|four|five|six|seven|eight|ten)\s+(?:سنوات|سنين|اعوام|years?)/);
+  return m?NUMW[m[1]]:0;
+}
+const DEG=[[5,/(دكتوراه|دكتوراة|phd|ph\.d|doctorate)/],[4,/(ماجستير|master|mba|m\.sc|msc|m\.a\b)/],[3,/(بكالوريوس|بكالوريس|بكلوريوس|bachelor|b\.sc|bsc|b\.a\b|b\.com|bba|جامعي|university degree)/],[2,/(دبلوم|diploma)/],[1,/(ثانوي|ثانويه|high school|secondary)/]];
+const DEG_N=[[''],['ثانوي','High school'],['دبلوم','Diploma'],['بكالوريوس','Bachelor'],['ماجستير','Master'],['دكتوراه','PhD']];
+function degLevels(t){const n=norm(t);return DEG.filter(([l,re])=>re.test(n)).map(([l])=>l)}
+
+function kwPretty(k,jd){const W=jd.split(/[\s\n]+/).map(w=>w.replace(/^[^\wء-ي]+|[^\wء-ي+#]+$/g,'')).filter(Boolean),n=k.split(' ').length;
+  for(let i=0;i+n<=W.length;i++){const seg=W.slice(i,i+n);if(toks(seg.join(' ')).join(' ')===k){let o=seg.join(' ');if(/^و/.test(o)&&!/^و/.test(k))o=o.slice(1);return o}}return k}
+const KW_GEN=new Set(['برنامج','برامج','اتقان','مراجعه','اعداد','متابعه','القدره','العمل','المام','معرفه','اجاده','جداول','الموقع','موقع','الهيئه','هيئه','عضويه','شركه','الشركه','location','جيده','ممتازه','program','knowledge','ability','good','strong','excellent','proficiency','proficient']);
+function kwClean(list,jd){
+  let L=list.filter(k=>!KW_GEN.has(k)&&!/(national|saudi|سعودي|only|فقط|required|مطلوب|jeddah|riyadh|dammam|makkah|جده|الرياض|الدمام|مكه|المدينه|الخبر|city|مدينه|experience|years|سنوات|خبره)/i.test(k));
+  L=L.filter(k=>!L.some(o=>o!==k&&o.split(' ').length>k.split(' ').length&&(' '+o+' ').includes(' '+k+' ')));
+  L=L.filter(k=>{const w=k.split(' ');return w.length<2||!w.every(x=>L.some(o=>o!==k&&o.split(' ').includes(x)))});
+  return L.map(k=>kwPretty(k,jd));
+}
+function recruiterEval(cv,jd,R){
+  const P=parseCV(cv),hasJD=jd.trim().length>30;
+  const K=[],crit=[];
+  const add=(key,title,score,reasons,fixes,strong)=>crit.push({key,title,score:score==null?null:Math.max(0,Math.min(100,Math.round(score))),reasons,fixes,strong});
+
+  // 1) الخبرة
+  let expLines=P.sec.experience.length?P.sec.experience:cv.split('\n').filter(l=>!P.sec.education.includes(l));
+  const per=datePeriods(expLines),mp=mergeP(per),months=mp.reduce((a,p)=>a+p.e-p.s+1,0),yrs=Math.round(months/12*10)/10;
+  const need=hasJD?reqYears(jd):0;
+  // الخبرة ذات العلاقة: نقارن كل وظيفة (المسمى + نقاطها) بمسمى الإعلان وكلماته المفتاحية
+  let relYrs=null;
+  if(hasJD&&per.length){
+    const jt=new Set(toks(jd.split('\n').filter(x=>x.trim())[0]||'').filter(w=>w.length>=3&&!STOP.has(w)&&!/^(مطلوب|نبحث|وظيفه|شاغر|required|hiring|wanted|job)$/.test(w)).map(stem));
+    const kk=(R.kw||[]).filter(k=>k.imp>=2).flatMap(k=>k.k.split(' ')).filter(w=>w.length>=3).map(stem);
+    const ks2=new Set(kk);
+    const idx=per.map(p=>p.i).sort((a,b)=>a-b);
+    const rel=per.filter(p=>{const nx=idx.find(x=>x>p.i);const blk=expLines.slice(Math.max(0,p.i-1),nx==null?expLines.length:nx);
+      const head=new Set(toks(expLines.slice(Math.max(0,p.i-1),p.i+1).join(' ')).map(stem)),body=toks(blk.join(' ')).map(stem);
+      const tHit=[...jt].some(w=>head.has(w)),kHit=new Set(body.filter(w=>ks2.has(w))).size;
+      return tHit||kHit>=2});
+    if(jt.size||ks2.size){const rm=mergeP(rel);relYrs=Math.round(rm.reduce((a,p)=>a+p.e-p.s+1,0)/12*10)/10}
+  }
+  let es,er=[],ef=[],eg=[];
+  if(!per.length){es=35;er.push(tr('ما نقدر نحسب سنوات خبرتك — التواريخ غير واضحة أو ناقصة','Your years of experience can’t be calculated — dates are missing or unclear'));
+    ef.push(tr('اكتب لكل وظيفة: من (شهر/سنة) – إلى (شهر/سنة أو حتى الآن)','For each job write: from (MM/YYYY) – to (MM/YYYY or Present)'));
+    if(need)K.push(tr(`الإعلان يطلب ${need} سنوات خبرة، وسيرتك ما توضح كم سنة عندك`,`The job asks for ${need} years, and your CV doesn’t show how many you have`));}
+  else{
+    const yT=yrs;let yrsC=yrs;
+    if(relYrs!=null&&relYrs<yT){yrsC=relYrs;er.push(tr(`خبرتك ذات العلاقة بالوظيفة ${relYrs} سنة من أصل ${yT} سنة`,`Relevant experience: ${relYrs} of ${yT} years`));ef.push(tr('وضّح في نقاط كل وظيفة المهام اللي لها علاقة بالوظيفة المعلنة','In each role, highlight tasks related to the advertised job'))}
+    else if(relYrs!=null&&relYrs>0)eg.push(tr('خبرتك كلها في نفس مجال الوظيفة ✓','All your experience is in the same field ✓'));
+    if(need){const yrs=yrsC;if(yrs>=need){es=100;eg.push(tr(`خبرتك ${relYrs!=null?'ذات العلاقة ':''}${yrs} سنة والمطلوب ${need} ✓`,`${yrs} ${relYrs!=null?'relevant ':''}years vs ${need} required ✓`))}
+      else if(yrs>=need*.75){es=62;er.push(tr(`خبرتك ${relYrs!=null?'ذات العلاقة ':''}${yrs} سنة والمطلوب ${need} — قريبة لكن أقل`,`${yrs} years vs ${need} required — close but short`));ef.push(tr('أبرز أي خبرة إضافية (تدريب تعاوني، عمل جزئي، مشاريع) لها علاقة بالوظيفة','Add any related extra experience (internship, part-time, projects)'))}
+      else{es=25;const k=tr(`خبرتك ${relYrs!=null?'ذات العلاقة ':''}${yrs} سنة والمطلوب ${need} سنوات`,`You have ${yrs} years; the job requires ${need}`);er.push(k);K.push(k);ef.push(tr('قدّم على وظائف بمستوى خبرة أقل، أو أضف خبراتك ذات العلاقة إن وُجدت','Apply for roles matching your level, or add related experience if you have it'))}}
+    else{es=yrsC>=3?90:yrsC>=1?78:58;if(relYrs===0){es=35;K.push(tr('خبرتك في مجال مختلف عن الوظيفة المعلنة','Your experience is in a different field from this job'))}eg.push(tr(`إجمالي خبرتك تقريبًا ${yrs} سنة`,`About ${yrs} years of total experience`));if(yrs<1)er.push(tr('خبرتك أقل من سنة — يناسبك التركيز على الدورات والمشاريع','Less than one year — highlight courses and projects'))}
+    let gaps=0;for(let i=1;i<mp.length;i++){const g=mp[i].s-mp[i-1].e-1;if(g>6)gaps++}
+    const now=new Date(),nowM=now.getFullYear()*12+now.getMonth(),last=mp[mp.length-1];
+    if(last&&!per.some(p=>p.cur)&&nowM-last.e>6)gaps++;
+    if(gaps){es-=Math.min(20,gaps*10);er.push(tr(`فيه ${gaps} فجوة وظيفية أكثر من 6 أشهر بدون توضيح`,`${gaps} employment gap(s) over 6 months with no explanation`));ef.push(tr('وضّح سبب الفجوة بسطر (دراسة، دورة، ظرف عائلي) بدل ما تتركها فاضية','Explain gaps in one line (study, course, family) instead of leaving them blank'))}
+    const ended=per.filter(p=>!p.cur),short=ended.filter(p=>p.e-p.s+1<12).length;
+    if(per.length>=3&&short>=2){es-=15;er.push(tr(`تنقّل كثير: ${short} وظائف أقل من سنة`,`Frequent job changes: ${short} roles under one year`));ef.push(tr('اذكر سبب التنقل باختصار (عقد مؤقت، مشروع انتهى) أو ادمج الوظائف القصيرة','Briefly state why (fixed-term contract, project ended) or group short roles'))}
+  }
+  add('exp',tr('الخبرة','Experience'),es,er,ef,eg);
+
+  // 2) المؤهل
+  const eduTxt=P.sec.education.join('\n')||cv,cvL=Math.max(0,...degLevels(eduTxt),...degLevels(cv)),jdLs=hasJD?degLevels(jd):[],reqL=jdLs.length?Math.min(...jdLs):0;
+  let ds,dr=[],df=[],dg=[];
+  if(!cvL){ds=40;dr.push(tr('المؤهل العلمي غير واضح في السيرة','Your qualification isn’t clear'));df.push(tr('اكتب المؤهل كاملًا: الدرجة – التخصص – الجهة – سنة التخرج','Write it fully: degree – major – institution – graduation year'));
+    if(reqL)K.push(tr(`الإعلان يطلب ${DEG_N[reqL][0]} ومؤهلك غير مذكور`,`The job requires a ${DEG_N[reqL][1]} and yours isn’t stated`));}
+  else if(reqL){if(cvL>=reqL){ds=100;dg.push(tr(`مؤهلك ${DEG_N[cvL][0]} يطابق المطلوب ✓`,`${DEG_N[cvL][1]} meets the requirement ✓`))}
+    else{ds=30;const k=tr(`مؤهلك ${DEG_N[cvL][0]} والمطلوب ${DEG_N[reqL][0]}`,`You have a ${DEG_N[cvL][1]}; the job requires a ${DEG_N[reqL][1]}`);dr.push(k);K.push(k);df.push(tr('إذا عندك خبرة طويلة تعوّض المؤهل، اذكرها بوضوح في الملخص','If long experience compensates, state it clearly in your summary'))}}
+  else{ds=cvL>=3?95:cvL===2?80:65;dg.push(tr(`المؤهل: ${DEG_N[cvL][0]}`,`Qualification: ${DEG_N[cvL][1]}`))}
+  if(cvL&&!/\b(19|20)\d\d\b/.test(P.sec.education.join(' '))&&P.sec.education.length){ds-=8;dr.push(tr('سنة التخرج غير مذكورة','Graduation year is missing'));df.push(tr('أضف سنة التخرج','Add your graduation year'))}
+  // الاعتماد المهني (السعودية)
+  let accr=null;
+  {const role=norm(hasJD?jd.split('\n').slice(0,4).join(' '):(P.title||cv.split('\n').slice(0,3).join(' ')));const nc=norm(cv),nj=norm(jd);
+   const AC=[
+    {re:/(مهندس|هندسه|engineer)/,need:/(هيئه المهندسين|الهيئه السعوديه للمهندسين|saudi council of engineers|\bsce\b|عضويه.{0,15}مهندس|مهندس معتمد|مهني معتمد)/,ar:'عضوية الهيئة السعودية للمهندسين',en:'Saudi Council of Engineers (SCE) membership'},
+    {re:/(محاسب|مراجع حسابات|مدقق|accountant|auditor)/,need:/(socpa|الهيئه السعوديه للمراجعين والمحاسبين|اعتماد مهني|زماله)/,ar:'الاعتماد المهني من الهيئة السعودية للمراجعين والمحاسبين (SOCPA)',en:'SOCPA professional accreditation'},
+    {re:/(طبيب|ممرض|تمريض|صيدلي|اخصائي (مختبر|اشعه|علاج)|فني (مختبر|اشعه|صيدله)|nurse|nursing|doctor|physician|pharmacist|lab technician|radiolog)/,need:/(هيئه التخصصات الصحيه|scfhs|تصنيف مهني|مصنف مهنيا|رخصه مزاوله)/,ar:'التصنيف المهني من هيئة التخصصات الصحية',en:'SCFHS professional classification'}];
+   const a=AC.find(x=>x.re.test(role));
+   if(a){accr={ar:a.ar,en:a.en,has:a.need.test(nc)};
+     if(accr.has){dg.push(tr(`${a.ar} ✓`,`${a.en} ✓`))}
+     else{const inJD=hasJD&&a.need.test(nj);ds-=inJD?40:15;
+       const k=tr(`${a.ar} غير مذكورة في السيرة`,`${a.en} not mentioned`);dr.push(k);if(inJD)K.push(tr(`الإعلان يطلب ${a.ar} وما ذكرتها`,`The job requires ${a.en}, not found in your CV`));
+       df.push(tr(`إذا عندك ${a.ar}، اذكرها مع رقم العضوية وتاريخ الانتهاء — كثير من الشركات ما تقبل بدونها`,`If you have it, list ${a.en} with the number and expiry date`))}}}
+  add('edu',tr('المؤهل','Qualification'),ds,dr,df,dg);
+
+  // 3) المهارات
+  const sk=P.sec.skills.flatMap(l=>l.replace(BULLET_RE,'').split(/\s*[,،•|;؛]\s*/)).filter(x=>x.trim().length>1).length;
+  let ss=sk===0?20:sk<4?55:sk>25?75:100,sr=[],sf=[],sg=[];
+  if(!sk){sr.push(tr('ما فيه قسم مهارات واضح','No clear skills section'));sf.push(tr('أضف قسم «المهارات» فيه الأنظمة والبرامج والمهارات الفنية','Add a Skills section with systems, tools and technical skills'))}
+  else if(sk<4){sr.push(tr(`مهاراتك قليلة (${sk})`,`Only ${sk} skills listed`));sf.push(tr('أضف 6–12 مهارة لها علاقة مباشرة بالوظيفة','List 6–12 skills directly related to the job'))}
+  else if(sk>25){sr.push(tr('المهارات كثيرة جدًا وتشتت القارئ','Too many skills — it dilutes the important ones'));sf.push(tr('اختصرها لأهم 10–15 مهارة','Trim to the top 10–15'))}
+  else sg.push(tr(`${sk} مهارة مذكورة`,`${sk} skills listed`));
+  if(R.kw){const core=R.kw.filter(k=>k.imp===3),miss=core.filter(k=>k.st==='m');
+    ss=ss*.3+R.kwScore*.7;
+    if(miss.length){sr.push(tr(`مهارات أساسية يطلبها الإعلان وما لقيناها: «${kwClean(miss.map(k=>k.k),jd).slice(0,4).join('»، «')}»`,`Core skills from the ad not found: “${kwClean(miss.map(k=>k.k),jd).slice(0,4).join('”, “')}”`));
+      sf.push(tr('إذا تتقنها فعلًا، أضفها بنفس صياغة الإعلان في المهارات والخبرات','If you truly have them, add them using the ad’s exact wording'))}
+    if(core.length>=3&&miss.length/core.length>=.5)K.push(tr('نصف المهارات الأساسية المطلوبة أو أكثر غير موجودة في سيرتك','Half or more of the core required skills are missing'));}
+  add('skills',tr('المهارات','Skills'),ss,sr,sf,sg);
+
+  // 4) وضوح السيرة وترتيبها
+  const sp=spellIssues(cv).length,fail=n=>R.C.some(c=>c.name===n&&c.st==='fail'),warn=n=>R.C.some(c=>c.name===n&&c.st!=='pass');
+  let cs=R.fmtScore*.6+R.bScore*.4,cr=[],cf=[],cg=[];
+  if(sp){cs-=Math.min(20,sp*4);cr.push(tr(`${sp} خطأ إملائي — أول شي يلاحظه مسؤول التوظيف`,`${sp} spelling mistake(s) — the first thing recruiters notice`));cf.push(tr('اضغط «حسّن سيرتي تلقائيًا» تحت ونصححها لك','Use “Improve my CV” below to fix them automatically'))}
+  if(sp>=5)K.push(tr('أخطاء إملائية كثيرة تعطي انطباع عدم اهتمام','Many spelling errors give a careless impression'));
+  if(fail('البريد الإلكتروني')&&fail('رقم الجوال')){K.push(tr('ما فيه أي وسيلة تواصل — ما نقدر نتصل فيك','No contact details — recruiters can’t reach you'));cr.push(tr('البريد والجوال غير موجودين','Email and phone missing'))}
+  else if(fail('البريد الإلكتروني')||fail('رقم الجوال')){cs-=8;cr.push(tr('بيانات التواصل ناقصة','Contact details incomplete'));cf.push(tr('أضف البريد والجوال أعلى السيرة','Add email and phone at the top'))}
+  const em=(cv.match(EMAIL_RE)||[''])[0];if(em&&/(\d{4,}|love|cute|girl|boy|king|queen|prince|angel|baby|star)/i.test(em.split('@')[0])){cs-=5;cr.push(tr('البريد الإلكتروني غير مهني','Email address looks unprofessional'));cf.push(tr('استخدم بريد باسمك مثل name.surname@gmail.com','Use a name-based email like name.surname@gmail.com'))}
+  if(warn('طول السيرة'))cr.push(tr(R.words<250?'السيرة قصيرة وما توضح قدراتك':'السيرة طويلة — مسؤول التوظيف يقرأها في ثواني','CV length isn’t ideal — recruiters skim in seconds'));
+  if(warn('عبارات عامة')){cr.push(tr('عبارات عامة مثل «أعمل تحت الضغط» بدون دليل','Generic phrases like “team player” without proof'));cf.push(tr('استبدلها بإنجاز حقيقي برقم','Replace them with a real, measurable achievement'))}
+  if(R.bScore<55){cr.push(tr('النقاط وصف مهام، مو إنجازات','Bullets describe duties, not achievements'));cf.push(tr('ابدأ كل نقطة بفعل واختم بنتيجة (عدد، نسبة، مدة)','Start each bullet with a verb and end with a result'))}
+  if(!cr.length)cg.push(tr('سيرة واضحة ومرتبة','Clear and well organised'));
+  add('clarity',tr('الوضوح والترتيب','Clarity & layout'),cs,cr,cf,cg);
+
+  // 5) التطابق مع الوظيفة
+  if(hasJD&&R.kwScore!=null){
+    let ms=R.kwScore,mr=[],mf=[],mg=[];
+    const tt=toks(P.title||'').filter(w=>w.length>=3&&!STOP.has(w)).map(stem),jt=new Set(toks(jd.split('\n').slice(0,3).join(' ')).map(stem));
+    if(tt.length&&tt.some(w=>jt.has(w))){ms+=10;mg.push(tr('مسمّاك الوظيفي قريب من الوظيفة ✓','Your title matches the role ✓'))}
+    else if(P.title){mr.push(tr(`مسمّاك «${P.title}» بعيد عن مسمى الوظيفة المعلنة`,`Your title “${P.title}” differs from the advertised role`));mf.push(tr('اكتب تحت اسمك مسمى قريب من الوظيفة (إذا ينطبق عليك)','Use a headline close to the job title (if accurate)'))}
+    if(R.kwScore<40){const k=tr(`تطابق سيرتك مع الإعلان ضعيف (${R.kwScore}%)`,`Low match with the job ad (${R.kwScore}%)`);mr.push(k);K.push(k);mf.push(tr('خصص سيرتك لكل وظيفة: الملخص والمهارات بنفس كلمات الإعلان','Tailor your summary and skills to each ad'))}
+    else if(R.kwScore<70)mr.push(tr(`التطابق متوسط (${R.kwScore}%)`,`Moderate match (${R.kwScore}%)`));
+    else mg.push(tr(`تطابق عالي مع الإعلان (${R.kwScore}%)`,`Strong match (${R.kwScore}%)`));
+    add('match',tr('التطابق مع الوظيفة','Job match'),ms,mr,mf,mg);
+  }else add('match',tr('التطابق مع الوظيفة','Job match'),null,[tr('ما أضفت إعلان الوظيفة — الصقه فوق وأعد الفحص عشان نقيس التطابق','No job ad added — paste it above and re-check to measure the match')],[],[]);
+
+  // 6) البيانات الأساسية (السعودية): الجنسية، المدينة، المباشرة
+  let miss6={};{const nc=norm(cv),nj=norm(jd),ks=[],kr=[],kf=[],kg=[];
+   const CITIES=[['جدة',/(جده|jeddah|jiddah|jedda)/],['الرياض',/(الرياض|riyadh)/],['الدمام',/(الدمام|dammam)/],['مكة',/(مكه|makkah|mecca)/],['المدينة',/(المدينه المنوره|madinah|medina)/],['الخبر',/(الخبر(?![ء-ي])|khobar)/],['الطائف',/(الطائف|taif)/],['تبوك',/(تبوك|tabuk)/],['أبها',/(ابها|abha)/],['خميس مشيط',/(خميس مشيط|khamis)/],['القصيم',/(القصيم|بريده|qassim|buraydah)/],['الجبيل',/(الجبيل|jubail)/],['ينبع',/(ينبع|yanbu)/],['حائل',/(حائل|hail\b)/],['جازان',/(جازان|جيزان|jazan|jizan)/],['نجران',/(نجران|najran)/],['الأحساء',/(الاحساء|الهفوف|ahsa|hofuf)/]];
+   const cityOf=t=>{let best=null,bi=1e9;CITIES.forEach(([c,re])=>{const m=t.match(re);if(m&&m.index<bi){bi=m.index;best=c}});return best};
+   const head=norm(cv.split('\n').slice(0,6).join(' ')),cvC=cityOf(head)||cityOf(nc),jdC=hasJD?cityOf(nj):null;
+   // الجنسية
+   const natM=nc.match(/(?:الجنسيه|nationality)\s*[:：\-]?\s*([a-zء-ي]+)/);
+   const saudi=/(^|[^ء-ي])(سعودي|سعوديه)(?![ء-ي])/.test(nc)||/\bsaudi\b(?!\s*arabia)/.test(nc)||(natM&&/^(سعودي|سعوديه|saudi)$/.test(natM[1]));
+   const nonS=!saudi&&(natM||/(اقامه|iqama|مقيم)/.test(nc));
+   const saOnly=hasJD&&/(سعودي(?:ين|ه)?\s+فقط|للسعوديين|للسعوديات|saudis?\s+only|saudi nationals? only)/.test(nj);
+   if(saudi){ks.push(100);kg.push(tr('الجنسية واضحة: سعودي ✓','Nationality stated: Saudi ✓'))}
+   else if(nonS){if(saOnly){ks.push(10);const k=tr('الوظيفة للسعوديين فقط','This job is for Saudi nationals only');kr.push(k);K.push(k)}
+     else if(/(قابله للنقل|نقل كفاله|نقل الكفاله|نقل خدمات|transferable|transferrable)/.test(nc)){ks.push(100);kg.push(tr('غير سعودي مع إقامة قابلة للنقل ✓','Non-Saudi with transferable Iqama ✓'))}
+     else{ks.push(70);kr.push(tr('غير سعودي ولم يُذكر هل الإقامة قابلة للنقل','Non-Saudi — Iqama transferability not stated'));kf.push(tr('اكتب: «الإقامة قابلة للنقل» إذا ينطبق — يسهّل قرار التوظيف','Add “Transferable Iqama” if it applies'))}}
+   else{ks.push(60);kr.push(tr('الجنسية غير مذكورة — مهمة لنسب التوطين','Nationality not stated — matters for Saudization'));kf.push(tr('أضف في بياناتك: الجنسية: سعودي / غير سعودي (والإقامة قابلة للنقل)','Add: Nationality (and Iqama status if non-Saudi)'))}
+   if(saOnly&&!saudi&&!nonS)K.push(tr('الوظيفة للسعوديين فقط وجنسيتك غير مذكورة','Job is for Saudis only and your nationality isn’t stated'));
+   // المدينة
+   const reloc=/(مستعد للانتقال|مستعده للانتقال|استعداد للانتقال|امكانيه الانتقال|willing to relocate|open to relocat|ready to relocate)/.test(nc);
+   if(!cvC){ks.push(65);kr.push(tr('مدينة السكن غير مذكورة','City of residence not stated'));kf.push(tr('اكتب مدينتك أعلى السيرة (مثل: جدة، السعودية)','Add your city at the top (e.g. Jeddah, Saudi Arabia)'))}
+   else if(jdC&&jdC!==cvC){if(reloc){ks.push(90);kg.push(tr(`أنت في ${cvC} ومستعد للانتقال إلى ${jdC} ✓`,`Based in ${cvC}, willing to relocate to ${jdC} ✓`))}
+     else{ks.push(55);kr.push(tr(`الوظيفة في ${jdC} وأنت في ${cvC}`,`Job is in ${jdC}, you are in ${cvC}`));kf.push(tr(`إذا تقدر تنتقل، اكتب: «مستعد للانتقال إلى ${jdC}»`,`If you can, add “Willing to relocate to ${jdC}”`))}}
+   else{ks.push(100);kg.push(jdC?tr(`نفس مدينة الوظيفة (${cvC}) ✓`,`Same city as the job (${cvC}) ✓`):tr(`المدينة: ${cvC}`,`City: ${cvC}`))}
+   // المباشرة
+   if(/(مباشره فوري|متاح فورا|متاحه فورا|المباشره فورا|فورا|فوري(?![ء-ي])|immediate|immediately|available to (start|join)|notice period|فتره الاشعار|مده الاشعار|اشعار\s*\d|يمكنني المباشره|استطيع المباشره|المباشره خلال|متاح للعمل)/.test(nc)){ks.push(100);kg.push(tr('موعد المباشرة واضح ✓','Availability stated ✓'))}
+   else{ks.push(70);kr.push(tr('ما ذكرت متى تقدر تباشر','Start availability not stated'));kf.push(tr('أضف سطر: «متاح للمباشرة فورًا» أو «فترة الإشعار: شهر»','Add “Available immediately” or “Notice period: 1 month”'))}
+   miss6={nat:!saudi&&!nonS,iq:nonS&&!saOnly&&!/(قابله للنقل|نقل كفاله|نقل الكفاله|نقل خدمات|transferable|transferrable)/.test(nc),reloc:!!(cvC&&jdC&&jdC!==cvC&&!reloc)?jdC:'',avail:!ks.length||ks[ks.length-1]!==100};
+   add('basic',tr('البيانات الأساسية','Key details'),ks.reduce((a,b)=>a+b,0)/ks.length,kr,kf,kg);}
+  let kwS=[],kwSrc='';
+  if(R.kw){kwS=kwClean(R.kw.filter(k=>k.st==='m').sort((a,b)=>b.imp-a.imp).map(k=>k.k),jd).slice(0,10);kwSrc='jd'}
+  else{try{const f=detectField(cv),nA=norm(cv);if(f){kwS=FIELDS[f].skills.filter(k=>!hasSkill(nA,k)).slice(0,10);kwSrc=f}}catch(e){}}
+  const sc=crit.filter(c=>c.score!=null),avg=Math.round(sc.reduce((a,c)=>a+c.score,0)/sc.length);
+  const verdict=K.length?'rej':avg>=75?'ok':avg>=55?'imp':'rej';
+  return {crit,K,avg,verdict,hasJD,kwS,kwSrc,miss6,cvAr:isAr(cv),accr};
+}
+
+let lastRec=null;
+function renderRec(E){
+  lastRec=E;const box=$('recCard');if(!box)return;box.style.display='';
+  const V={ok:[tr('✅ مرشح للمقابلة','✅ Shortlisted for interview'),'var(--ok)','var(--ok-l)',tr('لو كنت مسؤول التوظيف، كنت بتواصل معك. راجع الملاحظات البسيطة تحت.','As a recruiter, I would call you. Check the minor notes below.')],
+    imp:[tr('⚠️ يحتاج تحسين','⚠️ Needs improvement'),'var(--warn)','var(--warn-l)',tr('سيرتك قريبة، لكن فيه نقاط ممكن تخليها تتأخر أو تنحط على جنب.','Close, but some points could push you down the pile.')],
+    rej:[tr('❌ مرفوض مبدئيًا','❌ Likely rejected'),'var(--bad)','var(--bad-l)',tr('بالوضع الحالي، غالبًا ما توصل للمقابلة. شوف أسباب الرفض وكيف تصلحها.','As it stands, this CV probably won’t reach interview. See why and how to fix it.')]}[E.verdict];
+  let h=`<h3>🧑‍💼 ${tr('رأي مسؤول التوظيف','Recruiter’s view')} <span class="cnt">${E.avg}/100</span></h3>
+  <div style="background:${V[2]};border-radius:12px;padding:12px 14px;margin-bottom:12px"><div style="font-size:19px;font-weight:800;color:${V[1]}">${V[0]}</div><div style="font-size:14px;margin-top:2px">${esc(V[3])}</div></div>`;
+  if(E.K.length)h+=`<div style="border:1.5px solid var(--bad);border-radius:12px;padding:10px 14px;margin-bottom:12px"><b style="color:var(--bad)">${tr('🚫 أسباب الرفض','🚫 Rejection reasons')}</b><ul style="margin:6px 0 0;padding-inline-start:20px">${E.K.map(k=>`<li>${esc(k)}</li>`).join('')}</ul></div>`;
+  h+=E.crit.map(c=>{const s=c.score,cl=s==null?'var(--mut)':col(s);
+    return `<div class="chk" style="display:block"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><b>${esc(c.title)}</b><span style="font-weight:800;color:${cl}">${s==null?'—':s+'/100'}</span></div>
+    <div class="bar"><i style="width:${s||0}%;background:${cl}"></i></div>
+    ${c.strong.map(x=>`<div style="font-size:13.5px;color:var(--ok);margin-top:5px">✓ ${esc(x)}</div>`).join('')}
+    ${c.reasons.map(x=>`<div style="font-size:13.5px;color:${s==null?'var(--mut)':'var(--bad)'};margin-top:5px">${s==null?'ℹ️':'✕'} ${esc(x)}</div>`).join('')}
+    ${c.fixes.length?`<div class="wf"><b>${tr('كيف تصلحها:','How to fix:')}</b><ul style="margin:4px 0 0;padding-inline-start:18px">${c.fixes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}</div>`}).join('');
+  if(!E.kwS.length&&!E.hasJD)h+=`<div class="wf" style="margin-top:12px">🎯 ${tr('عشان نطلع لك الكلمات المفتاحية ونحسّنها: الصق إعلان الوظيفة فوق واضغط فحص مرة ثانية.','To get keyword suggestions: paste the job ad above and check again.')} <a href="#jd" style="color:var(--blue);font-weight:700" onclick="document.getElementById('jd').focus()">${tr('الصق الإعلان ↑','Paste the ad ↑')}</a></div>`;
+  const M=E.miss6,AC=E.accr&&!E.accr.has?E.accr:null,needB=M.nat||M.iq||M.reloc||M.avail||AC;
+  if(E.kwS.length||needB){
+    const sel1=(id,opts)=>`<select id="${id}" style="font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff">${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    h+=`<div style="margin-top:14px;border:1.5px solid var(--blue);border-radius:12px;padding:12px 14px">
+    <b>✨ ${tr('اقتراحات مسؤول التوظيف لسيرتك','Recruiter suggestions for your CV')}</b>`;
+    if(needB)h+=`<div class="wf" style="margin:8px 0"><b>${tr('بيانات ناقصة — اختر وبنضيفها لسيرتك:','Missing details — choose and we’ll add them:')}</b>
+      ${M.nat?`<div style="margin-top:6px">${tr('الجنسية:','Nationality:')} ${sel1('bNat',[tr('— اختر —','— select —'),tr('سعودي','Saudi'),tr('غير سعودي','Non-Saudi')])}</div>`:''}
+      ${M.nat||M.iq?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bIq"> ${tr('الإقامة قابلة للنقل (لغير السعودي)','Transferable Iqama (non-Saudi)')}</label>`:''}
+      ${M.reloc?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bRel"> ${tr(`مستعد للانتقال إلى ${M.reloc}`,`Willing to relocate to ${M.reloc}`)}</label>`:''}
+      ${AC?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bAc"> ${tr('عندي '+AC.ar+' سارية','I hold a valid '+AC.en)}</label>`:''}
+      ${M.avail?`<div style="margin-top:6px">${tr('المباشرة:','Availability:')} ${sel1('bAv',[tr('— اختر —','— select —'),tr('متاح للمباشرة فورًا','Available immediately'),tr('فترة الإشعار: أسبوعين','Notice period: 2 weeks'),tr('فترة الإشعار: شهر','Notice period: 1 month'),tr('فترة الإشعار: شهرين','Notice period: 2 months')])}</div>`:''}</div>`;
+    if(E.kwS.length)h+=`<div style="margin-top:8px"><b>🎯 ${tr('كلمات مفتاحية مقترحة','Suggested keywords')}</b></div>
+    ${E.kwS.length?'':''}<div class="hint" style="margin:2px 0 8px;${E.kwS.length?'':'display:none'}">${E.kwSrc==='jd'?tr('من إعلان الوظيفة وناقصة في سيرتك.','From the job ad and missing in your CV.'):tr(`شائعة في مجال ${E.kwSrc}.`,`Common in your field (${E.kwSrc}).`)} ${tr('اخترناها لك ✓ — اضغط على أي كلمة ما تتقنها عشان تشيلها.','All selected ✓ — tap any you don’t have to remove it.')}</div>
+    <div class="chips" id="recKw">${E.kwS.map(k=>`<span class="chip p" data-rk="${esc(k)}" style="cursor:pointer">✓ ${esc(k)}</span>`).join('')}</div>`;
+    h+=`
+    <div class="actions" style="margin-top:10px;justify-content:stretch">
+      <button class="btn2" id="recAuto" style="flex:1;background:var(--blue);color:#fff">✨ ${tr('طبّق الاقتراحات وحسّن سيرتي','Apply suggestions & improve my CV')}</button>
+      <button class="btn2" id="recHow" style="flex:1;${E.kwS.length?'':'display:none'}">👀 ${tr('وريني كيف أضيفها بنفسي','Show me how to add them')}</button></div>
+    <div id="recGuide" style="display:none;margin-top:10px"></div></div>`;
+  }
+  h+=`<div class="hint" style="margin-top:10px">${tr('💡 تقييم آلي مبدئي يحاكي طريقة مسؤول التوظيف في الفرز الأول. القرار النهائي يرجع لكل شركة ومتطلباتها.','💡 An automated first-screen estimate that mimics how recruiters shortlist. Final decisions depend on each employer.')}</div>`;
+  box.innerHTML=h;
+  if(!$('recAuto'))return;
+  const sel=()=>[...box.querySelectorAll('[data-rk].p')].map(x=>x.dataset.rk);
+  box.querySelectorAll('[data-rk]').forEach(ch=>ch.onclick=()=>{const on=ch.classList.toggle('p');ch.classList.toggle('m',!on);ch.firstChild.textContent=(on?'✓ ':'+ ')+ch.dataset.rk;if($('recGuide').style.display==='block')$('recHow').onclick(true)});
+  $('recHow').onclick=(keep)=>{const g=$('recGuide');if(keep!==true&&g.style.display==='block'){g.style.display='none';return}
+    const ks=(sel().length?sel():E.kwS.slice(0,4));
+    g.innerHTML=`<div class="hint" style="margin-bottom:6px">${tr('كل كلمة تنحط في 3 أماكن — المهارات، والملخص، ونقطة في الخبرات:','Use each keyword in 3 places — Skills, Summary, and one Experience bullet:')}</div>`+ks.map(k=>{const ar=isAr(k)||!UIen();
+      return `<div class="wf"><b>«${esc(k)}»</b>
+      <div style="margin-top:4px">1️⃣ <b>${tr('المهارات:','Skills:')}</b> <span dir="auto" style="background:var(--blue-l);color:var(--blue-d);font-weight:700;border-radius:6px;padding:1px 8px">• ${esc(k)}</span></div>
+      <div style="margin-top:4px">2️⃣ <b>${tr('الملخص:','Summary:')}</b> <span dir="auto">${esc(ar?`… متمكن من ${k} وتطبيقه في بيئة العمل.`:`… skilled in ${k} with hands-on application.`)}</span></div>
+      <div style="margin-top:4px">3️⃣ <b>${tr('الخبرات:','Experience:')}</b> <span dir="auto">${esc(ar?`• طبّقت ${k} في [المهمة]، مما أدى إلى [النتيجة] بنسبة [X%].`:`• Applied ${k} to [task], resulting in [X%] [improvement].`)}</span></div></div>`}).join('')+
+      `<div class="hint" style="margin-top:6px">⚠️ ${tr('لا تضيف كلمة ما تتقنها — مسؤول التوظيف بيسألك عنها في المقابلة.','Don’t add skills you don’t have — you’ll be asked about them in the interview.')}</div>`;
+    g.style.display='block'};
+  $('recAuto').onclick=()=>{const ks=sel();
+    const ac=$('bAc')&&$('bAc').checked,nat=$('bNat')?$('bNat').selectedIndex:0,iq=$('bIq')&&$('bIq').checked,rel=$('bRel')&&$('bRel').checked,av=$('bAv')?$('bAv').selectedIndex:0;
+    if(!ks.length&&!nat&&!iq&&!rel&&!av&&!ac){toast(tr('اختر اقتراح واحد على الأقل ☝️','Choose at least one suggestion ☝️'));return}
+    if($('builder').style.display!=='block')$('openB').click();
+    const ar=E.cvAr,lines=[];let n=0;
+    // 1) المهارات
+    const t=$('s-skills'),nn=norm(t.value),add=ks.filter(k=>!nn.includes(norm(k)));
+    if(add.length){t.value=(t.value.trim()?t.value.trim()+'\n':'')+add.map(k=>'• '+k).join('\n');n+=add.length}
+    // 2) الملخص: ندمج أهم الكلمات في جملة
+    const sm=$('s-summary');{const b4=sm.value;sm.value=sm.value.replace(/(و?(أ|ا)عمل بجد|و?(أ|ا)عمل تحت الضغط|و?(أ|ا)حب العمل\s*(ب|ضمن)?\s*(روح)?\s*(ال)?فريق|و?(القدرة على )?العمل تحت الضغط|و?روح الفريق|hard[- ]?working|team player|highly motivated|passionate|self[- ]starter)/gi,'').replace(/\s{2,}/g,' ').replace(/\s+([.،,])/g,'$1').replace(/[،,]\s*([.]|$)/g,'$1').trim();if(sm.value!==b4)n++}
+    const inS=add.filter(k=>!norm(sm.value).includes(norm(k))).slice(0,3);
+    if(inS.length){const j=ar?inS.join('، ').replace(/، ([^،]*)$/,(m,x)=>' و'+(/^[A-Za-z]/.test(x)?' ':'')+x):inS.join(', ').replace(/, ([^,]*)$/,' and $1');
+      sm.value=(sm.value.trim()?sm.value.trim().replace(/([^.。])$/,'$1.')+' ':'')+(ar?`متمكن من ${j}.`:`Skilled in ${j}.`);n++}
+    // 3) البيانات الأساسية
+    if(nat===1)lines.push(ar?'الجنسية: سعودي':'Nationality: Saudi');
+    if(nat===2)lines.push(ar?'الجنسية: غير سعودي':'Nationality: Non-Saudi');
+    if(iq&&nat!==1)lines.push(ar?'الإقامة قابلة للنقل':'Transferable Iqama');
+    if(rel)lines.push(ar?`مستعد للانتقال إلى ${E.miss6.reloc}`:`Willing to relocate to ${E.miss6.reloc}`);
+    if(av){const A=ar?['','متاح للمباشرة فورًا','فترة الإشعار: أسبوعين','فترة الإشعار: شهر','فترة الإشعار: شهرين']:['','Available immediately','Notice period: 2 weeks','Notice period: 1 month','Notice period: 2 months'];lines.push(A[av])}
+    if(ac){const c=$('s-certs');c.value=(c.value.trim()?c.value.trim()+'\n':'')+'• '+(ar?E.accr.ar+' (سارية)':E.accr.en+' (valid)');n++}
+    if(lines.length){const o=$('s-other');o.value=(o.value.trim()?o.value.trim()+'\n':'')+lines.map(x=>'• '+x).join('\n');n+=lines.length}
+    try{doRescan(false);updatePreview();renderSuggest()}catch(e){console.warn(e)}
+    toast(tr(`تم تطبيق ${n} اقتراح ✅`,`${n} suggestions applied ✅`));
+    setTimeout(()=>$('bldCard').scrollIntoView({behavior:'smooth',block:'start'}),300)};
+}
+window.addEventListener('mqlang',()=>{try{if(lastRec&&lastR)renderRec(recruiterEval(lastCV,$('jd').value,lastR))}catch(e){}});
 
 /* ---------- ATS CV builder ---------- */
 let lastCV='',lastR=null,lang='ar';
@@ -855,6 +1128,10 @@ function improveSummary(t){
 
 /* ---------- content suggestions: summary, skills, basics ---------- */
 const FIELDS={
+ 'الهندسة المدنية والإنشاءات':{kw:/(مهندس مدني|هندسه مدنيه|هندسة مدنية|انشاءات|إنشاءات|موقع|مقاول|حصر|كميات|مستخلص|civil|construction|site engineer|quantity|boq|autocad|primavera)/i,
+   skills:['حصر الكميات (BOQ)','إعداد المستخلصات','الإشراف على المواقع','قراءة المخططات','AutoCAD','Primavera P6','MS Project','Revit','ضبط الجودة (QA/QC)','السلامة المهنية (HSE)','إعداد التقارير الفنية','إدارة المقاولين','كود البناء السعودي','تقدير التكاليف']},
+ 'الهندسة الكهربائية والميكانيكية':{kw:/(كهرباء|كهربائي|ميكانيك|تكييف|صيانة|electrical|mechanical|hvac|mep|maintenance)/i,
+   skills:['أنظمة MEP','HVAC','الصيانة الوقائية','قراءة المخططات','AutoCAD','Revit MEP','السلامة المهنية (HSE)','الاختبار والتشغيل (T&C)','إعداد التقارير الفنية','كود البناء السعودي']},
  'الموارد البشرية':{areas:['التوظيف والاستقطاب','شؤون الموظفين','الرواتب','الانضباط الوظيفي','تقييم الأداء','التدريب والتطوير','علاقات الموظفين','تهيئة الموظفين'],kw:/(موارد بشري|شؤون الموظفين|توظيف|استقطاب|رواتب|hr\b|human resources|recruit|payroll|onboarding)/i,
    skills:['نظام العمل السعودي','التوظيف والاستقطاب','إدارة شؤون الموظفين','الرواتب والتعويضات','التأمينات الاجتماعية (GOSI)','منصة قوى','منصة مدد','منصة مقيم','تقييم الأداء','التدريب والتطوير','تهيئة الموظفين (Onboarding)','علاقات الموظفين','السعودة ونطاقات','أنظمة HRIS','Microsoft Excel','إعداد مؤشرات الأداء (KPI)']},
  'المحاسبة والمالية':{kw:/(محاسب|مالي|ميزانية|قيود|فواتير|ضريبة|زكاة|accounting|accountant|finance|audit)/i,
