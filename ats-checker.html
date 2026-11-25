@@ -773,7 +773,7 @@ function bulletKWs(t,R,idx){
   const ro=cvRole(lastCV||t);if(ro&&ro.sk&&!/(موارد|اداري|Human|Admin)/i.test(ro.ar+ro.en)){const cvAr=window.__cvAr!==false,nA=norm(lastCV||t);let L=(cvAr?ro.sk:ro.skEn).filter(k=>!nA.includes(norm(k.split(' (')[0].split(' / ')[0])));const jdm=R.kw?R.kw.filter(k=>k.st!=='p'&&k.imp===3).map(k=>k.d||k.k).filter(k=>cvAr||!/[ء-ي]/.test(k)):[];L=[...jdm.map(k=>({k,jd:true})),...L.map(k=>({k,jd:false}))];const off=((idx||0)*2)%Math.max(1,L.length);return L.slice(off).concat(L.slice(0,off)).filter((x,i,a)=>a.findIndex(y=>y.k===x.k)===i).slice(0,4)}
   const ty=bType(t);const cvAr=window.__cvAr!==false;const nm=e=>cvAr?e.d:e.en;
   const all=' '+toks(lastCV||t).join(' ')+' ';const out=[];const add=(k,jd)=>{if(k&&!out.some(x=>x.k===k))out.push({k,jd})};
-  const FL=detectFields(lastCV||t),isHR=!FL.length||FL.includes('الموارد البشرية');
+  const FL=detectFields(specText(lastCV||t)),isHR=!FL.length||FL.includes('الموارد البشرية');
   const want=ty&&(isHR||['data','audit','project'].includes(ty))?(KW_T[ty]||[]):[];
   if(R.kw)R.kw.filter(k=>k.st!=='p'&&k.dict&&want.includes(k.dict.d)).forEach(k=>add(nm(k.dict),true));
   want.map(d=>KD.find(x=>x.d===d)).filter(e=>e&&!e.a.some(a=>hasPh(all,a))).forEach(e=>add(nm(e),false));
@@ -1171,7 +1171,7 @@ function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);const LP=(a,e)=>{if(!ar)glo
   if(/(متاح للمباشره|available immediately)/i.test(n))return `<div style="font-size:12.5px;color:var(--mut);margin-top:6px">${tr('اكتب موعدك بنفسك (مثل: فترة الإشعار: شهر):','Type your own (e.g. Notice period: 1 month):')}</div>`+qfWidget('add',L('متاح للمباشرة فورًا','Available to join immediately'));
   if(/(سنه التخرج|graduation year)/i.test(n)&&!/الدرجه/.test(n))return qfWidget('year','',null,tr('✓ أضف السنة','✓ Add year')).replace('class="qfin"','class="qfin" inputmode="numeric" placeholder="2020"');
   if(/(اضف قسم «المهارات»|اضف 6–12 مهاره|add a “skills”|add 6–12)/i.test(n)){
-    const RS=roleSkills(cv,ar);const FL=RS&&RS.length?[]:detectFields(cv);const nA=norm(cv);let L=RS&&RS.length?RS.slice():[];FL.forEach(f=>L.push(...FIELDS[f].skills));
+    const RS=roleSkills(cv,ar);const FL=RS&&RS.length?[]:detectFields(specText(cv));const nA=norm(cv);let L=RS&&RS.length?RS.slice():[];FL.forEach(f=>L.push(...FIELDS[f].skills));
     L=L.filter((k,i,a)=>a.indexOf(k)===i&&!hasSkill(nA,k)).map(k=>ar?k:(FSK_EN[k]||k));
     const sysm=(cv.match(/\b(SAP|Oracle(?: ERP)?|Excel|Microsoft Office|MS Office|Power BI|Jisr|AutoCAD|Primavera)\b|أوراكل|اوراكل|جسر|إكسل|اكسل/gi)||[]);
     const sk=[...new Set([...sysm,...L])].slice(0,10);
@@ -1235,7 +1235,7 @@ function detectRole(t){const n=norm(t||'');
 function skHave(nA,k){const b=norm(k.split(' (')[0].split(' / ')[0]);if(nA.includes(b))return true;const w=b.split(/\s+/).filter(x=>x.length>=4);return w.length>0&&w.every(x=>nA.includes(x))}
 function roleSkills(cv,ar){const r=cvRole(cv);if(!r||!r.sk)return null;const nA=norm(cv);return (ar?r.sk:r.skEn).filter(k=>!skHave(nA,k))}
 function jobTitles(cv){const L=(cv||'').split('\n'),out=[];L.forEach((l,i)=>{if(/\b(19|20)\d\d\b/.test(l)&&!/^\s*[•●▪◦‣\-–*·]/.test(l)){out.push(l);const pv=(L[i-1]||'').trim();if(pv&&pv.split(/\s+/).length<=8&&!/\b(19|20)\d\d\b/.test(pv)&&!/[.،:]$/.test(pv))out.push(pv)}});return out}
-function cvRole(cv){const L=(cv||'').split('\n');const head=L.slice(0,4).join(' ');return detectRole(head)||detectRole(jobTitles(cv).slice(0,2).join(' '))||detectRole(L.filter(l=>/\|/.test(l)).slice(0,1).join(' '))}
+function cvRole(cv){const L=(cv||'').split('\n');const head=L.slice(0,4).filter(l=>!/(diploma|bachelor|master|degree|دبلوم|بكالوريوس|ماجستير|objective|الهدف)/i.test(l)).join(' ');return detectRole(head)||detectRole(jobTitles(cv).slice(0,2).join(' '))||detectRole(L.filter(l=>/\|/.test(l)).slice(0,1).join(' '))}
 const ROLE_BUL=[
  [/(سائق|driver)/,{ar:['نقل البضائع/الركاب بمعدل 12 رحلة شهريًا بدون أي حوادث أو مخالفات.','الصيانة الدورية للمركبة ومتابعة الأوراق والتصاريح والفحص الدوري.','الالتزام بمواعيد التسليم بنسبة 98%.'],en:['Completed 12+ trips monthly with zero accidents or violations.','Handled routine vehicle maintenance, permits and periodic inspection.','Met delivery schedules 98% of the time.']}],
  [/(رسام|draftsman|draughtsman|cad operator)/,{ar:['إعداد 40 مخطط تنفيذي شهريًا على AutoCAD وفق ملاحظات المهندس.','تعديل المخططات حسب ملاحظات الاستشاري خلال يومي عمل.','إعداد مخططات As-Built لعدد 5 مشاريع.'],en:['Produced 40+ shop drawings monthly in AutoCAD per engineer markups.','Revised drawings per consultant comments within 2 working days.','Prepared as-built drawings for 5 projects.']}],
@@ -1250,7 +1250,12 @@ function jobBullets(cv){const ar=isAr(cv),Lc=cv.split('\n');const note=t=>`<div 
     /* على حسب الوظيفة: لكل وظيفة في السيرة نقاط من نفس مجالها (أو من إعلان الوظيفة إذا موجود) */
     const r=secRange(Lc,'experience'),jd=($('jd')||{}).value||'',fall=jd.trim()?detectFields(jd)[0]:null;let out='';
     const jobs=[];if(r)for(let j=r[0]+1;j<r[1];j++){const l=Lc[j];if(l.trim()&&!/^\s*[•●▪◦‣\-–*·]/.test(l)&&/\b(19|20)\d\d\b/.test(l)){let k=j+1,bt='';while(k<r[1]&&/^\s*[•●▪◦‣\-–*·]/.test(Lc[k]))bt+=' '+Lc[k++];const pv=(Lc[j-1]||'').trim();const hasT=pv&&j-1>r[0]&&!/\b(19|20)\d\d\b/.test(pv)&&!/^\s*[•●▪◦‣\-–*·]/.test(pv)&&pv.split(/\s+/).length<=8;const title=hasT?pv:l.split('|')[0].trim();jobs.push({h:l,t:(hasT?pv+' ':'')+l+bt,title})}}
-    (jobs.length?jobs.slice(0,3):[{h:'',t:''}]).forEach((jb,ix)=>{const f=detectFields(jb.t)[0]||fall||'_';const B=(roleBul(jb.title||jb.h,ar)||roleBul(jb.t,ar)||(FIELD_BUL[f]||FIELD_BUL._)[ar?'ar':'en']).slice(0,ix?2:3);
+    /* مسؤول التوظيف: النقاط تكون للوظائف اللي لها علاقة بمهنتك (أو بالإعلان) — البعيدة تكفيها سطر */
+    const fam=r=>!r?null:/(مهندس|رسام|مساح|فني|Engineer|Draftsman|Surveyor|Technician)/.test(r.ar+r.en)?'eng':/(موارد|اداري|إداري)/.test(r.ar)?'hr':r.ar;
+    const main=(jd.trim()?detectRole(jd.split('\n').slice(0,3).join(' ')):null)||cvRole(cv);const mf=fam(main);let skipped=[];
+    const rel=jobs.filter(jb=>{if(!mf)return true;const r=detectRole(jb.title||jb.h)||detectRole(jb.t);if(!r)return !detectFields(jb.t).length||detectFields(jb.t)[0]===detectFields(specText(cv))[0];const ok=fam(r)===mf;if(!ok)skipped.push(jb.title||jb.h.split('|')[0].trim());return ok});
+    if(skipped.length)out+=`<div class="hint" style="margin-top:8px;font-size:13px">ℹ️ ${tr(`وظائف بعيدة عن مهنتك «${main.ar}»: «${skipped.map(esc).join('»، «')}» — كمسؤول توظيف أنصحك تخليها سطر واحد بدون نقاط، وتركّز النقاط على الوظائف القريبة.`,`Roles unrelated to your profession (“${main.en}”): “${skipped.map(esc).join('”, “')}” — keep them to one line; focus bullets on related roles.`)}</div>`;
+    (rel.length?rel.slice(0,3):jobs.length?[]:[{h:'',t:''}]).forEach((jb,ix)=>{const f=detectFields(jb.t)[0]||fall||'_';const B=(roleBul(jb.title||jb.h,ar)||roleBul(jb.t,ar)||(FIELD_BUL[f]||FIELD_BUL._)[ar?'ar':'en']).slice(0,ix?2:3);
       out+=note((jb.h?`${tr('نقاط مقترحة لوظيفة','Suggested bullets for')}: <b dir="auto">${esc(jb.title||jb.h.split('|')[0].trim())}</b>`:tr('نقاط مقترحة تضيفها لخبرتك','Suggested bullets to add'))+tr(' (عدّل الأرقام لأرقامك الحقيقية):',' (change the numbers to your real ones):'))+B.map(b=>qfWidget('addbullet',b,jb.h,tr('✓ أضفها','✓ Add'),true)).join('')});
     return out}
 function fmtQF(c,cv){if(c.st==='pass')return '';const nm=c.name,ar=isAr(cv),Lc=cv.split('\n');const is=(...k)=>k.some(x=>nm.includes(x));
@@ -1263,7 +1268,7 @@ function fmtQF(c,cv){if(c.st==='pass')return '';const nm=c.name,ar=isAr(cv),Lc=c
   if(is('رقم الجوال','Phone number'))return qfWidget('contact',ar?'05XXXXXXXX':'+966 5X XXX XXXX','',tr('✓ أضفه','✓ Add'));
   if(is('الملخص المهني','Professional Summary')){const t=(Lc.find((l,i)=>i>0&&l.trim()&&!/@|\d{6,}/.test(l))||'').trim().split('|')[0].trim();
     return note(tr('عدّل الملخص (حط سنوات خبرتك وأهم شغلك):','Edit the summary (add your years and main work):'))+qfWidget('summary',ar?`${t||'أخصائي'} بخبرة ... سنوات في ...، متمكن من ...`:`${t||'Professional'} with ... years of experience in ..., skilled in ...`,'',tr('✓ أضف الملخص','✓ Add summary'),true)}
-  if(is('قسم المهارات','Skills section')){const RS=roleSkills(cv,ar);if(RS&&RS.length)return note(tr('مهارات مهنتك — احذف اللي ما تتقنه وأضف اللي عندك:','Skills for your role — remove any you don’t have, add your own:'))+qfWidget('skills',RS.join(ar?'، ':', '),'',tr('✓ أضفها','✓ Add'),true);const FL=detectFields(cv),nA=norm(cv);let L=[];FL.forEach(f=>L.push(...FIELDS[f].skills));L=L.filter((k,i,a)=>a.indexOf(k)===i&&!hasSkill(nA,k)).map(k=>ar?k:(FSK_EN[k]||k)).slice(0,10);
+  if(is('قسم المهارات','Skills section')){const RS=roleSkills(cv,ar);if(RS&&RS.length)return note(tr('مهارات مهنتك — احذف اللي ما تتقنه وأضف اللي عندك:','Skills for your role — remove any you don’t have, add your own:'))+qfWidget('skills',RS.join(ar?'، ':', '),'',tr('✓ أضفها','✓ Add'),true);const FL=detectFields(specText(cv)),nA=norm(cv);let L=[];FL.forEach(f=>L.push(...FIELDS[f].skills));L=L.filter((k,i,a)=>a.indexOf(k)===i&&!hasSkill(nA,k)).map(k=>ar?k:(FSK_EN[k]||k)).slice(0,10);
     return note(tr('احذف اللي ما تتقنه وأضف اللي عندك:','Remove any you don’t have, add your own:'))+qfWidget('skills',L.join(ar?'، ':', '),'',tr('✓ أضفها','✓ Add'),true)}
   if(is('قسم التعليم','Education section'))return qfWidget('edu',ar?'بكالوريوس ... – جامعة ... – 2020':'Bachelor of ... – ... University – 2020','',tr('✓ أضفه','✓ Add'),true);
   if(is('الدورات والشهادات','Courses & Certifications')){const h=norm(cv.split('\n').slice(0,3).join(' '));
@@ -1599,6 +1604,8 @@ const FSK_EN={"حصر الكميات (BOQ)": "Quantity Surveying (BOQ)", "إعد
 const SYSTEMS=['Oracle','SAP','Odoo','Zoho','Microsoft Office','Microsoft Excel','Excel','Power BI','HRIS','ERP','Salesforce','جسر','مايكروسوفت أوفيس','قوى','مدد','مقيم','التأمينات الاجتماعية','أبشر','Canva'];
 function hasSkill(nA,k){const core=norm(k.split(' (')[0]).replace(/^(منصه|نظام|انظمه|اداره)\s+/,'');const c2=core.replace(/^ال/,'');
   if(nA.includes(c2))return true;const first=c2.split(' ')[0];return first.length>=4&&c2.split(' ').length>1&&nA.includes(first.replace(/^ال/,''))&&/و/.test(c2)?false:false}
+function specText(cv){const L=(cv||'').split('\n');const EDU=/^\s*(التعليم|المؤهلات|المؤهل العلمي|المؤهل|الشهادات|الدورات|الدورات التدريبية|التدريب|education|academic|qualifications?|certifications?|courses|training courses|training)\s*:?\s*$/i;
+  const out=[];let skip=false;L.forEach(l=>{const t=l.trim();if(EDU.test(t)){skip=true;return}if(skip&&ANY_HEAD.test(t)&&t.length<40&&!EDU.test(t))skip=false;if(!skip&&!/(diploma|bachelor|master|degree|دبلوم|بكالوريوس|ماجستير|objective|الهدف الوظيفي)/i.test(t))out.push(l)});return out.join('\n')}
 function detectFields(txt){const L=Object.entries(FIELDS).map(([f,o])=>[f,(txt.match(new RegExp(o.kw.source,'gi'))||[]).length]).filter(x=>x[1]>=2).sort((a,b)=>b[1]-a[1]);return L.filter(x=>x[1]>=L[0][1]*.5).slice(0,2).map(x=>x[0])}
 function detectField(txt){let best=null,bc=0;for(const [f,o] of Object.entries(FIELDS)){const c=(txt.match(new RegExp(o.kw.source,'gi'))||[]).length;if(c>bc){bc=c;best=f}}return bc>=2?best:null}
 function yearsOf(txt){const now=new Date().getFullYear();const ys=[...txt.matchAll(/\b(19[89]\d|20[0-3]\d)\b/g)].map(m=>+m[1]).filter(y=>y<=now);if(!ys.length)return 0;
@@ -1609,7 +1616,7 @@ function suggestSummary(){
   const d=collect(),exp=$('s-experience').value,all=cvText(d),fem=isFem(all);
   const ar=isAr(all);if(!ar)return null;
   const title=d.title||((exp.split('\n').find(l=>!BULLET_RE.test(l)&&l.trim())||'').split('|')[0].trim());
-  const y=yearsOf(exp);const field=detectField(all);
+  const y=yearsOf(exp);const field=detectField(specText(all));
   const lib=field?FIELDS[field].skills:[];const nA=norm(all);
   const pool=(field&&FIELDS[field].areas)||lib;const areas=pool.filter(k=>hasSkill(nA,k)).slice(0,3);
   const sys=SYSTEMS.filter(x=>new RegExp(x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(all));
@@ -1624,7 +1631,7 @@ function suggestSummary(){
   return (s1+s2+s3).replace(/\s+/g,' ').trim();
 }
 function renderSuggest(){
-  const box=$('suggest');if(!box)return;const d=collect(),all=cvText(d),nA=norm(all),field=detectField(all);
+  const box=$('suggest');if(!box)return;const d=collect(),all=cvText(d),nA=norm(all),field=detectField(specText(all));
   let h='<div style="background:#fff8e6;border:1px solid #f3d79c;border-radius:12px;padding:12px"><h4 style="margin:0 0 8px;font-size:15px">💡 اقتراحات لسيرتك</h4>';
   // summary
   const sm=suggestSummary(),cur=$('s-summary').value.trim();
