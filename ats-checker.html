@@ -114,7 +114,7 @@ html[lang=en] .gl{display:none!important}
 .fitm{position:absolute;left:0;top:0;width:184mm;font-family:Arial,'Tajawal',sans-serif;font-size:9.9pt;line-height:1.4;visibility:hidden}
 .fitm .pn{font-size:17pt;font-weight:700;margin:0;text-align:center}.fitm .pt{font-size:11pt;margin:1px 0;text-align:center}.fitm .pc{font-size:9pt;margin:1px 0 6px;text-align:center}
 .fitm h4{font-size:11pt;margin:9px 0 3px;padding-bottom:1px;border-bottom:1.1px solid #000}.fitm p{margin:1px 0}.fitm p.b{font-weight:700;margin-top:5px}.fitm ul{margin:1px 0;padding-inline-start:16px}.fitm li{margin:0}
-.cvp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 14px;font-family:Arial,'Tajawal',sans-serif;font-size:13px;line-height:1.55;color:#111;max-height:520px;overflow:auto;box-shadow:inset 0 -12px 12px -12px rgba(0,0,0,.12)}
+.cvp{background:#fff;border:1px solid #e6e6ea;border-radius:4px;padding:26px 20px 30px;font-family:Arial,'Tajawal',sans-serif;font-size:12.5px;line-height:1.6;color:#1b1b1f;box-shadow:0 6px 22px rgba(40,30,80,.14);margin:6px 2px 4px}
 .cvp .pn{text-align:center;font-size:19px;font-weight:700;color:#2C3146;margin:0}.cvp .pt{text-align:center;font-size:14px;margin:2px 0}.cvp .pc{text-align:center;font-size:11.5px;margin:2px 0 8px;word-break:break-word}
 .cvp h4{font-size:14px;color:#3B4159;border-bottom:1.2px solid #3B4159;margin:12px 0 5px;padding-bottom:2px}.cvp p{margin:2px 0}.cvp p.b{font-weight:700;margin-top:6px}.cvp ul{margin:2px 0;padding-inline-start:18px}.cvp li{margin:1px 0}
 @media print{
@@ -292,7 +292,7 @@ html[lang=en] #paper,html[lang=en] #doc{direction:rtl;text-align:right}
 <footer>
   <div>© <span id="yr"></span> <b>إيمان خالد</b> — منقذك | EMAN HR. جميع الحقوق محفوظة.</div>
   <div class="en">All rights reserved. Unauthorized copying or redistribution is prohibited.</div>
-  <div style="margin-top:6px;font-weight:800;color:var(--blue)">🔖 الإصدار: 25/11 — 21:45</div>
+  <div style="margin-top:6px;font-weight:800;color:var(--blue)">🔖 الإصدار: 25/11 — 22:00</div>
   <div style="margin-top:6px">أدوات HR أخرى: <a href="https://hreman01.github.io" target="_blank" rel="noopener">hreman01.github.io</a></div>
 </footer>
 <div class="toast" id="toast"></div>
@@ -1191,8 +1191,8 @@ function qfFor(fix,cv){const ar=isAr(cv),n=norm(fix);const LP=(a,e)=>{if(!ar)glo
 }
 function qfApply(box){const mode=box.dataset.mode,orig=box.dataset.orig,v=box.querySelector('.qfin').value.trim();
   let L=lastCV.split('\n');
-  if(mode==='add'){if(!v){toast(tr('اكتب النص أول','Type the text first'));return}
-    let ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci<0)ci=Math.min(1,L.length-1);L.splice(ci+1,0,v);}
+  if(mode==='add'){if(!v){toast(tr('اكتب النص أول','Type the text first'));return}const ar=isAr(lastCV);
+    const hi=L.findIndex(l=>/^\s*(معلومات إضافية|معلومات اضافية|معلومات شخصية|البيانات الشخصية|additional information|additional info|personal information|personal details)\s*:?\s*$/i.test(l.trim()));if(hi>=0)L.splice(hi+1,0,'• '+v);else L.push('',ar?'معلومات إضافية':'Additional Information','• '+v);}
   else if(mode==='city'){if(!v)return;const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci>=0)L[ci]=v+' | '+L[ci].trim();else{let k=L.findIndex(l=>l.trim());L.splice(k+2,0,v)}}
   else if(mode==='contact'){if(!v)return;let k=L.findIndex(l=>l.trim());const ci=L.findIndex(l=>/@|\+?\d[\d\s-]{7,}/.test(l));if(ci>=0)L[ci]=L[ci].trim()+' | '+v;else L.splice(k+2,0,v)}
   else if(mode==='edu'||mode==='cert'){if(!v||/____/.test(v)){toast(tr('عبّي البيانات أول (مكان ____)','Fill in the details first (the ____ parts)'));return}const ar=isAr(lastCV);
@@ -1371,7 +1371,7 @@ const SECS=[
  ['experience','الخبرات العملية','Work Experience',/^(work experience|professional experience|experience|employment( history)?|work history|career history|الخبرات.*|الخبره.*|السجل الوظيفي|التاريخ الوظيفي)$/],
  ['education','التعليم','Education',/^(education|academic.*|qualifications?|educational background|التعليم|المؤهل.*|الموهل.*|الدراسه|التحصيل العلمي)$/],
  ['skills','المهارات','Skills',/^(skills|technical skills|core competencies|competencies|key skills|expertise|soft skills|المهارات.*|مهارات.*|الكفاءات)$/],
- ['certs','الدورات والشهادات','Certifications & Courses',/^(certifications?|certificates|courses|training( courses)?|licenses?|الدورات.*|الشهادات.*|التدريب.*|الرخص.*)$/],
+ ['certs','الدورات والشهادات','Certifications & Courses',/^(certifications?\s*(&|and)\s*(training\s*)?courses|(training\s*)?courses\s*(&|and)\s*certifications?|licenses?\s*(&|and)\s*certifications?|certifications?|certificates|courses|training( courses)?|licenses?|الدورات.*|الشهادات.*|التدريب.*|الرخص.*)$/],
  ['langs','اللغات','Languages',/^(languages|اللغات|اللغه)$/],
  ['other','معلومات إضافية','Additional Information',/^(additional information|additional info|projects|volunteer.*|achievements|awards|interests|hobbies|المشاريع|التطوع.*|الانجازات|الجوائز|الهوايات|معلومات اضافيه)$/],
 ];
@@ -1504,11 +1504,10 @@ function showFixLog(B,A){const L=[];
   const box=$('fixLog');if(!L.length){box.innerHTML='';return}
   const sp=L.filter(x=>x.r.some(r=>r.startsWith('خطأ إملائي'))).length;
   const item=x=>`<li style="margin-bottom:8px"><b style="color:var(--warn)">${x.r.map(esc).join(' • ')}</b><br><span dir="auto" style="color:#b3261e;text-decoration:line-through">${esc(x.b)}</span><br><span dir="auto" style="color:var(--ok)">${esc(x.a)}</span></li>`;
-  box.innerHTML=`<div style="margin:10px 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;text-align:start">
-    <b style="font-size:15px">🔧 صحّحنا لك ${L.length} ${L.length<=10&&L.length>2?'أخطاء':'خطأ'} تلقائياً${sp?` (منها ${sp} إملائية)`:''}</b>
+  box.innerHTML=`<details style="margin:10px 0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;text-align:start"><summary style="cursor:pointer;font-size:14.5px;font-weight:800">🔧 وش عدّلنا في سيرتك (${L.length})${sp?` — منها ${sp} إملائية`:''}</summary>
     <ol style="margin:8px 0 0;padding-inline-start:20px;font-size:13.5px">${L.slice(0,5).map(item).join('')}</ol>
     ${L.length>5?`<details><summary style="cursor:pointer;color:var(--blue);font-weight:700;font-size:13px">عرض الباقي (${L.length-5})</summary><ol start="6" style="margin:6px 0 0;padding-inline-start:20px;font-size:13.5px">${L.slice(5).map(item).join('')}</ol></details>`:''}
-    <div style="font-size:12.5px;color:var(--mut);margin-top:6px">الأحمر = قبل، والأخضر = بعد التصحيح.</div></div>`}
+    <div style="font-size:12.5px;color:var(--mut);margin-top:6px">الأحمر = قبل، والأخضر = بعد التصحيح.</div></details>`}
 
 /* ---------- rule-based bullet rewriter ---------- */
 const AR_MAP={'اداره':'أدرت','اعداد':'أعددت','تطبيق':'طبّقت','تحديث':'حدّثت','متابعه':'تابعت','رفع':'رفعت','مراجعه':'راجعت','تنسيق':'نسّقت','تنفيذ':'نفّذت','تطوير':'طوّرت','تحسين':'حسّنت','تدريب':'درّبت','توظيف':'وظّفت','استقطاب':'استقطبت','تحليل':'حلّلت','تصميم':'صمّمت','بناء':'بنيت','اطلاق':'أطلقت','اصدار':'أصدرت','نشر':'نشرت','فرز':'فرزت','اجراء':'أجريت','دعم':'دعمت','ادخال':'أدخلت','تنظيم':'نظّمت','معالجه':'عالجت','تقليل':'قلّلت','تخفيض':'خفّضت','خفض':'خفّضت','زياده':'زدت','انشاء':'أنشأت','تاسيس':'أسّست','قياده':'قدت','اشراف':'أشرفت على','تجهيز':'جهّزت','صياغه':'صغت','وضع':'وضعت','اعتماد':'اعتمدت','تقييم':'قيّمت','قياس':'قست','توحيد':'وحّدت','ضبط':'ضبطت','تفعيل':'فعّلت','توفير':'وفّرت','حساب':'حسبت','تدقيق':'دقّقت','استلام':'استلمت','اعداده':'أعددت','التعامل':'تعاملت','تعامل':'تعاملت','تمثيل':'مثّلت','التواصل':'تواصلت','تواصل':'تواصلت','عمل':'عملت','العمل':'عملت','المشاركه':'شاركت','مشاركه':'شاركت','المساهمه':'ساهمت','مساهمه':'ساهمت','توزيع':'وزّعت','ترتيب':'رتّبت','حفظ':'حفظت','ارشفه':'أرشفت','استقبال':'استقبلت','تسجيل':'سجّلت','ضمان':'ضمنت','استكمال':'استكملت','تحقيق':'حققت','اداره':'أدرت'};
@@ -1824,12 +1823,15 @@ function compactSecs(secs){
     let L=s.lines.slice();
     if(s.id==='experience'||s.id==='education'){
       const out=[];
+      const isHead0=x=>!BULLET_RE.test(x)&&(/\|/.test(x)||/\b(19|20)\d\d\b/.test(x));const f0=L.find(x=>x.trim()&&!BULLET_RE.test(x));
+      const titleFirst=f0&&!isHead0(f0); /* شكل السيرة: المسمى فوق التاريخ، أو الجهة|التاريخ فوق المسمى */
       for(let i=0;i<L.length;i++){const l=L[i],n=L[i+1];
         const isHead=x=>!BULLET_RE.test(x)&&(/\|/.test(x)||/\b(19|20)\d\d\b/.test(x));
-        const isTitle=x=>x&&!BULLET_RE.test(x)&&!/\|/.test(x)&&!/\b(19|20)\d\d\b/.test(x)&&x.split(/\s+/).length<=8&&!/[.،:]$/.test(x);
+        const LBL=/^(role overview|key achievements?|core responsibilities|responsibilities|achievements?|duties|المهام|المسؤوليات|الإنجازات|نبذة عن الدور)\s*:?$/i;
+        const isTitle=x=>x&&!LBL.test(x.trim())&&!/^[A-Z &]{6,}$/.test(x.trim())&&!BULLET_RE.test(x)&&!/\|/.test(x)&&!/\b(19|20)\d\d\b/.test(x)&&x.split(/\s+/).length<=8&&!/[.،:]$/.test(x);
         const nn=L[i+2];
-        if(isTitle(l)&&isHead(n)){out.push(l+' | '+n);i++}
-        else if(isHead(l)&&isTitle(n)&&!(nn&&isHead(nn))){out.push(n+' | '+l);i++}else out.push(l)}
+        if(titleFirst&&isTitle(l)&&isHead(n)){out.push(l+' | '+n);i++}
+        else if(!titleFirst&&isHead(l)&&isTitle(n)){out.push(n+' | '+l);i++}else out.push(l)}
       L=out;
     }
     if((s.id==='skills'||s.id==='langs')&&L.length>2&&L.every(x=>x.replace(BULLET_RE,'').split(/\s+/).length<=7))
@@ -1885,6 +1887,7 @@ function oneNote(f){const el=$('oneNote');if(!el)return;
   else el.innerHTML=`⚠️ ${tr('حتى بعد الاختصار تطلع أطول — قصّر نقاط الخبرات الطويلة يدويًا تحت، أو اختر «تلقائي».','Still too long after trimming — shorten long bullets manually below, or choose “Automatic”.')}`;
 }
 function cvHTML(d){
+  if(isAr(d.secs.map(s=>s.lines.join(' ')).join(' ')+d.name))d={...d,secs:d.secs.map(s=>({...s,lines:s.lines.map(l=>l.replace(/\b(Present|Current|Now)\b/gi,'حتى الآن'))}))};
   const rtl=lang!=='en'&&(lang==='ar'||isAr(d.secs.map(s=>s.lines.join(' ')).join(' ')+d.name));
   let h=`<div dir="${rtl?'rtl':'ltr'}">`;
   if(d.name)h+=`<p class="pn">${esc(d.name)}</p>`;if(d.title)h+=`<p class="pt">${esc(d.title)}</p>`;
