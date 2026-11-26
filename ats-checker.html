@@ -411,23 +411,28 @@ function isVerb(w){const n=norm(w).replace(/^و/,'');if(!window.__AV){try{window
 function isAr(s){return (s.match(/[؀-ۿ]/g)||[]).length>(s.match(/[a-z]/gi)||[]).length}
 
 /* ---------- keywords ---------- */
+const KW_DROP=new Set(['اجاده','الاقل','اقل','المتطلبات','متطلبات','يفضل','ممتازه','ممتاز','مهارات','مهاره','الالمام','المام','اتقان','قدره','القدره','مطلوب','مطلوبه','لديه','لديها','وجود','requirements','required','preferred','plus','least','minimum','excellent','skills','must','strong']);
+const KW_PH=new Set(['التامينات الاجتماعيه','نظام العمل','منصه قوي','منصه مدد','موارد بشريه','اداره اعمال','شوون الموظفين','مسير الرواتب','حمايه الاجور','oracle hr','الهيئه السعوديه','حصر الكميات','خدمه العملاء','power bi','ms office','microsoft office']);
+function kwTok(l){return toks(l).map(w=>w.length>=4&&/^و[اتمنيبل]/.test(w)?w.slice(1):w)}
+function cAr(n,one,two,pl){return n===1?one:n===2?two:n>=3&&n<=10?n+' '+pl:n+' '+one}
 function extractKeywords(jd){
   const lines=jd.split(/[\n.;،,:؛•\-\(\)\/|]+/);
   const uni={},bi={};
+  const bad=w=>STOP.has(w)||KW_DROP.has(w)||KW_GEN.has(w)||/^\d+$/.test(w)||/^(جده|الرياض|الدمام|مكه|المدينه|الخبر|jeddah|riyadh|dammam|makkah|ksa)$/.test(w);
   lines.forEach(l=>{
-    const t=toks(l);
+    const t=kwTok(l);
     t.forEach((w,i)=>{
-      const ok=w.length>=3&&!STOP.has(w)&&!/^\d+$/.test(w);
+      const ok=w.length>=3&&!bad(w);
       if(ok)uni[w]=(uni[w]||0)+1;
       const n=t[i+1];
-      if(ok&&n&&n.length>=3&&!STOP.has(n)&&!/^\d+$/.test(n)){const k=w+' '+n;bi[k]=(bi[k]||0)+1}
+      if(ok&&n&&n.length>=3&&!bad(n)){const k=w+' '+n;bi[k]=(bi[k]||0)+1}
     });
   });
   // merge unigram variants by stem
   const byStem={};
   Object.entries(uni).forEach(([w,c])=>{const s=stem(w);if(!byStem[s]||byStem[s].c<c)byStem[s]={w,c:(byStem[s]?byStem[s].c:0)+c};else byStem[s].c+=c});
   let list=[];
-  Object.entries(bi).filter(([k,c])=>c>=2).forEach(([k,c])=>list.push({k,c:c*1.6,phrase:true}));
+  Object.entries(bi).filter(([k,c])=>c>=2||KW_PH.has(k)).forEach(([k,c])=>list.push({k,c:c*1.6,phrase:true}));
   const inPhrase=new Set(list.flatMap(x=>x.k.split(' ').map(stem)));
   Object.values(byStem).forEach(({w,c})=>{if(!inPhrase.has(stem(w))||c>=3)list.push({k:w,c,phrase:false})});
   list.sort((a,b)=>b.c-a.c||b.k.length-a.k.length);
@@ -445,7 +450,7 @@ function matchKeywords(kws,cv){
   return kws.map(k=>{
     let st;
     if(k.phrase){const ws=k.k.split(' ');st=has(k.k)?'p':ws.every(w=>has(w)||part(w))?'pa':ws.some(w=>has(w))?'pa':'m';}
-    else st=has(k.k)?'p':part(k.k)?'pa':'m';
+    else st=has(k.k)||stems.has(stem(k.k))?'p':part(k.k)?'pa':'m';
     return {...k,st};
   });
 }
@@ -543,10 +548,10 @@ function analyze(cv,jd,meta){
   ];
   sec.forEach(([nm,re,w,fix])=>{const ok=re.test(n);add(nm,ok?'pass':(w>=8?'fail':'warn'),w,ok?'موجود بعنوان واضح':'لم نجد عنواناً واضحاً لهذا القسم',fix)});
   const years=(n.match(/\b(19[7-9]\d|20[0-3]\d)\b/g)||[]).length;
-  add('التواريخ',years>=3?'pass':years>=1?'warn':'fail',8,years?`وجدنا ${years} تاريخ`:'لا توجد تواريخ',`اكتب تاريخ البداية والنهاية لكل وظيفة ومؤهل بصيغة موحدة (مثل 05/2023 – الآن).`);
-  add('طول السيرة',words>=250&&words<=1100?'pass':words<250?'fail':'warn',6,`${words} كلمة`,words<250?'السيرة قصيرة جداً — وسّع وصف خبراتك وإنجازاتك (المثالي 400–900 كلمة).':'السيرة طويلة — اختصر لصفحتين كحد أقصى وركّز على آخر 10 سنوات.');
+  add('التواريخ',years>=3?'pass':years>=1?'warn':'fail',8,years?`وجدنا ${cAr(years,'تاريخ واحد','تاريخين','تواريخ')}`:'لا توجد تواريخ',`اكتب تاريخ البداية والنهاية لكل وظيفة ومؤهل بصيغة موحدة (مثل 05/2023 – الآن).`);
+  add('طول السيرة',words>=200&&words<=1100?'pass':words<120?'fail':'warn',6,`${words} كلمة`,words<120?'السيرة قصيرة جداً — وسّع وصف خبراتك وإنجازاتك (المثالي 300–800 كلمة).':words<200?'السيرة قصيرة شوي — أضف نقطة أو نقطتين بإنجازات لكل وظيفة (المثالي 300–800 كلمة).':'السيرة طويلة — اختصر لصفحتين كحد أقصى وركّز على آخر 10 سنوات.');
   const B=getBullets(cv);
-  add('النقاط (Bullets)',B.detected&&B.list.length>=5?'pass':B.detected?'warn':'fail',6,B.detected?`${B.list.length} نقطة`:'لم نجد نقاطاً منظمة',`اكتب مهامك وإنجازاتك على شكل نقاط (•) تحت كل وظيفة — 3 إلى 6 نقاط لكل وظيفة.`);
+  add('النقاط (Bullets)',B.detected&&B.list.length>=5?'pass':B.detected?'warn':'fail',6,B.detected?cAr(B.list.length,'نقطة واحدة','نقطتين','نقاط'):'لم نجد نقاطاً منظمة',B.detected?`عندك ${cAr(B.list.length,'نقطة واحدة','نقطتين','نقاط')} بس — الأفضل 3 إلى 6 نقاط لكل وظيفة، خصوصًا آخر وظيفتين.`:`اكتب مهامك وإنجازاتك على شكل نقاط (•) تحت كل وظيفة — 3 إلى 6 نقاط لكل وظيفة.`);
   if(meta&&meta.type==='docx'){
     add('الجداول',meta.tables?'fail':'pass',8,meta.tables?`يوجد ${meta.tables} جدول`:'لا توجد جداول',`الجداول تلخبط ترتيب القراءة في أنظمة ATS — حوّل المحتوى إلى نص عادي بعناوين ونقاط.`);
     const tb=meta.textboxes+(meta.columns?1:0);
@@ -566,14 +571,14 @@ function analyze(cv,jd,meta){
   add('عبارات عامة',GEN.length?'warn':'pass',4,GEN.length?`«${[...new Set(GEN)].slice(0,3).join('»، «')}»`:'لا توجد',`استبدل العبارات العامة بحقائق: تخصصك، سنوات خبرتك، الأنظمة اللي تتقنها، وأبرز إنجاز برقم — هذا أسلوب السيرة المهنية.`);
   const scored=B.list.map(scoreBullet);
   const q=scored.filter(b=>b.num).length;
-  add('الإنجازات بالأرقام',q>=3?'pass':q>=1?'warn':'fail',6,`${q} نقطة فيها أرقام`,`أضف أرقاماً حقيقية لأهم 2–3 إنجازات في كل وظيفة (عدد، نسبة، مدة) — مو لازم في كل نقطة.`);
+  add('الإنجازات بالأرقام',q>=3?'pass':q>=1?'warn':'fail',6,`${q?cAr(q,'نقطة واحدة','نقطتين','نقاط'):'ولا نقطة'} فيها أرقام`,`أضف أرقاماً حقيقية لأهم 2–3 إنجازات في كل وظيفة (عدد، نسبة، مدة) — مو لازم في كل نقطة.`);
 
   const fmtScore=Math.round(100*C.reduce((a,c)=>a+c.w*(c.st==='pass'?1:c.st==='warn'?.5:0),0)/C.reduce((a,c)=>a+c.w,0));
   const bScore=scored.length?Math.round(scored.reduce((a,b)=>a+b.s,0)/scored.length):25;
   let kw=null,kwScore=null;
   if(jd.trim().length>30){
     const ks=extractKeywords(jd);
-    if(ks.length){kw=matchKeywords(ks,cv);const tw=kw.reduce((a,k)=>a+k.imp,0);kwScore=Math.round(100*kw.reduce((a,k)=>a+k.imp*(k.st==='p'?1:k.st==='pa'?.5:0),0)/tw);}
+    if(ks.length){ks.forEach(k=>{try{k.d=kwPretty(k.k,jd)}catch(e){k.d=k.k}});kw=matchKeywords(ks,cv);const tw=kw.reduce((a,k)=>a+k.imp,0);kwScore=Math.round(100*kw.reduce((a,k)=>a+k.imp*(k.st==='p'?1:k.st==='pa'?.5:0),0)/tw);}
   }
   const total=kwScore==null?Math.round(fmtScore*.6+bScore*.4):Math.round(kwScore*.5+fmtScore*.3+bScore*.2);
 
@@ -581,12 +586,12 @@ function analyze(cv,jd,meta){
   const F=[];
   C.filter(c=>c.st!=='pass').forEach(c=>F.push({w:c.w*(c.st==='fail'?1.5:1),t:c.fix,tag:c.name}));
   if(kw){const miss=kw.filter(k=>k.st==='m').sort((a,b)=>b.imp-a.imp);
-    if(miss.length)F.push({w:kwScore<60?16:9,tag:'الكلمات المفتاحية',t:`أضف الكلمات الناقصة من الوصف الوظيفي (إذا كانت تنطبق عليك فعلاً) في الملخص والمهارات والخبرات: «${miss.slice(0,6).map(k=>k.k).join('»، «')}».`});
-    const pa=kw.filter(k=>k.st==='pa');if(pa.length)F.push({w:5,tag:'الكلمات المفتاحية',t:`استخدم نفس صياغة الإعلان حرفياً لهذه الكلمات: «${pa.slice(0,5).map(k=>k.k).join('»، «')}».`});
+    if(miss.length)F.push({w:kwScore<60?16:9,tag:'الكلمات المفتاحية',t:`أضف الكلمات الناقصة من الوصف الوظيفي (إذا كانت تنطبق عليك فعلاً) في الملخص والمهارات والخبرات: «${miss.slice(0,6).map(k=>k.d||k.k).join('»، «')}».`});
+    const pa=kw.filter(k=>k.st==='pa');if(pa.length)F.push({w:5,tag:'الكلمات المفتاحية',t:`استخدم نفس صياغة الإعلان حرفياً لهذه الكلمات: «${pa.slice(0,5).map(k=>k.d||k.k).join('»، «')}».`});
   }else F.push({w:4,tag:'الكلمات المفتاحية',t:'أضف الوصف الوظيفي وأعد الفحص عشان تعرف الكلمات المفتاحية الناقصة لكل وظيفة تتقدم لها.'});
   const nv=scored.filter(b=>!b.verb).length;if(scored.length&&nv/scored.length>.4)F.push({w:7,tag:'قوة النقاط',t:`${nv} من نقاطك لا تبدأ بفعل قوي — ابدأ كل نقطة بكلمة إنجاز مثل: إدارة، تطوير، تحقيق، خفض (Led, Developed, Achieved).`});
-  const np=scored.filter(b=>b.pas).length;if(np)F.push({w:5,tag:'قوة النقاط',t:`${np} نقطة بصياغة سلبية مثل «مسؤول عن» أو «تم» — حوّلها لصياغة فاعلة تبرز دورك.`});
-  const SPx=spellIssues(cv);if(SPx.length)F.push({w:12,tag:'الإملاء',t:`فيه ${SPx.length} خطأ إملائي — نصحّحها تلقائياً في السيرة المحسّنة: ${SPx.slice(0,8).map(x=>`«${x.w}» ← «${x.r}»`).join('، ')}${SPx.length>8?'…':''}`});
+  const np=scored.filter(b=>b.pas).length;if(np)F.push({w:5,tag:'قوة النقاط',t:`${cAr(np,'نقطة','نقطتين','نقاط')} بصياغة سلبية مثل «مسؤول عن» أو «تم» — حوّلها لصياغة فاعلة تبرز دورك.`});
+  const SPx=spellIssues(cv);if(SPx.length)F.push({w:12,tag:'الإملاء',t:`فيه ${cAr(SPx.length,'خطأ إملائي واحد','خطآن إملائيان','أخطاء إملائية')} — نصحّحها تلقائياً في السيرة المحسّنة: ${SPx.slice(0,8).map(x=>`«${x.w}» ← «${x.r}»`).join('، ')}${SPx.length>8?'…':''}`});
   F.sort((a,b)=>b.w-a.w);
   return {total,fmtScore,bScore,kwScore,C,kw,scored,detected:B.detected,F:F.slice(0,10),words};
 }
@@ -618,21 +623,21 @@ function render(R,noScroll){
   // fixes
   try{renderErrors(detectErrors(lastCV))}catch(e){console.warn(e);$('errCard').style.display='none'}
   $('fixCnt').textContent=R.F.length;
-  $('fixes').innerHTML=R.F.map((f,i)=>`<li><span class="pr ${i<3?'h':i<6?'md':'lo'}">${i<3?'عالية':i<6?'متوسطة':'منخفضة'}</span>${esc(f.t)}</li>`).join('')||'<li>لا توجد إصلاحات — سيرتك ممتازة 🎉</li>';
+  $('fixes').innerHTML=R.F.map((f,i)=>`<li><span class="pr ${f.w>=9?'h':f.w>=5?'md':'lo'}">${f.w>=9?'عالية':f.w>=5?'متوسطة':'منخفضة'}</span>${esc(f.t)}</li>`).join('')||'<li>لا توجد إصلاحات — سيرتك ممتازة 🎉</li>';
   // keywords
   if(R.kw){
     $('kwCard').style.display='';
     const c={p:0,pa:0,m:0};R.kw.forEach(k=>c[k.st]++);
     $('kwCnt').textContent=`${c.p} موجودة · ${c.pa} جزئية · ${c.m} ناقصة`;
     const ord={m:0,pa:1,p:2};
-    $('kw').innerHTML=[...R.kw].sort((a,b)=>ord[a.st]-ord[b.st]||b.imp-a.imp).map(k=>`<span class="chip ${k.st}">${esc(k.k)}${k.imp===3?'<span class="imp">★</span>':''}</span>`).join('');
+    $('kw').innerHTML=[...R.kw].sort((a,b)=>ord[a.st]-ord[b.st]||b.imp-a.imp).map(k=>`<span class="chip ${k.st}">${esc(k.d||k.k)}${k.imp===3?'<span class="imp">★</span>':''}</span>`).join('');
   }else{$('kwCard').style.display='';$('kwCnt').textContent='';$('kw').innerHTML='<div class="hint" style="font-size:14px">لم تُضف وصفاً وظيفياً. الصق إعلان الوظيفة في الأعلى وأعد الفحص لتعرف الكلمات المفتاحية الناقصة ودرجة التطابق.</div>';}
   // format
   const pc=R.C.filter(c=>c.st==='pass').length;$('fmtCnt').textContent=`${pc} / ${R.C.length} ناجح`;
   const so={fail:0,warn:1,pass:2};
   $('fmt').innerHTML=[...R.C].sort((a,b)=>so[a.st]-so[b.st]||b.w-a.w).map(c=>`<div class="chk"><div class="ic ${c.st}">${c.st==='pass'?'✓':c.st==='warn'?'!':'✕'}</div><div><b>${esc(c.name)}</b><span>${esc(c.detail)}${c.st!=='pass'?' — '+esc(c.fix):''}</span></div></div>`).join('');
   // bullets
-  const S=R.scored;$('bCnt').textContent=S.length?`${S.length} نقطة`:'';
+  const S=R.scored;$('bCnt').textContent=S.length?cAr(S.length,'نقطة واحدة','نقطتين','نقاط'):'';
   if(!S.length){$('bullets').innerHTML='<div class="hint" style="font-size:14px">لم نتمكن من استخراج نقاط من سيرتك. اكتب خبراتك على شكل نقاط تبدأ بـ (•).</div>';}
   else{
     const weak=[...S].sort((a,b)=>a.s-b.s)[0],sg=suggest(weak);
@@ -643,7 +648,7 @@ function render(R,noScroll){
       <b style="display:block;margin-top:6px">✨ ${sg.ar?'النقطة بعد التحسين:':'Improved bullet:'}</b><code dir="${sg.ar?'rtl':'ltr'}" id="wkFix">${esc(smartFix(weak.t))}</code>
       <div style="font-size:12.5px;color:var(--mut);margin:4px 0 6px">${sg.ar?'غيّر اللي بين [ ] لأرقامك الحقيقية.':'Replace the [ ] with your real numbers.'}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn2" data-apb="w" style="flex:1">✏️ ${sg.ar?'طبّقها على سيرتي':'Apply to my CV'}</button><button type="button" class="btn2" data-cpb="w" style="flex:1">📋 ${sg.ar?'نسخ':'Copy'}</button></div></div></div>`;
-    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div>${b.s<100?`<div dir="auto" style="margin-top:5px;font-size:13.5px;color:var(--blue-d,#5b4a8a)">✨ ${esc(smartFix(b.t))}</div><button type="button" class="btn2" data-apb="${S.indexOf(b)}" style="margin-top:5px;padding:3px 10px;font-size:12.5px">✏️ طبّق</button>`:''}</div></div>`).join('')}</details></div>`;
+    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div>${b.s<100?`<div dir="auto" style="margin-top:5px;font-size:13.5px;color:var(--blue-d,#5b4a8a)">✨ ${esc(smartFix(b.t))}</div><button type="button" class="btn2" data-apb="${S.indexOf(b)}" style="margin-top:5px;padding:3px 10px;font-size:12.5px">✏️ ${tr('طبّق','Apply')}</button>`:''}</div></div>`).join('')}</details></div>`;
     h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">✏️ عدّلي نقاطك بنفسك مع اقتراحات</button>`;$('bullets').innerHTML=h;$('bullets').onclick=e=>{const ap=e.target.closest('[data-apb]'),cp=e.target.closest('[data-cpb]');if(ap){const b=ap.dataset.apb==='w'?weak:S[+ap.dataset.apb];applyBullet(b.t,smartFix(b.t))}else if(cp){const x=smartFix(weak.t);try{navigator.clipboard.writeText(x).then(()=>toast('تم النسخ ✅'),()=>toast('حدد النص وانسخه'))}catch(_){toast('حدد النص وانسخه')}}};$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
   }
   try{renderRec(recruiterEval(lastCV,$('jd').value,R))}catch(e){console.warn(e);$('recCard').style.display='none'}
@@ -788,12 +793,12 @@ function recruiterEval(cv,jd,R){
   // 4) وضوح السيرة وترتيبها
   const sp=spellIssues(cv).length,fail=n=>R.C.some(c=>c.name===n&&c.st==='fail'),warn=n=>R.C.some(c=>c.name===n&&c.st!=='pass');
   let cs=R.fmtScore*.6+R.bScore*.4,cr=[],cf=[],cg=[];
-  if(sp){cs-=Math.min(20,sp*4);cr.push(tr(`${sp} خطأ إملائي — أول شي يلاحظه مسؤول التوظيف`,`${sp} spelling mistake(s) — the first thing recruiters notice`));cf.push(tr('اضغط «حسّن سيرتي تلقائيًا» تحت ونصححها لك','Use “Improve my CV” below to fix them automatically'))}
+  if(sp){cs-=Math.min(20,sp*4);cr.push(tr(`${cAr(sp,'خطأ إملائي واحد','خطآن إملائيان','أخطاء إملائية')} — أول شي يلاحظه مسؤول التوظيف`,`${sp} spelling mistake(s) — the first thing recruiters notice`));cf.push(tr('اضغط «حسّن سيرتي تلقائيًا» تحت ونصححها لك','Use “Improve my CV” below to fix them automatically'))}
   if(sp>=5)K.push(tr('أخطاء إملائية كثيرة تعطي انطباع عدم اهتمام','Many spelling errors give a careless impression'));
   if(fail('البريد الإلكتروني')&&fail('رقم الجوال')){K.push(tr('ما فيه أي وسيلة تواصل — ما نقدر نتصل فيك','No contact details — recruiters can’t reach you'));cr.push(tr('البريد والجوال غير موجودين','Email and phone missing'))}
   else if(fail('البريد الإلكتروني')||fail('رقم الجوال')){cs-=8;cr.push(tr('بيانات التواصل ناقصة','Contact details incomplete'));cf.push(tr('أضف البريد والجوال أعلى السيرة','Add email and phone at the top'))}
   const em=(cv.match(EMAIL_RE)||[''])[0];if(em&&/(\d{4,}|love|cute|girl|boy|king|queen|prince|angel|baby|star)/i.test(em.split('@')[0])){cs-=5;cr.push(tr('البريد الإلكتروني غير مهني','Email address looks unprofessional'));cf.push(tr('استخدم بريد باسمك مثل name.surname@gmail.com','Use a name-based email like name.surname@gmail.com'))}
-  if(warn('طول السيرة'))cr.push(tr(R.words<250?'السيرة قصيرة وما توضح قدراتك':'السيرة طويلة — مسؤول التوظيف يقرأها في ثواني','CV length isn’t ideal — recruiters skim in seconds'));
+  if(warn('طول السيرة'))cr.push(tr(R.words<200?'السيرة قصيرة وما توضح قدراتك':'السيرة طويلة — مسؤول التوظيف يقرأها في ثواني','CV length isn’t ideal — recruiters skim in seconds'));
   if(warn('عبارات عامة')){const gd=(R.C.find(c=>c.name==='عبارات عامة')||{}).detail||'';cr.push(tr(`عبارات عامة بدون دليل: ${gd}`,`Generic phrases without proof: ${gd}`));cf.push(tr('استبدلها بإنجاز حقيقي برقم','Replace them with a real, measurable achievement'))}
   if(R.bScore<55){cr.push(tr('النقاط وصف مهام، مو إنجازات','Bullets describe duties, not achievements'));cf.push(tr('ابدأ كل نقطة بفعل واختم بنتيجة (عدد، نسبة، مدة)','Start each bullet with a verb and end with a result'))}
   if(!cr.length)cg.push(tr('سيرة واضحة ومرتبة','Clear and well organised'));
@@ -862,17 +867,18 @@ function renderRec(E){
     ${c.reasons.map(x=>`<div style="font-size:13.5px;color:${s==null?'var(--mut)':'var(--bad)'};margin-top:5px">${s==null?'ℹ️':'✕'} ${esc(x)}</div>`).join('')}
     ${c.fixes.length?`<div class="wf"><b>${tr('كيف تصلحها:','How to fix:')}</b><ul style="margin:4px 0 0;padding-inline-start:18px">${c.fixes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}</div>`}).join('');
   if(!E.kwS.length&&!E.hasJD)h+=`<div class="wf" style="margin-top:12px">🎯 ${tr('عشان نطلع لك الكلمات المفتاحية ونحسّنها: الصق إعلان الوظيفة فوق واضغط فحص مرة ثانية.','To get keyword suggestions: paste the job ad above and check again.')} <a href="#jd" style="color:var(--blue);font-weight:700" onclick="document.getElementById('jd').focus()">${tr('الصق الإعلان ↑','Paste the ad ↑')}</a></div>`;
-  const M=E.miss6,AC=E.accr&&!E.accr.has?E.accr:null,needB=M.nat||M.iq||M.reloc||M.avail||AC;
+  const M=E.miss6,AC=E.accr&&!E.accr.has?E.accr:null,needB=true;
   if(E.kwS.length||needB){
     const sel1=(id,opts)=>`<select id="${id}" style="font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff">${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
     h+=`<div style="margin-top:14px;border:1.5px solid var(--blue);border-radius:12px;padding:12px 14px">
     <b>✨ ${tr('اقتراحات مسؤول التوظيف لسيرتك','Recruiter suggestions for your CV')}</b>`;
     if(needB)h+=`<div class="wf" style="margin:8px 0"><b>${tr('بيانات ناقصة — اختر وبنضيفها لسيرتك:','Missing details — choose and we’ll add them:')}</b>
-      ${M.nat?`<div style="margin-top:6px">${tr('الجنسية:','Nationality:')} ${sel1('bNat',[tr('— اختر —','— select —'),tr('سعودي','Saudi'),tr('غير سعودي','Non-Saudi')])}</div>`:''}
-      ${M.nat||M.iq?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bIq"> ${tr('الإقامة قابلة للنقل (لغير السعودي)','Transferable Iqama (non-Saudi)')}</label>`:''}
+      <div style="margin-top:6px">${tr('الجنسية:','Nationality:')} ${sel1('bNat',[tr('— اختر —','— select —'),tr('سعودي','Saudi'),tr('غير سعودي','Non-Saudi')])}${M.nat?'':`<span style="font-size:12px;color:var(--mut)"> ${tr('(مذكورة في سيرتك — اختر لو تبي تعدلها)','(already in your CV — choose only to change it)')}</span>`}</div>
+      <label id="bIqW" style="display:none;margin-top:6px"><input type="checkbox" id="bIq"> ${tr('الإقامة قابلة للنقل','Transferable Iqama')}</label>
       ${M.reloc?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bRel"> ${tr(`مستعد للانتقال إلى ${M.reloc}`,`Willing to relocate to ${M.reloc}`)}</label>`:''}
       ${AC?`<label style="display:block;margin-top:6px"><input type="checkbox" id="bAc"> ${tr('عندي '+AC.ar+' سارية','I hold a valid '+AC.en)}</label>`:''}
-      ${M.avail?`<div style="margin-top:6px">${tr('المباشرة:','Availability:')} ${sel1('bAv',[tr('— اختر —','— select —'),tr('متاح للمباشرة فورًا','Available immediately'),tr('فترة الإشعار: أسبوعين','Notice period: 2 weeks'),tr('فترة الإشعار: شهر','Notice period: 1 month'),tr('فترة الإشعار: شهرين','Notice period: 2 months')])}</div>`:''}</div>`;
+      <div style="margin-top:6px">${tr('المباشرة:','Availability:')} ${sel1('bAv',[tr('— اختر —','— select —'),tr('متاح للمباشرة فورًا','Available immediately'),tr('فترة الإشعار: أسبوعين','Notice period: 2 weeks'),tr('فترة الإشعار: شهر','Notice period: 1 month'),tr('فترة الإشعار: شهرين','Notice period: 2 months'),tr('أخرى — اكتب بنفسك','Other — type it')])}${M.avail?'':`<span style="font-size:12px;color:var(--mut)"> ${tr('(مذكورة في سيرتك — اختر لو تبي تعدلها)','(already in your CV — choose only to change it)')}</span>`}
+      <input id="bAvT" type="text" placeholder="${tr('مثال: فترة الإشعار 45 يوم','e.g. Notice period: 45 days')}" style="display:none;width:100%;margin-top:6px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:8px;padding:6px 8px"></div></div>`;
     if(E.kwS.length)h+=`<div style="margin-top:8px"><b>🎯 ${tr('كلمات مفتاحية مقترحة','Suggested keywords')}</b></div>
     ${E.kwS.length?'':''}<div class="hint" style="margin:2px 0 8px;${E.kwS.length?'':'display:none'}">${E.kwSrc==='jd'?tr('من إعلان الوظيفة وناقصة في سيرتك.','From the job ad and missing in your CV.'):tr(`شائعة في مجال ${E.kwSrc}.`,`Common in your field (${E.kwSrc}).`)} ${tr('اضغط على الكلمات اللي تتقنها فعلاً عشان نضيفها — لا تضيف شي ما تعرفه.','Tap only the ones you really have — never add what you don’t know.')}</div>
     <div class="chips" id="recKw">${E.kwS.map(k=>`<span class="chip m" data-rk="${esc(k)}" style="cursor:pointer">+ ${esc(k)}</span>`).join('')}</div>`;
@@ -896,8 +902,11 @@ function renderRec(E){
       <div style="margin-top:4px">3️⃣ <b>${tr('الخبرات:','Experience:')}</b> <span dir="auto">${esc(ar?`• طبّقت ${k} في [المهمة]، مما أدى إلى [النتيجة] بنسبة [X%].`:`• Applied ${k} to [task], resulting in [X%] [improvement].`)}</span></div></div>`}).join('')+
       `<div class="hint" style="margin-top:6px">⚠️ ${tr('لا تضيف كلمة ما تتقنها — مسؤول التوظيف بيسألك عنها في المقابلة.','Don’t add skills you don’t have — you’ll be asked about them in the interview.')}</div>`;
     g.style.display='block'};
+  if($('bNat'))$('bNat').onchange=()=>{$('bIqW').style.display=$('bNat').selectedIndex===2?'block':'none'};
+  if($('bAv'))$('bAv').onchange=()=>{$('bAvT').style.display=$('bAv').selectedIndex===5?'block':'none';if($('bAv').selectedIndex===5)$('bAvT').focus()};
   $('recAuto').onclick=()=>{const ks=sel();if(!ks.length&&E.kwS.length&&!$('bNat')&&!$('bAv')){toast(tr('اختر الكلمات اللي تتقنها أول','Pick the keywords you really have first'));return}
-    const ac=$('bAc')&&$('bAc').checked,nat=$('bNat')?$('bNat').selectedIndex:0,iq=$('bIq')&&$('bIq').checked,rel=$('bRel')&&$('bRel').checked,av=$('bAv')?$('bAv').selectedIndex:0;
+    const ac=$('bAc')&&$('bAc').checked,nat=$('bNat')?$('bNat').selectedIndex:0,iq=$('bIq')&&$('bIq').checked,rel=$('bRel')&&$('bRel').checked,av=$('bAv')?$('bAv').selectedIndex:0,avT=$('bAvT')?$('bAvT').value.trim():'';
+    if(av===5&&!avT){toast(tr('اكتب فترة الإشعار أو المباشرة','Type the notice period or availability'));$('bAvT').focus();return}
     if(!ks.length&&!nat&&!iq&&!rel&&!av&&!ac){toast(tr('اختر اقتراح واحد على الأقل ☝️','Choose at least one suggestion ☝️'));return}
     if($('builder').style.display!=='block')$('openB').click();
     const ar=E.cvAr,lines=[];let n=0;
@@ -910,11 +919,14 @@ function renderRec(E){
     if(inS.length){const j=ar?inS.join('، ').replace(/، ([^،]*)$/,(m,x)=>' و'+(/^[A-Za-z]/.test(x)?' ':'')+x):inS.join(', ').replace(/, ([^,]*)$/,' and $1');
       sm.value=(sm.value.trim()?sm.value.trim().replace(/([^.。])$/,'$1.')+' ':'')+(ar?`متمكن من ${j}.`:`Skilled in ${j}.`);n++}
     // 3) البيانات الأساسية
+    const strip=re=>SECS.forEach(s=>{const ta=$('s-'+s[0]);if(ta)ta.value=ta.value.split('\n').filter(l=>!re.test(l)).join('\n')});
+    if(nat)strip(/^\s*(•\s*)?(الجنسية|الجنسيه|Nationality)\s*[:：]/i);
+    if(av)strip(/(فترة الإشعار|فتره الاشعار|متاح للمباشرة|متاح للعمل فور|Notice period|Available immediately|Availability\s*:)/i);
     if(nat===1)lines.push(ar?'الجنسية: سعودي':'Nationality: Saudi');
     if(nat===2)lines.push(ar?'الجنسية: غير سعودي':'Nationality: Non-Saudi');
     if(iq&&nat!==1)lines.push(ar?'الإقامة قابلة للنقل':'Transferable Iqama');
     if(rel)lines.push(ar?`مستعد للانتقال إلى ${E.miss6.reloc}`:`Willing to relocate to ${E.miss6.reloc}`);
-    if(av){const A=ar?['','متاح للمباشرة فورًا','فترة الإشعار: أسبوعين','فترة الإشعار: شهر','فترة الإشعار: شهرين']:['','Available immediately','Notice period: 2 weeks','Notice period: 1 month','Notice period: 2 months'];lines.push(A[av])}
+    if(av){const A=ar?['','متاح للمباشرة فورًا','فترة الإشعار: أسبوعين','فترة الإشعار: شهر','فترة الإشعار: شهرين']:['','Available immediately','Notice period: 2 weeks','Notice period: 1 month','Notice period: 2 months'];lines.push(av===5?avT:A[av])}
     if(ac){const c=$('s-certs');c.value=(c.value.trim()?c.value.trim()+'\n':'')+'• '+(ar?E.accr.ar+' (سارية)':E.accr.en+' (valid)');n++}
     if(lines.length){const o=$('s-other');o.value=(o.value.trim()?o.value.trim()+'\n':'')+lines.map(x=>'• '+x).join('\n');n+=lines.length}
     try{doRescan(false);updatePreview();renderSuggest()}catch(e){console.warn(e)}
@@ -1046,7 +1058,8 @@ function fixReasons(b,a){const R=[],t=b.replace(BULLET_RE,'').trim();
 function detectErrors(cv){const P=parseCV(cv),L=[];const lab=Object.fromEntries(SECS.map(s=>[s[0],s[1]]));
   const chk=(where,b,isB)=>{if(!b||!b.trim())return;let a=spellFix(b);
     if(isB)a='• '+improveBullet(a.replace(BULLET_RE,''));else if(/__|\[[^\]]*\]/.test(a))a=a.replace(/\s*\[[^\]]*\]\s*/g,' ').replace(/__+/g,'').replace(/\s+/g,' ').trim();
-    if(a.replace(BULLET_RE,'').trim()!==b.replace(BULLET_RE,'').trim())L.push({where,b:b.replace(BULLET_RE,'').trim(),a:a.replace(BULLET_RE,'').trim(),r:fixReasons(b,a)})};
+    const dz=x=>x.replace(BULLET_RE,'').replace(/[ً-ْ]/g,'').trim();
+    if(dz(a)!==dz(b))L.push({where,b:b.replace(BULLET_RE,'').trim(),a:a.replace(BULLET_RE,'').trim(),r:fixReasons(b,a)})};
   chk('الاسم',P.name);chk('المسمى',P.title);chk('المدينة',P.city);
   SECS.forEach(s=>P.sec[s[0]].forEach(l=>chk(lab[s[0]],l,(s[0]==='experience'||s[0]==='other')&&BULLET_RE.test(l))));
   // spelling first, then real problems, then wording
@@ -1060,7 +1073,8 @@ function renderErrors(E){const c=$('errCard');if(!E.length){c.style.display='non
     `<div class="hint" style="margin-top:8px;font-size:13px">اضغط «✨ حسّن سيرتي تلقائياً» تحت، ونصحّح لك كل هذي الأخطاء.</div>`}
 function showFixLog(B,A){const L=[];
   Object.keys(B).forEach(k=>{const b=B[k],a=A[k];if(!a)return;if(b.length!==a.length){if(b.join('\n').trim()!==a.join('\n').trim())L.push({b:b.join(' '),a:a.join(' '),r:['تحسين الصياغة']});return}
-    b.forEach((x,i)=>{if(x.trim()&&x.trim()!==a[i].trim())L.push({b:x.replace(BULLET_RE,'').trim(),a:a[i].replace(BULLET_RE,'').trim(),r:fixReasons(x,a[i])})})});
+    const dz=y=>String(y).replace(/[ً-ْ]/g,'').trim();
+    b.forEach((x,i)=>{if(x.trim()&&dz(x)!==dz(a[i]))L.push({b:x.replace(BULLET_RE,'').trim(),a:a[i].replace(BULLET_RE,'').trim(),r:fixReasons(x,a[i])})})});
   const box=$('fixLog');if(!L.length){box.innerHTML='';return}
   const sp=L.filter(x=>x.r.some(r=>r.startsWith('خطأ إملائي'))).length;
   const item=x=>`<li style="margin-bottom:8px"><b style="color:var(--warn)">${x.r.map(esc).join(' • ')}</b><br><span dir="auto" style="color:#b3261e;text-decoration:line-through">${esc(x.b)}</span><br><span dir="auto" style="color:var(--ok)">${esc(x.a)}</span></li>`;
@@ -1346,7 +1360,8 @@ function renderAdvice(cv,jd){
   const lv=degLevels(edu),top=lv.length?Math.max(...lv):0,degName=top?DEG_N[top][en?1:0]:T('غير واضح','Not clear');
   const mf=majorField(edu);
   let ex=[];try{const P=parseCV(cv);ex=P.sec.experience||[]}catch(e){}
-  let y=0;try{const mp=mergeP(datePeriods(ex.length?ex:cv.split('\n')));y=Math.round(mp.reduce((a,p)=>a+p.e-p.s+1,0)/12)}catch(e){}if(!y)y=yearsOf(ex.join('\n')||cv);
+  let y=0;try{const mp=mergeP(datePeriods(ex.length?ex:cv.split('\n')));y=Math.floor(mp.reduce((a,p)=>a+p.e-p.s+1,0)/12)}catch(e){}if(!y)y=yearsOf(ex.join('\n')||cv);
+  {const sm=(cv.match(/(?:بخبرة|خبرة)\s+(?:تزيد\s+عن|تزيد\s+على|أكثر\s+من|اكثر\s+من)?\s*(\d{1,2})\s*(?:سنوات|سنة|سنه|عام|أعوام)|(\d{1,2})\+?\s*years?\s+of\s+experience/i)||[]);const st=+(sm[1]||sm[2]||0);if(st&&st<=y+1)y=st}
   const row=(ic,t,d)=>`<div style="display:flex;gap:8px;margin:7px 0;align-items:flex-start"><span>${ic}</span><div><b>${t}</b>${d?`<div style="color:var(--mut);font-size:13.5px;margin-top:2px">${d}</div>`:''}</div></div>`;
   let h=`<h3>📝 ${T('مقترحات مسؤول التوظيف لوظيفتك وشهادتك','Recruiter suggestions for your job & degree')}</h3>
   <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px"><label style="font-weight:700">${T('الوظيفة المستهدفة:','Target field:')}</label>
@@ -1361,7 +1376,7 @@ function renderAdvice(cv,jd){
   // must-haves
   if(K.must){const miss=K.must.filter(m=>!new RegExp(m,'i').test(nA));if(miss.length)h+=row('⚠️',T('أشياء يدور عليها مسؤول التوظيف في مجالك وما لقيناها','What recruiters look for in your field — not found'),miss.map(m=>m.split('|')[0]).join('، '))}
   // certs
-  const cm=K.certs.filter(c=>!new RegExp(c[1].split(/[ (/]/)[0].replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(cv));
+  const cm=K.certs.filter(c=>{const en=c[1].split(/[ (/]/)[0],arw=norm(c[0]).split(/\s+/).filter(w=>w.length>2).slice(0,2);return !(new RegExp(en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(cv)||(arw.length>=2&&/[\u0600-\u06FF]/.test(c[0])&&arw.every(w=>nA.includes(stem(w)))))});
   if(cm.length)h+=row('🏅',T('شهادات مهنية تقوّي سيرتك في هذا المجال','Certificates that strengthen your CV'),cm.map(c=>en?c[1]:c[0]).join(' • ')+T('<br>اذكر اللي عندك منها فقط، واللي ما عندك خطط لها.','<br>List only the ones you hold; plan for the rest.'));
   // skills present / missing
   const has=FS.skills.filter(k=>hasSkill(nA,k)),miss=FS.skills.filter(k=>!hasSkill(nA,k)).slice(0,8);
