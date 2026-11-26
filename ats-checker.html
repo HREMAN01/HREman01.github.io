@@ -549,7 +549,10 @@ function analyze(cv,jd,meta){
   sec.forEach(([nm,re,w,fix])=>{const ok=re.test(n);add(nm,ok?'pass':(w>=8?'fail':'warn'),w,ok?'موجود بعنوان واضح':'لم نجد عنواناً واضحاً لهذا القسم',fix)});
   const years=(n.match(/\b(19[7-9]\d|20[0-3]\d)\b/g)||[]).length;
   add('التواريخ',years>=3?'pass':years>=1?'warn':'fail',8,years?`وجدنا ${cAr(years,'تاريخ واحد','تاريخين','تواريخ')}`:'لا توجد تواريخ',`اكتب تاريخ البداية والنهاية لكل وظيفة ومؤهل بصيغة موحدة (مثل 05/2023 – الآن).`);
-  add('طول السيرة',words>=200&&words<=1100?'pass':words<120?'fail':'warn',6,`${words} كلمة`,words<120?'السيرة قصيرة جداً — وسّع وصف خبراتك وإنجازاتك (المثالي 300–800 كلمة).':words<200?'السيرة قصيرة شوي — أضف نقطة أو نقطتين بإنجازات لكل وظيفة (المثالي 300–800 كلمة).':'السيرة طويلة — اختصر لصفحتين كحد أقصى وركّز على آخر 10 سنوات.');
+  const xp=(()=>{try{return mergeP(datePeriods(cv.split('\n'))).reduce((a,p)=>a+p.e-p.s+1,0)/12}catch(e){return 0}})();
+  const LN=xp<3?{f:60,lo:90,hi:450,mx:600,pg:'صفحة وحدة تكفي لخبرتك',rg:'90–450'}:xp<10?{f:100,lo:150,hi:800,mx:1000,pg:'صفحة إلى صفحتين تناسب خبرتك',rg:'150–800'}:{f:150,lo:250,hi:1100,mx:1300,pg:'صفحتين تناسب خبرتك الطويلة',rg:'250–1100'};
+  const lenSt=words>=LN.lo&&words<=LN.mx?'pass':words<LN.f?'fail':'warn';
+  add('طول السيرة',lenSt,6,`${words} كلمة · ${LN.pg}`,words<LN.f?`السيرة قصيرة جداً — وسّع وصف خبراتك وإنجازاتك (المناسب لخبرتك ${LN.rg} كلمة تقريبًا).`:words<LN.lo?`السيرة قصيرة شوي — أضف نقطة أو نقطتين بإنجازات لكل وظيفة (المناسب لخبرتك ${LN.rg} كلمة تقريبًا).`:`السيرة أطول من اللازم لخبرتك — ${LN.pg}. اختصر وركّز على آخر 10 سنوات وأهم الإنجازات.`);
   const B=getBullets(cv);
   add('النقاط (Bullets)',B.detected&&B.list.length>=5?'pass':B.detected?'warn':'fail',6,B.detected?cAr(B.list.length,'نقطة واحدة','نقطتين','نقاط'):'لم نجد نقاطاً منظمة',B.detected?`عندك ${cAr(B.list.length,'نقطة واحدة','نقطتين','نقاط')} بس — الأفضل 3 إلى 6 نقاط لكل وظيفة، خصوصًا آخر وظيفتين.`:`اكتب مهامك وإنجازاتك على شكل نقاط (•) تحت كل وظيفة — 3 إلى 6 نقاط لكل وظيفة.`);
   if(meta&&meta.type==='docx'){
@@ -798,7 +801,7 @@ function recruiterEval(cv,jd,R){
   if(fail('البريد الإلكتروني')&&fail('رقم الجوال')){K.push(tr('ما فيه أي وسيلة تواصل — ما نقدر نتصل فيك','No contact details — recruiters can’t reach you'));cr.push(tr('البريد والجوال غير موجودين','Email and phone missing'))}
   else if(fail('البريد الإلكتروني')||fail('رقم الجوال')){cs-=8;cr.push(tr('بيانات التواصل ناقصة','Contact details incomplete'));cf.push(tr('أضف البريد والجوال أعلى السيرة','Add email and phone at the top'))}
   const em=(cv.match(EMAIL_RE)||[''])[0];if(em&&/(\d{4,}|love|cute|girl|boy|king|queen|prince|angel|baby|star)/i.test(em.split('@')[0])){cs-=5;cr.push(tr('البريد الإلكتروني غير مهني','Email address looks unprofessional'));cf.push(tr('استخدم بريد باسمك مثل name.surname@gmail.com','Use a name-based email like name.surname@gmail.com'))}
-  if(warn('طول السيرة'))cr.push(tr(R.words<200?'السيرة قصيرة وما توضح قدراتك':'السيرة طويلة — مسؤول التوظيف يقرأها في ثواني','CV length isn’t ideal — recruiters skim in seconds'));
+  if(warn('طول السيرة'))cr.push(tr(R.C.some(c=>c.name==='طول السيرة'&&/قصيرة/.test(c.fix||''))?'السيرة قصيرة وما توضح قدراتك':'السيرة طويلة — مسؤول التوظيف يقرأها في ثواني','CV length isn’t ideal — recruiters skim in seconds'));
   if(warn('عبارات عامة')){const gd=(R.C.find(c=>c.name==='عبارات عامة')||{}).detail||'';cr.push(tr(`عبارات عامة بدون دليل: ${gd}`,`Generic phrases without proof: ${gd}`));cf.push(tr('استبدلها بإنجاز حقيقي برقم','Replace them with a real, measurable achievement'))}
   if(R.bScore<55){cr.push(tr('النقاط وصف مهام، مو إنجازات','Bullets describe duties, not achievements'));cf.push(tr('ابدأ كل نقطة بفعل واختم بنتيجة (عدد، نسبة، مدة)','Start each bullet with a verb and end with a result'))}
   if(!cr.length)cg.push(tr('سيرة واضحة ومرتبة','Clear and well organised'));
