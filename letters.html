@@ -125,10 +125,21 @@ textarea{font:inherit;font-size:15px;background:var(--input);border:1px solid va
 .mq-n{font-weight:800;font-size:32px;line-height:1.2;color:var(--mq,#3B4159);margin:0}
 .mq-e{direction:ltr;font-size:13px;letter-spacing:2.5px;color:#6A6F84;margin-top:2px;font-weight:500}
 </style>
+<style id="mq-lang-css">
+.mq-lang{display:flex;width:fit-content;margin:0 0 10px auto;gap:2px;background:var(--surface,var(--card,var(--panel,#fff)));border:1px solid var(--line,#E4DFEE);border-radius:30px;padding:3px;position:relative;z-index:2}
+.mq-lang button{font:inherit;font-size:13px;font-weight:700;border:0;background:transparent;color:var(--muted,#6F6782);padding:6px 12px;border-radius:30px;cursor:pointer}
+.mq-lang button.on{background:#8A6BBE;color:#fff}
+html[lang=en] .mq-lang{margin:0 auto 10px 0}
+html[lang=en] body{direction:ltr}
+html[lang=en] .mq-n{font-size:28px}
+html[lang=en] label em,html[lang=en] h1 small,html[lang=en] h2 small,html[lang=en] .k i{text-align:left;direction:rtl}
+html[lang=en] h1 small,html[lang=en] h2 small{margin-inline-start:8px}
+html[lang=en] #paper{direction:ltr;text-align:left}html[lang=en] .paper td,html[lang=en] .paper th{text-align:left}html[lang=en] .paper .meta{direction:ltr;text-align:right}
+</style>
 </head>
 <body>
 <div class="wrap">
-<header style="display:block"><div class="mq-hero" role="banner"><h1 class="mq-n">منقذك</h1><div class="mq-e">Your HR Lifesaver</div></div></header>
+<header style="display:block"><div class="mq-lang" role="group" aria-label="Language"><button type="button" data-l="ar" class="on">عربي</button><button type="button" data-l="en">EN</button></div><div class="mq-hero" role="banner"><h1 class="mq-n">منقذك</h1><div class="mq-e">Your HR Lifesaver</div></div></header>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between">
   <h2 style="margin:0;font-size:22px">الخطابات <small style="color:var(--muted);font-weight:500;font-size:13px">HR Letters</small></h2>
   <span style="display:flex;gap:8px;flex-wrap:wrap"><a class="back" href="dashboard.html">لوحة المؤشرات 📊</a><a class="back" href="performance.html">أداء الموظف 🎯</a><a class="back" href="forms.html">النماذج 📋</a><a class="back" href="./">الحاسبات ←</a></span>
@@ -273,24 +284,117 @@ const L={
    return `<p><b>${toEmp()}</b></p><p>${greet}</p>
    <p>نفيدك بالموافقة على منحك إجازة ${esc(v('ltype'))} لمدة (${days}) يوم، اعتبارًا من ${fdate('from')} حتى ${fdate('to')}، على أن ${g('تباشر','تباشري')} عملك بتاريخ ${ret}.</p><p>مع تمنياتنا ${g('لك','لكِ')} بإجازة سعيدة،،</p>`},emp:true}
 };
+
+const EN=()=>document.documentElement.lang==='en';
+const OPT_EN={'هوية وطنية':'National ID','إقامة':'Iqama','انتهاء مدة العقد وعدم تجديده':'Contract expiry (not renewed)','انتهاء العمل المتفق عليه في العقد':'Completion of the work agreed in the contract','إنهاء العقد باتفاق الطرفين':'Termination by mutual agreement','إنهاء العقد لسبب مشروع مع الإشعار':'Termination for a valid reason with notice','إنهاء العقد من صاحب العمل لغير سبب مشروع':'Termination by the employer without a valid reason','فصل لارتكاب مخالفة جسيمة':'Dismissal for gross misconduct','إنهاء العقد خلال فترة التجربة':'Termination during probation','بلوغ سن التقاعد':'Reaching retirement age','إغلاق المنشأة نهائيًا':'Permanent closure of the establishment','إنهاء بسبب المرض بعد استنفاد الإجازة المرضية':'Termination due to illness after exhausting sick leave','عجز الموظف كليًا عن العمل':'Total incapacity to work','وفاة الموظف':'Death of the employee','ترك الموظف العمل لإخلال صاحب العمل بالتزاماته':"Employee left due to the employer's breach of obligations",'الموظفة خلال 6 أشهر من الزواج':'Female employee within 6 months of marriage','الموظفة خلال 3 أشهر من الولادة':'Female employee within 3 months of giving birth','قوة قاهرة':'Force majeure',
+'الاعتداء على صاحب العمل أو المدير المسؤول أو أحد الرؤساء أثناء العمل أو بسببه':'Assaulting the employer, the responsible manager or a superior during or because of work','عدم أداء الالتزامات الجوهرية أو عدم إطاعة الأوامر المشروعة رغم الإنذار الكتابي':'Failure to perform essential obligations or obey lawful orders despite a written warning','سوء السلوك أو ارتكاب عمل مخل بالشرف أو الأمانة':'Misconduct or an act against honour or integrity','ارتكاب خطأ متعمد بقصد إلحاق خسارة مادية بصاحب العمل':'A deliberate act intended to cause the employer material loss','استخدام التزوير للحصول على العمل':'Using forgery to obtain the job','الغياب بدون سبب مشروع أكثر من 30 يوم في السنة العقدية أو أكثر من 15 يوم متتالية بعد إنذار كتابي':'Absence without a valid reason for more than 30 days in a contract year or more than 15 consecutive days, after a written warning','استغلال المنصب للحصول على مكاسب شخصية بغير حق':'Abusing the position for unlawful personal gain','إفشاء الأسرار الصناعية أو التجارية الخاصة بالعمل':'Disclosing industrial or commercial secrets of the work',
+'سنوية':'annual','مرضية':'sick','اضطرارية':'emergency','بدون أجر':'unpaid','زواج':'marriage','وفاة':'bereavement','مولود':'paternity (newborn)','امتحان':'exam'};
+const DEF_EN={'إلى من يهمه الأمر':'To Whom It May Concern','10:00 صباحًا':'10:00 AM','إدارة الموارد البشرية':'Human Resources Department','سنة':'One year','مدير الموارد البشرية':'HR Manager'};
+const ORDER_EN={salary:'Salary certificate',exp:'Experience certificate',leave:'Leave approval',notice:'Formal notice',invest:'Investigation summons',warn1:'First warning',warnF:'Final warning',deduct:'Deduction penalty',resign:'Resignation',acceptR:'Resignation acceptance',term:'Termination',clear:'Clearance'};
+const fe=id=>{const x=v(id);return x?esc(DEF_EN[x]||x):blank};
+const fdateE=id=>{const x=v(id);if(!x)return blank;const [y,m,d]=x.split('-');return esc(`${d}/${m}/${y}`)};
+const gE=(m,fm)=>G()?fm:m;
+const he=()=>gE('he','she'),He=()=>gE('He','She'),his=()=>gE('his','her'),him=()=>gE('him','her'),hon=()=>gE('Mr.','Ms.');
+const whoE=()=>`${hon()} ${f('ename')}, ${f('nat')} national, holder of ${esc(OPT_EN[v('idtype')]||v('idtype'))} No. (${f('idno')})`;
+const toEmpE=()=>`${hon()} ${f('ename')}`+(v('jtitle')?` — ${f('jtitle')}`:'');
+const dearE=()=>`<p>Dear ${hon()} ${f('ename')},</p>`;
+const violE=()=>`<p>On ${fdateE('vdate')}, the following occurred: ${f('viol')}.</p>`;
+const grievE=`<p>You have the right to file a written grievance against this decision within thirty (30) days, excluding official holidays, from the date you are notified of it, in accordance with Article 72 of the Labor Law.</p>`;
+const LE={
+ salary:{t:'Salary Certificate',body:()=>{const tot=n('b')+n('h')+n('tr')+n('o');const sal=$('showsal')&&$('showsal').checked;const a=v('addr');
+  return `<p><b>${!a||a==='إلى من يهمه الأمر'?'To Whom It May Concern':'To: '+esc(a)}</b></p><p>Dear Sir/Madam,</p>
+  <p>This is to certify that ${whoE()}, has been employed by ${f('company')} as (${f('jtitle')}) since ${fdateE('hire')} and remains in service to date.</p>`+
+  (sal?`<p>${He()} receives a total monthly salary of SAR ${money(tot)}, broken down as follows:</p>
+  <table><tr><th>Basic salary</th><td>SAR ${money(n('b'))}</td></tr><tr><th>Housing allowance</th><td>SAR ${money(n('h'))}</td></tr><tr><th>Transport allowance</th><td>SAR ${money(n('tr'))}</td></tr>${n('o')?`<tr><th>Other allowances</th><td>SAR ${money(n('o'))}</td></tr>`:''}<tr><th>Total</th><td><b>SAR ${money(tot)}</b></td></tr></table>`:'')+
+  `<p>This certificate has been issued at ${his()} request without any liability on the company towards third parties.</p><p>Yours faithfully,</p>`}},
+ exp:{t:'Experience Certificate',body:()=>`<p><b>To Whom It May Concern</b></p><p>Dear Sir/Madam,</p>
+  <p>This is to certify that ${whoE()}, worked at ${f('company')} as (${f('jtitle')}) from ${fdateE('hire')} to ${fdateE('end')}.</p>`+
+  ($('praise')&&$('praise').checked?`<p>During ${his()} employment, ${he()} was an example of commitment and good performance. We wish ${him()} every success.</p>`:'')+
+  `<p>This certificate has been issued at ${his()} request without any liability on the company.</p>`},
+ notice:{t:'Formal Notice',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}<p>We would like to draw your attention to the following:</p>${violE()}
+  <p>This constitutes a breach of the company's approved work regulations. We therefore expect you to comply with work rules and instructions and not to repeat this in the future.</p><p>Best regards,</p>`},
+ warn1:{t:'First Written Warning',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}<p>We hereby issue you this first written warning.</p>${violE()}
+  <p>This warning follows notifying you of the violation, hearing your statement and investigating your defence. Your conduct constitutes a breach of the company's approved work regulations.</p>
+  <p>Please note that any repetition of the violation will expose you to the penalties set out in the work regulations.</p>${grievE}`},
+ warnF:{t:'Final Warning',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}<p>We hereby issue you this final warning.</p>${violE()}
+  <p>This warning follows notifying you of the violation, hearing your statement and investigating your defence, and despite the previous notices given to you.</p>
+  <p>Please note that this is your last warning. If the violation is repeated, statutory action will be taken in accordance with the work regulations and the Labor Law.</p>${grievE}`},
+ invest:{t:'Investigation Summons',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}
+  <p>You are requested to attend on ${fdateE('idate')} at ${fe('itime')} at ${fe('iplace')} for an investigation into the violation attributed to you on ${fdateE('vdate')}, namely: ${f('viol')}.</p>
+  <p>The purpose of the investigation is to hear your statement and defence before any action is taken, in accordance with the work regulations and the Labor Law.</p>`},
+ deduct:{t:'Notice of Wage Deduction Penalty',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}${violE()}
+  <p>After notifying you of the violation, hearing your statement and investigating your defence, it has been decided to impose a penalty of deducting (${n('ddays')||blank}) day${n('ddays')===1?'':'s'}' wages, as provided in the company's approved work regulations.</p>${grievE}`},
+ resign:{t:'Resignation Letter',body:()=>`<p><b>To: The Management of ${f('company')}</b></p><p>Dear Sirs,</p>
+  <p>I hereby submit my resignation from my position as (${f('jtitle')}), with my last working day being ${fdateE('last')}.</p>`+
+  (v('reason')?`<p>Reason: ${esc(v('reason'))}.</p>`:'')+`<p>I thank you for the opportunity to work with you and wish the company continued success.</p>`},
+ acceptR:{t:'Acceptance of Resignation',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}
+  <p>With reference to your resignation submitted on ${fdateE('rdate')}, we hereby accept it, with your last working day being ${fdateE('last')}.</p>
+  <p>Your statutory dues will be paid in accordance with the Labor Law upon completion of clearance procedures. We thank you for your contribution during your employment and wish you every success.</p>`},
+ clear:{t:'Clearance Certificate',body:()=>`<p>${f('company')} certifies that ${whoE()}, employed as (${f('jtitle')}), whose last working day is ${fdateE('last')}, has obtained clearance from the following departments:</p>
+  <table><tr><th>Department</th><th>Notes</th><th>Name & signature</th></tr><tr><td>Direct manager</td><td></td><td></td></tr><tr><td>Administrative affairs & HR</td><td></td><td></td></tr><tr><td>Finance (advances & custody)</td><td></td><td></td></tr><tr><td>IT</td><td></td><td></td></tr><tr><td>Warehouse / physical custody</td><td></td><td></td></tr></table>`},
+ offer:{t:'Job Offer',body:()=>{const tot=n('b')+n('h')+n('tr')+n('o');return `${dearE()}
+  <p>${f('company')} is pleased to offer you employment as (${f('jtitle')}) on the following terms:</p>
+  <table><tr><th>Basic salary</th><td>SAR ${money(n('b'))}</td></tr><tr><th>Housing allowance</th><td>SAR ${money(n('h'))}</td></tr><tr><th>Transport allowance</th><td>SAR ${money(n('tr'))}</td></tr>${n('o')?`<tr><th>Other allowances</th><td>SAR ${money(n('o'))}</td></tr>`:''}<tr><th>Gross salary</th><td><b>SAR ${money(tot)}</b></td></tr>
+  <tr><th>Expected start date</th><td>${fdateE('start')}</td></tr><tr><th>Contract term</th><td>${fe('dur')}</td></tr><tr><th>Probation period</th><td>${n('prob')||blank} days</td></tr><tr><th>Annual leave</th><td>21 days; 30 days after 5 continuous years</td></tr><tr><th>Medical insurance & social insurance (GOSI)</th><td>As per regulations and company policy</td></tr></table>
+  <p>This offer is valid until ${fdateE('valid')} and will be finalised by signing the employment contract and documenting it on Qiwa.</p>`}},
+ join:{t:'Joining Notice',body:()=>`<p>Dear Sir/Madam,</p><p>We hereby confirm that ${whoE()}, commenced ${his()} work at ${f('company')} as (${f('jtitle')}) on ${fdateE('start')}.</p><p>Signed accordingly.</p>`},
+ nonrenew:{t:'Notice of Non-Renewal of Contract',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}
+  <p>We wish to inform you that your employment contract expires on ${fdateE('cend')}, and the company has decided not to renew it.</p>
+  <p>Your statutory dues will be paid in accordance with the Labor Law after the contract ends and clearance procedures are completed. We thank you for your contribution during your employment.</p>`},
+ prob:{t:'Termination During Probation',body:()=>`<p><b>${toEmpE()}</b></p>${dearE()}
+  <p>We inform you that it has been decided to terminate your employment contract during the probation period, effective ${fdateE('tdate')}, pursuant to the probation provisions of your contract.</p>
+  <p>Your wages for the days actually worked and your leave balance, if any, will be paid upon completion of clearance procedures.</p>`},
+ term:{t:'Notice of Termination of Service',body:()=>{const r=v('treason'),d=fdateE('tdate');let p1='',full=true;
+  if(/وفاة/.test(r))return `<p><b>To the heirs of the late ${f('ename')}</b></p><p>Dear Sir/Madam,</p><p>${f('company')} extends its sincere condolences on the passing of the late ${f('ename')}, who worked with us as (${f('jtitle')}). May ${he()} rest in peace.</p><p>We inform you that the employment contract ended by death on ${d}. ${gE('His','Her')} statutory dues, including the end-of-service award, will be paid to the legal heirs in accordance with the applicable regulations.</p>`;
+  if(/انتهاء العمل المتفق/.test(r))p1=`As the work agreed in your employment contract has been completed, we inform you that the contract ends effective ${d}.`;
+  else if(/لغير سبب مشروع/.test(r))p1=`We inform you that your employment contract is terminated effective ${d}.`;
+  else if(/عجز/.test(r))p1=`Based on the approved medical report confirming your total incapacity to work, we inform you that your employment contract ends effective ${d}.`;
+  else if(/إخلال صاحب العمل/.test(r))p1=`With reference to your leaving work on ${d} for the reasons stated in your letter, we confirm the end of the contractual relationship, with all your statutory rights preserved.`;
+  else if(/الزواج/.test(r))p1=`With reference to your ending your employment contract within six months of the date of your marriage contract, we confirm that the contract ends effective ${d}, with entitlement to the full end-of-service award.`;
+  else if(/الولادة/.test(r))p1=`With reference to your ending your employment contract within three months of giving birth, we confirm that the contract ends effective ${d}, with entitlement to the full end-of-service award.`;
+  else if(/انتهاء مدة/.test(r))p1=`We wish to inform you that your employment contract expires on ${d}, and the company has decided not to renew it.`;
+  else if(/باتفاق/.test(r))p1=`Further to the agreement between both parties, we confirm the termination of your employment contract by mutual consent, effective ${d}.`;
+  else if(/سبب مشروع/.test(r))p1=`We inform you that your employment contract is terminated for a valid reason, namely: ${f('tcause')}, with the contract ending on ${d} after the notice period of (${n('tnotice')||blank}) days.`;
+  else if(/مخالفة جسيمة/.test(r)){full=false;p1=`We inform you that it has been decided to dismiss you effective ${d}, without an end-of-service award, notice or compensation, due to: ${esc(OPT_EN[v('tsub')]||v('tsub'))}, after you were given the opportunity to state your reasons for objecting to the dismissal.`}
+  else if(/التجربة/.test(r)){full=false;p1=`We inform you that it has been decided to terminate your employment contract during the probation period, effective ${d}, pursuant to the probation provisions of your contract.`}
+  else if(/التقاعد/.test(r))p1=`We inform you that your employment contract ends on reaching retirement age, effective ${d}.`;
+  else if(/إغلاق/.test(r))p1=`Due to the permanent closure of the establishment, we inform you that your employment contract ends effective ${d}.`;
+  else if(/المرض/.test(r))p1=`As you have exhausted the sick leave periods set by law, we inform you that your employment contract is terminated effective ${d}.`;
+  else p1=`Due to force majeure beyond the control of both parties, namely: ${f('tcause')}, we inform you that your employment contract ends effective ${d}.`;
+  const p2=full?`Your statutory dues, including the end-of-service award${/لغير سبب مشروع/.test(r)?' and the applicable compensation':''}, will be paid in accordance with the Labor Law upon completion of clearance procedures.`:`Your wages for the days actually worked and your leave balance, if any, will be paid upon completion of clearance procedures.`;
+  return `<p><b>${toEmpE()}</b></p>${dearE()}<p>${p1}</p><p>${p2}</p>`}},
+ leave:{t:'Leave Approval',body:()=>{let days=blank,ret=blank;const a=v('from'),b=v('to');if(a&&b){const d=(Date.parse(b)-Date.parse(a))/864e5+1;if(d>0){days=d;const r=new Date(Date.parse(b)+864e5);ret=`${String(r.getUTCDate()).padStart(2,'0')}/${String(r.getUTCMonth()+1).padStart(2,'0')}/${r.getUTCFullYear()}`}}
+  return `<p><b>${toEmpE()}</b></p>${dearE()}<p>We are pleased to approve your ${esc(OPT_EN[v('ltype')]||v('ltype'))} leave of (${days}) day${days===1?'':'s'}, from ${fdateE('from')} to ${fdateE('to')}. You are expected to resume work on ${ret}.</p><p>We wish you a pleasant leave.</p>`}}
+};
+
 const order=[['salary','تعريف بالراتب'],['exp','شهادة خبرة'],['leave','موافقة على إجازة'],['notice','لفت نظر'],['invest','استدعاء للتحقيق'],['warn1','إنذار أول'],['warnF','إنذار نهائي'],['deduct','جزاء خصم'],['resign','استقالة'],['acceptR','قبول استقالة'],['term','إنهاء خدمة'],['clear','إخلاء طرف']];
 let cur='salary';
 const LOGO_OK=/^data:image\/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+\/=]+$/;let logo='';try{logo=localStorage.getItem('mq-logo')||'';if(!LOGO_OK.test(logo))logo=''}catch(e){}
 const store={};
 function saveSpecific(){document.querySelectorAll('#specific input,#specific textarea,#specific select').forEach(e=>{store[e.id]=e.type==='checkbox'?e.checked:e.value})}
-function renderTypes(){$('types').innerHTML=order.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${l}</button>`).join('')}
+function renderTypes(){$('types').innerHTML=order.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${EN()?ORDER_EN[k]:l}</button>`).join('')}
 function renderFields(){
   const fs=L[cur].fields;
-  $('specific').innerHTML=fs.map(([id,lab,en,type,cls,def])=>{
+  $('specific').innerHTML=fs.map(([id,lab0,en0,type,cls,def])=>{const lab=EN()?en0:lab0,en=EN()?lab0:en0;
     const c=cls?` class="${cls}"`:'';const val=store[id]!==undefined?store[id]:(typeof def==='string'?def:'');
     if(type==='check')return `<label class="chk full"><input id="${id}" type="checkbox" ${store[id]===false?'':'checked'}> ${lab}</label>`;
     if(type==='textarea')return `<label${c}>${lab}<em>${en}</em><textarea id="${id}">${esc(val)}</textarea></label>`;
-    if(type==='select')return `<label${c}>${lab}<em>${en}</em><select id="${id}">${def.map(o=>`<option${store[id]===o?' selected':''}>${o}</option>`).join('')}</select></label>`;
+    if(type==='select')return `<label${c}>${lab}<em>${en}</em><select id="${id}">${def.map(o=>`<option value="${esc(o)}"${store[id]===o?' selected':''}>${EN()?(OPT_EN[o]||o):o}</option>`).join('')}</select></label>`;
     return `<label${c}>${lab}<em>${en}</em><input id="${id}" type="${type}" ${type==='number'?'min="0" step="0.01" inputmode="decimal"':''} value="${esc(val)}"></label>`}).join('');
   $('specific').querySelectorAll('input,textarea,select').forEach(e=>{e.addEventListener('input',draw);e.addEventListener('change',draw)});
 }
 function draw(){
   const T=L[cur];
+  if(EN()){const E=LE[cur];
+   const meta=`<div class="meta">Date: ${fdateE('ldate')}${v('ref')?`<br>Ref.: ${esc(v('ref'))}`:''}</div>`;
+   const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${esc(logo)}" alt="">`:''}<b>${f('company')}</b><small>${v('city')?esc(v('city'))+' · ':''}Kingdom of Saudi Arabia</small></div>${meta}</div>`;
+   let sig;
+   if(T.from==='emp')sig=`<div class="sig"><div><b>Submitted by</b><br>Name: ${f('ename')}<br>Signature: ………………</div></div>`;
+   else sig=`<div class="sig"><div><b>${fe('stitle')}</b><br>Name: ${f('sname')}<br>Signature: ………………<br>Stamp:</div>`+
+     (T.emp&&!(cur==='term'&&/وفاة/.test(v('treason')))?`<div><b>Employee acknowledgement of receipt</b><br>Name: ${f('ename')}<br>Signature: ………………<br>Date: ………………</div>`:'')+
+     (T.cand?`<div><b>Candidate's acceptance</b><br>Name: ${f('ename')}<br>Signature: ………………<br>Date: ………………</div>`:'')+`</div>`;
+   const mark=$('mark').checked?`<div class="mark">Letter by Your HR Lifesaver — EMAN HR · hreman01.github.io</div>`:'';
+   $('paper').innerHTML=lh+`<h3>${E.t}</h3>`+E.body()+sig+mark;return}
   const meta=`<div class="meta">التاريخ: ${fdate('ldate')}${v('ref')?`<br>الرقم: ${esc(v('ref'))}`:''}</div>`;
   const lh=`<div class="lh"><div>${logo?`<img class="logo" src="${esc(logo)}" alt="">`:''}<b>${f('company')}</b><small>${v('city')?esc(v('city'))+' · ':''}المملكة العربية السعودية</small></div>${meta}</div>`;
   let sig;
@@ -305,19 +409,82 @@ $('types').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
 document.querySelectorAll('#common input,#common select,.lt .grid:last-child input').forEach(e=>{e.addEventListener('input',draw);e.addEventListener('change',draw)});
 $('mark').addEventListener('change',draw);$('sname').addEventListener('input',draw);$('stitle').addEventListener('input',draw);
 $('print').addEventListener('click',()=>window.print());
-$('copy').addEventListener('click',()=>{const t=$('paper').innerText;const b=$('copy');const done=()=>{const o=b.textContent;b.textContent='تم النسخ';setTimeout(()=>b.textContent=o,1500)};
+$('copy').addEventListener('click',()=>{const t=$('paper').innerText;const b=$('copy');const done=()=>{const o=b.textContent;b.textContent=EN()?'Copied':'تم النسخ';setTimeout(()=>b.textContent=o,1500)};
   try{navigator.clipboard.writeText(t).then(done,()=>{fb(t);done()})}catch(x){fb(t);done()}});
 function fb(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove()}
 $('clear').addEventListener('click',()=>{document.querySelectorAll('.lt input[type=text],.lt input[type=date],.lt input[type=number],.lt textarea').forEach(e=>{if(e.id!=='stitle')e.value=''});for(const k in store)delete store[k];renderFields();draw()});
 function showLogo(){$('logoBox').hidden=!logo;if(logo)$('logoPrev').src=logo}
 $('logo').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;
-  if(file.size>2*1024*1024){alert('حجم الشعار كبير، اختر صورة أقل من 2 ميجا');e.target.value='';return}
-  const r=new FileReader();r.onload=()=>{if(!LOGO_OK.test(r.result)){alert('نوع الملف غير مدعوم');return}logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
+  if(file.size>2*1024*1024){alert(EN()?'Logo is too large — choose an image under 2 MB':'حجم الشعار كبير، اختر صورة أقل من 2 ميجا');e.target.value='';return}
+  const r=new FileReader();r.onload=()=>{if(!LOGO_OK.test(r.result)){alert(EN()?'File type not supported':'نوع الملف غير مدعوم');return}logo=r.result;try{localStorage.setItem('mq-logo',logo)}catch(x){}showLogo();draw()};r.readAsDataURL(file)});
 $('logoDel').addEventListener('click',()=>{logo='';$('logo').value='';try{localStorage.removeItem('mq-logo')}catch(x){}showLogo();draw()});
 const h=location.hash.slice(1);if(Object.prototype.hasOwnProperty.call(L,h))cur=h;
 showLogo();
 const t=new Date();$('ldate').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
 renderTypes();renderFields();draw();
+window.addEventListener('mqlang',()=>{saveSpecific();renderTypes();renderFields();draw()});
+})();
+</script>
+<script>window.MQ_SKIP="script,style,noscript,.mq-lang,#paper,#types,#specific,textarea";</script>
+<script id="mq-lang-js">
+(function(){
+var D={"الخطابات": "Letters", "لوحة المؤشرات 📊": "KPI Dashboard 📊", "أداء الموظف 🎯": "Employee Performance 🎯", "النماذج 📋": "Forms 📋", "الحاسبات ←": "← Calculators", "عبّ الخانات، والخطاب يتجهز على طول. بعدها اطبعه أو احفظه PDF، أو انسخ النص.": "Fill in the fields and the letter is ready instantly. Then print it, save it as PDF, or copy the text.", "حذف الشعار": "Remove logo", "ذكر": "Male", "أنثى": "Female", "هوية وطنية": "National ID", "إقامة": "Iqama", "إظهار \"خطاب من منقذك\" أسفل الخطاب": "Show \"Letter by Your HR Lifesaver\" at the bottom", "طباعة / حفظ PDF": "Print / Save PDF", "نسخ النص": "Copy text", "تصفير": "Clear", "© 2026 إيمان | EMAN HR — جميع الحقوق محفوظة، ويُمنع النسخ أو إعادة النشر دون ذكر المصدر": "© 2026 Eman | EMAN HR — All rights reserved. Do not copy or republish without crediting the source", "منقذك · Your HR Lifesaver": "Your HR Lifesaver", "الخطابات استرشادية، وراجعها مع لائحة تنظيم العمل في منشأتك قبل الاستخدام.": "Letters are for guidance; review them against your company's work regulations before use.", "منقذك": "Your HR Lifesaver", "Your HR Lifesaver": "منقذك", "نوع الخطاب": "Letter type"},T={},USE_T=false;
+var R={};for(var k in D)R[D[k]]=k;
+var TK=Object.keys(T).sort(function(a,b){return b.length-a.length});
+var AR=/[؀-ۿ]/;
+var DYN='.how,.status,.v,.rows';
+var SKIP=window.MQ_SKIP||'script,style,noscript,.mq-lang,#paper,#doc,#viewer,[data-en],textarea';
+function isPairSub(n){var p=n.parentNode;return p&&/^(EM|SMALL|I)$/.test(p.tagName)&&p.parentNode&&p.parentNode.matches&&p.parentNode.matches('label,h1,h2,.k')}
+function swapPairs(){
+  document.querySelectorAll('label,h1,h2,.k').forEach(function(el){
+    if(el.closest(SKIP))return;
+    var sub=el.querySelector(':scope>em,:scope>small,:scope>i'); if(!sub||!sub.textContent.trim())return;
+    var main=null;
+    for(var i=0;i<el.childNodes.length;i++){var n=el.childNodes[i]; if(n===sub)continue;
+      if(n.nodeType===3&&n.textContent.trim()){main=n;break}
+      if(n.nodeType===1&&/^(SPAN|B)$/.test(n.tagName)&&n.textContent.trim()&&!n.querySelector('input,select')){main=n;break}}
+    if(!main)return;
+    var a=main.textContent,b=sub.textContent; main.textContent=b; sub.textContent=a;
+  });
+}
+function setT(n,r){var p=n.parentNode; if(p&&p.tagName==='OPTION'&&!p.hasAttribute('value'))p.setAttribute('value',n.textContent); n.textContent=r;}
+function look(map,s){ if(map[s]!==undefined)return map[s]; var t=s.trim(); if(t&&map[t]!==undefined)return s.replace(t,map[t]); return null; }
+function tok(s){ if(!AR.test(s))return null; var o=s; for(var i=0;i<TK.length;i++){ if(o.indexOf(TK[i])>-1) o=o.split(TK[i]).join(T[TK[i]]); } return o===s?null:o; }
+function walk(map,root){
+  var w=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT,null),n,list=[];
+  while(n=w.nextNode()){ if(!n.parentNode||n.parentNode.closest(SKIP)||isPairSub(n))continue; list.push(n); }
+  list.forEach(function(n){ var r=look(map,n.textContent); if(r===null&&map===D&&USE_T&&n.parentNode.closest(DYN))r=tok(n.textContent); if(r!==null)setT(n,r); });
+  (root||document).querySelectorAll('[placeholder]').forEach(function(e){ if(e.parentNode.closest(SKIP))return; var r=map['PH:'+e.placeholder]; if(r!==undefined){e.dataset.ph=e.placeholder; e.placeholder=r.replace(/^PH:/,'');} else if(map===R&&e.dataset.ph){e.placeholder=e.dataset.ph;} });
+}
+function swapRich(l){
+  document.querySelectorAll('[data-en]').forEach(function(e){ if(l==='en'){ if(!e.dataset.ar)e.dataset.ar=e.innerHTML; e.innerHTML=e.dataset.en; } else if(e.dataset.ar){ e.innerHTML=e.dataset.ar; } });
+}
+var cur='ar', obs=null, busy=false;
+function observe(on){
+  if(obs){obs.disconnect();obs=null}
+  if(!on)return;
+  obs=new MutationObserver(function(ms){ if(busy)return; busy=true;
+    ms.forEach(function(m){
+      if(m.type==='characterData'){ var n=m.target; if(n.parentNode&&!n.parentNode.closest(SKIP)&&!isPairSub(n)){ var r=look(D,n.textContent); if(r===null&&USE_T&&n.parentNode.closest(DYN))r=tok(n.textContent); if(r!==null)setT(n,r); } }
+      m.addedNodes&&m.addedNodes.forEach(function(a){ if(a.nodeType===3){ if(a.parentNode&&!a.parentNode.closest(SKIP)){ var r=look(D,a.textContent); if(r===null&&USE_T&&a.parentNode.closest(DYN))r=tok(a.textContent); if(r!==null)setT(a,r); } } else if(a.nodeType===1&&!a.closest(SKIP)) walk(D,a); });
+    }); busy=false; });
+  obs.observe(document.body,{subtree:true,childList:true,characterData:true});
+}
+function setLang(l,init){
+  if(l===cur)return;
+  observe(false);
+  swapPairs(); walk(l==='en'?D:R); swapRich(l);
+  document.documentElement.lang=l; document.documentElement.dir=(l==='en'?'ltr':'rtl'); cur=l;
+  document.querySelectorAll('.mq-lang button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});
+  try{localStorage.setItem('mq_lang',l)}catch(e){}
+  window.dispatchEvent(new Event('mqlang'));
+  if(l==='en')observe(true);
+  else if(USE_T&&!init){ document.querySelectorAll('input,select').forEach(function(e){ if(e.offsetParent!==null) e.dispatchEvent(new Event('input',{bubbles:true})); }); }
+}
+document.querySelectorAll('option').forEach(function(o){ if(!o.hasAttribute('value')) o.setAttribute('value',o.textContent); });
+document.querySelectorAll('.mq-lang button').forEach(function(b){b.onclick=function(){setLang(b.dataset.l)}});
+function boot(){ try{ if(localStorage.getItem('mq_lang')==='en')setLang('en',true) }catch(e){} }
+if(document.readyState==='complete')setTimeout(boot,0); else window.addEventListener('load',function(){setTimeout(boot,0)});
 })();
 </script>
 </body>

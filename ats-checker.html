@@ -640,9 +640,11 @@ function render(R,noScroll){
     if(!R.detected)h+='<div class="hint" style="margin-bottom:8px">⚠️ ما لقينا نقاط منظمة، فحللنا أطول الأسطر بدلاً منها.</div>';
     h+=`<div class="weak"><div style="font-size:13px;color:var(--bad);font-weight:800">أضعف نقطة في سيرتك — ${weak.s}/100</div><div class="q">«${esc(weak.t)}»</div>
       <div class="tip"><b>${sg.ar?'كيف تحسّنها:':'How to improve:'}</b><ul style="margin:4px 0;padding-inline-start:18px">${sg.tips.map(t=>`<li>${esc(t)}</li>`).join('')||'<li>جيدة — يمكنك إضافة نتيجة أوضح.</li>'}</ul>
-      ${sg.ar?'قالب مقترح:':'Suggested template:'}<code dir="${sg.ar?'rtl':'ltr'}">${esc(sg.tpl)}</code></div></div>`;
-    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div></div></div>`).join('')}</details></div>`;
-    h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">✏️ عدّلي نقاطك بنفسك مع اقتراحات</button>`;$('bullets').innerHTML=h;$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
+      <b style="display:block;margin-top:6px">✨ ${sg.ar?'النقطة بعد التحسين:':'Improved bullet:'}</b><code dir="${sg.ar?'rtl':'ltr'}" id="wkFix">${esc(smartFix(weak.t))}</code>
+      <div style="font-size:12.5px;color:var(--mut);margin:4px 0 6px">${sg.ar?'غيّر اللي بين [ ] لأرقامك الحقيقية.':'Replace the [ ] with your real numbers.'}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn2" data-apb="w" style="flex:1">✏️ ${sg.ar?'طبّقها على سيرتي':'Apply to my CV'}</button><button type="button" class="btn2" data-cpb="w" style="flex:1">📋 ${sg.ar?'نسخ':'Copy'}</button></div></div></div>`;
+    h+=`<div class="blist"><details><summary>عرض تقييم كل النقاط (${S.length})</summary>${S.map(b=>`<div class="bl"><div class="sc" style="background:${colL(b.s)};color:${col(b.s)}">${b.s}</div><div><div dir="auto">${esc(b.t)}</div><div class="tags">${b.verb?'<em>✓ فعل قوي</em>':'<em>✕ بدون فعل</em>'}${b.num?'<em>✓ أرقام</em>':b.res?'<em>✓ نتيجة</em>':'<em>— بدون رقم</em>'}${b.unfinished?'<em>✕ غير مكتملة</em>':''}${b.odd?'<em>✕ رقم غير منطقي</em>':''}${b.pas?'<em>✕ صياغة سلبية</em>':''}${b.thin?'<em>✕ قصيرة</em>':''}</div>${b.s<100?`<div dir="auto" style="margin-top:5px;font-size:13.5px;color:var(--blue-d,#5b4a8a)">✨ ${esc(smartFix(b.t))}</div><button type="button" class="btn2" data-apb="${S.indexOf(b)}" style="margin-top:5px;padding:3px 10px;font-size:12.5px">✏️ طبّق</button>`:''}</div></div>`).join('')}</details></div>`;
+    h+=document.querySelector('.tipsbox').outerHTML;h+=`<button class="btn2" id="goEdit" style="width:100%;margin-top:10px">✏️ عدّلي نقاطك بنفسك مع اقتراحات</button>`;$('bullets').innerHTML=h;$('bullets').onclick=e=>{const ap=e.target.closest('[data-apb]'),cp=e.target.closest('[data-cpb]');if(ap){const b=ap.dataset.apb==='w'?weak:S[+ap.dataset.apb];applyBullet(b.t,smartFix(b.t))}else if(cp){const x=smartFix(weak.t);try{navigator.clipboard.writeText(x).then(()=>toast('تم النسخ ✅'),()=>toast('حدد النص وانسخه'))}catch(_){toast('حدد النص وانسخه')}}};$('goEdit').onclick=()=>{if($('builder').style.display!=='block')$('openB').click();$('manual').open=true;setTimeout(()=>$('weakFix').scrollIntoView({behavior:'smooth'}),400)};
   }
   try{renderRec(recruiterEval(lastCV,$('jd').value,R))}catch(e){console.warn(e);$('recCard').style.display='none'}
   lastReport=[`تقرير فحص السيرة الذاتية ATS — منقذك | EMAN HR`,`الدرجة الشاملة: ${R.total}/100 — ${v[0]}`,`التنسيق: ${R.fmtScore} | قوة النقاط: ${R.bScore} | الكلمات المفتاحية: ${R.kwScore==null?'—':R.kwScore}`,``,`أهم الإصلاحات:`,...R.F.map((f,i)=>`${i+1}. ${f.t}`),...(lastRec?['',`رأي مسؤول التوظيف: ${lastRec.avg}/100 — ${lastRec.verdict==='ok'?'مرشح للمقابلة':lastRec.verdict==='imp'?'يحتاج تحسين':'مرفوض مبدئيًا'}`,...lastRec.K.map(k=>'• '+k)]:[]),
@@ -1326,6 +1328,14 @@ const RK={
 };
 let advTarget=null;
 const FEN={'الهندسة المدنية والإنشاءات':'Civil Engineering & Construction','الهندسة الكهربائية والميكانيكية':'Electrical & Mechanical Engineering','الموارد البشرية':'Human Resources','المحاسبة والمالية':'Accounting & Finance','المبيعات':'Sales','التسويق':'Marketing','تقنية المعلومات':'Information Technology','الإدارة والسكرتارية':'Administration & Secretarial','المشتريات وسلاسل الإمداد':'Procurement & Supply Chain','خدمة العملاء':'Customer Service'};
+function smartFix(t){const ar=isAr(t);let b=improveBullet(t).replace(/[.،\s]+$/,'');if(numInfo(b).real)return b+'.';const n=norm(b);
+  const P=ar?[[/(توظيف|استقطاب|مقابلات|شواغر)/,'، وتوظيف [عدد] موظف خلال [المدة]'],[/(رواتب|مسير)/,' لـ[عدد] موظف شهرياً بدون أخطاء'],[/(جزاء|انضباط|مخالف|انذار)/,'، مما خفّض المخالفات بنسبة [X]% خلال [المدة]'],[/(تقرير|تقارير)/,' بشكل [شهري] لـ[عدد] إدارات'],[/(مبيعات|عملاء)/,'، وتحقيق [X]% من المستهدف'],[/(حضور|انصراف|اجاز)/,' لـ[عدد] موظف'],[/(اشراف|فريق|موظفا|موظفين)/,'، وتحقيق [النتيجة] بنسبة [X]%'],[/(ملفات|ارشيف|سجلات)/,' لـ[عدد] ملف، وتقليل وقت البحث [X]%']]
+   :[[/(recruit|hiring|interview|vacanc)/i,', hiring [N] employees within [period]'],[/(payroll|salar)/i,' for [N] employees monthly with zero errors'],[/(disciplin|violation|warning)/i,', reducing violations by [X]% within [period]'],[/(report)/i,' [monthly] for [N] departments'],[/(sales|client|customer)/i,', achieving [X]% of target'],[/(supervis|team|led|manag)/i,', achieving [result] of [X]%']];
+  for(const [re,s] of P)if(re.test(n)||re.test(b))return b+s+'.';
+  return b+(ar?'، مما حقق [النتيجة] بنسبة [X]% خلال [المدة].':', resulting in [result] of [X]% within [period].')}
+function applyBullet(oldT,newT){const run=()=>{let ok=false;for(const sec of ['experience','other']){if(!$('s-'+sec))continue;ok=syncLine(sec,oldT,newT)||syncLine(sec,improveBullet(oldT).replace(/[.،\s]+$/,''),newT)||syncLine(sec,improveBullet(oldT),newT);if(ok)break}
+   try{updatePreview();renderImprove()}catch(e){}toast(ok?tr('✅ طبّقناها على سيرتك — غيّر اللي بين [ ] لأرقامك','✅ Applied to your CV — replace the [ ] with your real numbers'):tr('انسخها والصقها مكان النقطة في «تعديل يدوي»','Copy it and paste it in place of the bullet under “Manual edit”'))};
+  if($('builder').style.display!=='block'){$('openB').click();setTimeout(run,700)}else run()}
 function eduText(cv){try{const P=parseCV(cv);return (P.sec.education||[]).join('\n')}catch(e){return ''}}
 function majorField(edu){const n=norm(edu);for(const [f,o] of Object.entries(RK)){if(f==='خدمة العملاء')continue;if(o.maj.test(n)||o.maj.test(edu))return f}return null}
 function renderAdvice(cv,jd){
@@ -1421,10 +1431,21 @@ function renderAI(cv,jd){
   <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0"><label style="font-weight:700">${T('لغة السيرة النهائية:','Final CV language:')}</label>
   <select id="aiOut" style="font:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff"><option value="bi">${T('عربي + إنجليزي','Arabic + English')}</option><option value="ar">${T('عربي','Arabic')}</option><option value="en">English</option></select></div>
   <button class="btn" id="aiCopy" style="margin-top:0">📋 ${T('انسخ الأمر الجاهز','Copy the ready prompt')}</button>
-  <div class="actions" style="margin-top:8px"><a class="btn2" href="https://claude.ai/new" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${T('افتح Claude','Open Claude')} ↗</a><a class="btn2" href="https://chatgpt.com/" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${T('افتح ChatGPT','Open ChatGPT')} ↗</a></div>
+  <div class="actions" style="margin-top:8px"><button type="button" class="btn2" id="aiClaude">${T('انسخ وافتح Claude','Copy & open Claude')} ↗</button><button type="button" class="btn2" id="aiGpt">${T('انسخ وافتح ChatGPT','Copy & open ChatGPT')} ↗</button></div>
+  <div id="aiDone" style="display:none;margin-top:10px;background:var(--blue-l);border-radius:10px;padding:10px;font-size:14px;line-height:1.7"></div>
+  <textarea id="aiBox" readonly dir="auto" style="display:none;width:100%;min-height:140px;margin-top:8px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:10px;padding:8px"></textarea>
   <div class="hint" style="margin-top:8px">🔒 ${T('سيرتك ما تنحفظ عندنا. احذف رقم الهوية أو الإقامة من السيرة قبل ما تلصقها في أي موقع.','We don’t store your CV. Remove your ID/Iqama number before pasting it anywhere.')}</div>`;
   card.style.display='';
-  $('aiCopy').onclick=async()=>{const p=aiPrompt(cv,jd,$('aiOut').value);try{await navigator.clipboard.writeText(p);toast(T('تم نسخ الأمر ✅ الصقه في Claude أو ChatGPT','Prompt copied ✅ paste it in Claude or ChatGPT'))}catch(e){const ta=document.createElement('textarea');ta.value=p;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(T('تم النسخ ✅','Copied ✅'))}catch(_){toast(T('تعذر النسخ','Copy failed'))}ta.remove()}};
+  const box=$('aiBox'),done=$('aiDone');
+  const doCopy=()=>{const p=aiPrompt(cv,jd,$('aiOut').value);box.value=p;box.style.display='block';
+    let ok=false;try{box.removeAttribute('readonly');box.focus({preventScroll:true});box.select();box.setSelectionRange(0,p.length);ok=document.execCommand('copy');box.setAttribute('readonly','');box.blur()}catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(p).then(()=>show(true),()=>show(ok))}else show(ok);
+    return p};
+  const show=ok=>{done.style.display='block';done.innerHTML=ok?T('✅ تم نسخ الأمر. افتح Claude أو ChatGPT، اضغط مطوّلًا في خانة الكتابة واختر «لصق»، ثم أرسل.','✅ Prompt copied. Open Claude or ChatGPT, long-press the message box, choose “Paste”, then send.'):T('⚠️ جهازك منع النسخ التلقائي. اضغط مطوّلًا على النص في المربع تحت، اختر «تحديد الكل» ثم «نسخ».','⚠️ Your device blocked automatic copying. Long-press the text in the box below, choose “Select All”, then “Copy”.')};
+  $('aiCopy').onclick=()=>{doCopy()};
+  const go=base=>{const p=doCopy();const q=encodeURIComponent(p);window.open(q.length<7000?base+q:base.replace(/\?q=$|new\?q=$/,''),'_blank','noopener')};
+  $('aiClaude').onclick=()=>go('https://claude.ai/new?q=');
+  $('aiGpt').onclick=()=>go('https://chatgpt.com/?q=');
 }
 
 function collect(){
